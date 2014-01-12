@@ -1,10 +1,14 @@
 package gsalgos;
 
+import java.io.IOException;
+import org.graphstream.algorithm.community.CommunityDetectionLouvain;
+import org.graphstream.stream.GraphParseException;
+
 public class App 
 {
-    public static void main( String[] args )
+    public static void main( String[] args ) throws IOException, GraphParseException
     {
-        System.out.println("Hello, world!");
+        (new CommunityDetectionLouvain()).findCommunities("data/smalltest.gml");
     }
     
 }
