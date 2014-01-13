@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.graphstream.algorithm.measure.Modularity;
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -25,7 +26,7 @@ import org.graphstream.stream.GraphParseException;
  */
 public class CommunityDetectionLouvain {
     
-    private Graph graph;
+    private Graph graph, graphPhase2;
     HashMap<Node, Integer> map; // Map every node to an index number.
     HyperCommunity[] communityPerNode; // Each cell contains the community of the node
                                        // who has index the number of the cell.
@@ -34,7 +35,8 @@ public class CommunityDetectionLouvain {
             newModularity,
             initialModularity,
             deltaQ;
-    String bestCommunity;
+    String  oldCommunity,
+            bestCommunity;
     
     // Used for colors.
     Random color;
@@ -42,10 +44,10 @@ public class CommunityDetectionLouvain {
     
     Map<String,ArrayList<Node>> mySortedMap;
     
-    public void findCommunities(String fileName) throws IOException, GraphParseException {
+    public ListMultimap<String, Node> findCommunities(String fileName) throws IOException, GraphParseException {
             
             graph = new SingleGraph("communities");
-            graph.display(true);  // Display the nodes in a nice aesthetic way.
+            //graph.display(true);  // Display the nodes in a nice aesthetic way.
             graph.read(fileName); // Import from the text file.
             
             int N = graph.getNodeCount();
@@ -60,9 +62,18 @@ public class CommunityDetectionLouvain {
                 // Add community attribute to each node, so modularity alg can identify which
                 // nodes belong to each community.
                 node.addAttribute("community", communityPerNode[node.getIndex()].getId());
+                
+                // Since every node is a community by itself, increase the outerEdgesCount of the
+                // community by the number of edges that leave the node.
+                communityPerNode[node.getIndex()].increaseOuterEdgesCount(node.getOutDegree());
             }
             
-            modularity = new Modularity("community");
+            // Add an initial weight of 1.0 in each edge
+            for (Edge edge : graph.getEdgeSet()) {
+                edge.addAttribute("weight", 1.0);
+            }
+            
+            modularity = new Modularity("community","weight");
             modularity.init(graph);
             
             do {
@@ -71,7 +82,8 @@ public class CommunityDetectionLouvain {
 
                     maxModularity = -2.0;
                     newModularity = -2.0;
-                    bestCommunity = node.getAttribute("community");
+                    oldCommunity = node.getAttribute("community");
+                    bestCommunity = oldCommunity;
 
                     Iterator<Node> neighbours = node.getNeighborNodeIterator();
                     System.out.println("Node " + node.getId());
@@ -88,6 +100,7 @@ public class CommunityDetectionLouvain {
 
                         // Find the community that if the node is transfered to, the modularity gain
                         // is the maximum.
+                        // In case of tie, the breaking rule is always to take the one that was checked last.
                         if(newModularity > maxModularity) {
                             maxModularity = newModularity;
                             bestCommunity = node.getAttribute("community");
@@ -95,7 +108,9 @@ public class CommunityDetectionLouvain {
                     }
 
                     // Mode node to the best community
-                    node.changeAttribute("community", bestCommunity);
+                    if(node.getAttribute("community") != bestCommunity) {
+                        node.changeAttribute("community", bestCommunity);
+                    }
                     System.out.println("best community to go: " + node.getAttribute("community"));
                     System.out.println("");
                 }
@@ -121,5 +136,24 @@ public class CommunityDetectionLouvain {
                     iterator.next().addAttribute("ui.style", "fill-color: rgb("+r+","+g+","+b+"); size: 20px;");
                 }
             }
+            
+            return multimap;
 	}
+    
+    public void shrinkCommunities(ListMultimap<String, Node> multimap) {
+        
+        graphPhase2 = new SingleGraph("communitiesPhase2");
+        graphPhase2.display(true);
+        graphPhase2.setAutoCreate(true); // configuration to create nodes automatically
+                                         // when edges are created.
+        
+//        for(String community : multimap.keySet()) {
+            
+//            List<Node> communityNodes = multimap.get(community);
+//            Iterator<Node> iterator = communityNodes.iterator();
+//            while(iterator.hasNext()) {
+//                iterator.next().addAttribute("ui.style", "fill-color: rgb("+r+","+g+","+b+"); size: 20px;");
+//            }
+//        }
+    }
 }
