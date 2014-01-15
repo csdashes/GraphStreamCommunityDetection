@@ -7,6 +7,7 @@ package org.graphstream.algorithm.community;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -48,13 +49,13 @@ public class CommunityDetectionLouvain {
     
     private Iterator<Node> neighbours;
     
-    public ListMultimap<String, Node> findCommunities(String fileName) throws IOException, GraphParseException {
+    public void findCommunities(String fileName) throws IOException, GraphParseException {
             
             graph = new SingleGraph("communities");
             graph.display(true);  // Display the nodes in a nice aesthetic way.
             graph.read(fileName); // Import from the text file.
             
-            int N = graph.getNodeCount();
+            
             communities = new HashMap<String,HyperCommunity>();
             manager = new HyperCommunityManager();
             
@@ -68,8 +69,6 @@ public class CommunityDetectionLouvain {
                 // nodes belong to each community.
                 node.addAttribute("community", community.getAttribute());
                 
-                // Initialize the outer edges count of the node's community
-                community.initOuterEdgesCount(node);
                 communities.put(community.getAttribute(), community);
             }
             
@@ -80,8 +79,6 @@ public class CommunityDetectionLouvain {
             
             modularity = new Modularity("community","weight");
             modularity.init(graph);
-            
-//            outerEdgesToChange = new HashMap<String,Integer>();
             
             do {
                 initialModularity = modularity.getMeasure();
@@ -119,7 +116,8 @@ public class CommunityDetectionLouvain {
                         node.changeAttribute("community", bestCommunity);
                     }
                     // Commented for the moment. Maybe it will be used later.
-                    // Count the inner and outer edges that the node that changes community is connected to.
+                    // Count the inner and outer edges that the node that changes community is connected to, 
+                    // simmultaniously with the community calculation.
 //                    if(node.getAttribute("community") != oldCommunity) {
 //                        neighbours = node.getNeighborNodeIterator();
 //                        while(neighbours.hasNext()) {
@@ -157,8 +155,10 @@ public class CommunityDetectionLouvain {
                 community = communities.get(node.getAttribute("community"));
                 community.increaseNodesCount();
                 neighbours = node.getNeighborNodeIterator();
+                System.out.println("Node: " + node.getId() + " / neighbours communities: ");
                 while (neighbours.hasNext()) {
                     String neighbourCommunity = neighbours.next().getAttribute("community");
+                    System.out.print(neighbourCommunity + ", ");
                     if (neighbourCommunity.equals(node.getAttribute("community"))) {
                         community.increaseInnerEdgesCount();
                     } else {
@@ -166,7 +166,9 @@ public class CommunityDetectionLouvain {
                     }
                 }
                 communities.put(community.getAttribute(), community);
+                System.out.println("");
             }
+
             
             // Remove from the map the communities with 0 nodes.
             for(Iterator<Entry<String, HyperCommunity>> it = communities.entrySet().iterator(); it.hasNext(); ) {
@@ -180,7 +182,8 @@ public class CommunityDetectionLouvain {
             System.out.println("Communities for next phase: ");
             for(Iterator<Entry<String, HyperCommunity>> it = communities.entrySet().iterator(); it.hasNext(); ) {
                 Entry<String, HyperCommunity> entry = it.next();
-                System.out.println(communities.get(entry.getKey()).getAttribute());
+                System.out.println(communities.get(entry.getKey()).getAttribute() 
+                        + " outers: " + communities.get(entry.getKey()).getOuterEdgesCount());
             }
             
             // Color the nodes of one community with the same (random) color.
@@ -197,23 +200,48 @@ public class CommunityDetectionLouvain {
                 }
             }
             
-            return multimap;
+            shrinkCommunities(communities);
+            
 	}
     
-    public void shrinkCommunities(ListMultimap<String, Node> multimap) {
+    public void shrinkCommunities(Map<String,HyperCommunity> communities) {
         
         graphPhase2 = new SingleGraph("communitiesPhase2");
         graphPhase2.display(true);
         graphPhase2.setAutoCreate(true); // configuration to create nodes automatically
                                          // when edges are created.
         
-//        for(String community : multimap.keySet()) {
-            
-//            List<Node> communityNodes = multimap.get(community);
-//            Iterator<Node> iterator = communityNodes.iterator();
-//            while(iterator.hasNext()) {
-//                iterator.next().addAttribute("ui.style", "fill-color: rgb("+r+","+g+","+b+"); size: 20px;");
-//            }
-//        }
+        String edgeIdentifierWayOne,
+               edgeIdentifierWayTwo;
+        Entry<String, HyperCommunity> communityEntry;
+        Entry<String, Integer> outerEdgeEntry;
+        List<String> edgeIdentifiers = new ArrayList<String>();
+        Edge edge;
+        
+        for(Iterator<Entry<String, HyperCommunity>> it = communities.entrySet().iterator(); it.hasNext(); ) {
+            communityEntry = it.next();
+            Map<String,Integer> outerEdges = communityEntry.getValue().getOuterEdgesCount();
+            for(Iterator<Entry<String, Integer>> outerEdgesIt = outerEdges.entrySet().iterator(); outerEdgesIt.hasNext(); ) {
+                outerEdgeEntry = outerEdgesIt.next();
+                edgeIdentifierWayOne = communityEntry.getKey() + ":" + outerEdgeEntry.getKey();
+                edgeIdentifierWayTwo = outerEdgeEntry.getKey() + ":" + communityEntry.getKey();
+                if(!edgeIdentifiers.contains(edgeIdentifierWayOne) && !edgeIdentifiers.contains(edgeIdentifierWayTwo)) {
+                    if(graphPhase2.getNode(communityEntry.getKey()) == null) {
+                        graphPhase2.addNode(communityEntry.getKey()).addAttribute("ui.label", communityEntry.getKey());
+                    }
+                    if(graphPhase2.getNode(outerEdgeEntry.getKey()) == null) {
+                        graphPhase2.addNode(outerEdgeEntry.getKey()).addAttribute("ui.label", outerEdgeEntry.getKey());
+                    }
+                    edge = graphPhase2.addEdge(edgeIdentifierWayOne, 
+                            communityEntry.getKey(), 
+                            outerEdgeEntry.getKey());
+                    edge.addAttribute("weight", Double.parseDouble(String.valueOf(outerEdgeEntry.getValue())));
+                    edge.addAttribute("ui.label", outerEdgeEntry.getValue());
+                    
+                    edgeIdentifiers.add(edgeIdentifierWayOne);
+                    edgeIdentifiers.add(edgeIdentifierWayTwo);
+                }
+            }
+        }
     }
 }
