@@ -8,7 +8,14 @@ public class App
 {
     public static void main( String[] args ) throws IOException, GraphParseException
     {
-        (new CommunityDetectionLouvain()).findCommunities("data/smalltest.gml");
+        CommunityDetectionLouvain louvain = new CommunityDetectionLouvain();
+        louvain.init("data/dolphins.gml");
+//        while(!louvain.isModularityMaximized()) {
+//            louvain.execute();
+//        }
+        for(int i=0;i<2;i++) {
+            louvain.execute();
+        }
     }
     
 }
