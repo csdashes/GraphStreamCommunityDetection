@@ -146,4 +146,8 @@ public class HyperCommunity extends Community {
             this.outerEdgesCount.put((String)neighbours.next().getAttribute("community"),1);
         }
     }
+    
+    public void finilizeInnerEdgesCount() {
+        this.innerEdgesCount/=2;
+    }
 }

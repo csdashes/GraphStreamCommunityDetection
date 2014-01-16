@@ -27,16 +27,18 @@ import org.graphstream.stream.GraphParseException;
  */
 public class CommunityDetectionLouvain {
 
-    private Graph graph, graphPhase2;
+    private Graph graph, graphPhase2, pervGraph;
     private HyperCommunityManager manager;
-    private Map<String, HyperCommunity> communities;
+    //private Map<String, HyperCommunity> communities;
+    private List<Map<String, HyperCommunity>> communitiesPerPhase;
     private Modularity modularity;
     private double maxModularity,
             newModularity,
             initialModularity,
             deltaQ,
             globalMaxQ,
-            globalNewQ;
+            globalNewQ,
+            prevQ;
     private String oldCommunity,
             bestCommunity;
     // Used for colors.
@@ -49,24 +51,31 @@ public class CommunityDetectionLouvain {
     public void init(String fileName) throws IOException, GraphParseException {
 
         step = 1;
-        communities = new HashMap<String, HyperCommunity>();
+        communitiesPerPhase = new ArrayList<Map<String, HyperCommunity>>();
         manager = new HyperCommunityManager();
         
         globalMaxQ = -2.0;
-        globalNewQ = 0.0;
         this.fileName = fileName;
     }
     
     public void execute() throws IOException, GraphParseException {
         
-        if(step == 1) {
-            step1Init();
-        } else {
-            findCommunities();
-            foldingCommunities();
-        }
+//        if(step == 1) {
+//            step1Init();
+//        } else {
+//            findCommunities();
+//            foldingCommunities();
+//        }
+//        
+//        step++;
         
-        step++;
+        this.graph = step1Init();
+        globalNewQ = findCommunities(this.graph);
+        while(globalNewQ > globalMaxQ) {
+            globalMaxQ = globalNewQ;
+            this.graph = foldingCommunities(this.graph);
+            globalNewQ = findCommunities(this.graph);
+        }
     }
     
     public boolean isModularityMaximized() {
@@ -76,7 +85,7 @@ public class CommunityDetectionLouvain {
     public Graph step1Init() throws IOException, GraphParseException {
         
         graph = new SingleGraph("communities");
-        graph.display(true);  // Display the nodes in a nice aesthetic way.
+        //graph.display(true);  // Display the nodes in a nice aesthetic way.
         graph.read(fileName); // Import from the text file.
         
         // Add an initial weight of 1.0 in each edge
@@ -84,13 +93,16 @@ public class CommunityDetectionLouvain {
             edge.addAttribute("weight", 1.0);
         }
         
-        modularity = new Modularity("community", "weight");
-        modularity.init(graph);
-        
         return graph;
     }
 
-    public void findCommunities() {
+    public double findCommunities(Graph graph) {
+        
+        
+        modularity = new Modularity("community", "weight");
+        modularity.init(graph);
+        
+        Map<String, HyperCommunity> communities = new HashMap<String, HyperCommunity>();
         
 	for (Node node : graph) {
             node.addAttribute("ui.label", node.getId()); // Add a label in every node.
@@ -103,6 +115,7 @@ public class CommunityDetectionLouvain {
             node.addAttribute("community", community.getAttribute());
 
             communities.put(community.getAttribute(), community);
+            communitiesPerPhase.add(communities);
         }
 
         do {
@@ -170,11 +183,20 @@ public class CommunityDetectionLouvain {
             }
             deltaQ = modularity.getMeasure() - initialModularity;
         } while (deltaQ > 0); // Loop until there is no improvement in modularity
-
-        //globalNewQ = modularity.getMeasure();
         
+        return modularity.getMeasure();
+    }
+    
+    public void countEdges() {
+        
+
+    }
+
+    public Graph foldingCommunities(Graph graph) {
+        
+        graph.display(true);
         // Group nodes by community and count the edge types
-        // TO-DO: it counts the inner edges double. Implement the method in HyperCommunityManager
+        Map<String, HyperCommunity> communities = communitiesPerPhase.get(communitiesPerPhase.size()-1);
         ListMultimap<String, Node> multimap = ArrayListMultimap.create();
         HyperCommunity community;
         for (Node node : graph) {
@@ -182,10 +204,8 @@ public class CommunityDetectionLouvain {
             community = communities.get(node.getAttribute("community"));
             community.increaseNodesCount();
             neighbours = node.getNeighborNodeIterator();
-            System.out.println("Node: " + node.getId() + " / neighbours communities: ");
             while (neighbours.hasNext()) {
                 String neighbourCommunity = neighbours.next().getAttribute("community");
-                System.out.print(neighbourCommunity + ", ");
                 if (neighbourCommunity.equals(node.getAttribute("community"))) {
                     community.increaseInnerEdgesCount();
                 } else {
@@ -193,7 +213,6 @@ public class CommunityDetectionLouvain {
                 }
             }
             communities.put(community.getAttribute(), community);
-            System.out.println("");
         }
 
 
@@ -211,6 +230,7 @@ public class CommunityDetectionLouvain {
             Entry<String, HyperCommunity> entry = it.next();
             System.out.println(communities.get(entry.getKey()).getAttribute()
                     + " outers: " + communities.get(entry.getKey()).getOuterEdgesCount());
+            communities.get(entry.getKey()).finilizeInnerEdgesCount();
         }
 
         // Color the nodes of one community with the same (random) color.
@@ -227,21 +247,19 @@ public class CommunityDetectionLouvain {
             }
         }
 
-    }
-
-    public void foldingCommunities() {
-
         graphPhase2 = new SingleGraph("communitiesPhase2");
-        graphPhase2.display(true);
+        //graphPhase2.display(true);
         graphPhase2.setAutoCreate(true); // configuration to create nodes automatically
         // when edges are created.
 
         String edgeIdentifierWayOne,
-                edgeIdentifierWayTwo;
+               edgeIdentifierWayTwo,
+               edgeIdentifierSelfie;
         Entry<String, HyperCommunity> communityEntry;
         Entry<String, Integer> outerEdgeEntry;
         List<String> edgeIdentifiers = new ArrayList<String>();
         Edge edge;
+        int innerEdges;
 
         for (Iterator<Entry<String, HyperCommunity>> it = communities.entrySet().iterator(); it.hasNext();) {
             communityEntry = it.next();
@@ -252,10 +270,10 @@ public class CommunityDetectionLouvain {
                 edgeIdentifierWayTwo = outerEdgeEntry.getKey() + ":" + communityEntry.getKey();
                 if (!edgeIdentifiers.contains(edgeIdentifierWayOne) && !edgeIdentifiers.contains(edgeIdentifierWayTwo)) {
                     if (graphPhase2.getNode(communityEntry.getKey()) == null) {
-                        graphPhase2.addNode(communityEntry.getKey()).addAttribute("ui.label", communityEntry.getKey());
+                        graphPhase2.addNode(communityEntry.getKey());
                     }
                     if (graphPhase2.getNode(outerEdgeEntry.getKey()) == null) {
-                        graphPhase2.addNode(outerEdgeEntry.getKey()).addAttribute("ui.label", outerEdgeEntry.getKey());
+                        graphPhase2.addNode(outerEdgeEntry.getKey());
                     }
                     edge = graphPhase2.addEdge(edgeIdentifierWayOne,
                             communityEntry.getKey(),
@@ -267,6 +285,29 @@ public class CommunityDetectionLouvain {
                     edgeIdentifiers.add(edgeIdentifierWayTwo);
                 }
             }
+            innerEdges = communityEntry.getValue().getInnerEdgesCount();
+            edgeIdentifierSelfie = communityEntry.getKey() + ":" + communityEntry.getKey();
+            edge = graphPhase2.addEdge(edgeIdentifierSelfie,
+                            communityEntry.getKey(),
+                            communityEntry.getKey());
+            edge.addAttribute("weight", Double.parseDouble(String.valueOf(innerEdges)));
+            edge.addAttribute("ui.label", innerEdges);
         }
+        
+//        modularity = new Modularity("community", "weight");
+//        modularity.init(graphPhase2);
+//        
+//        for (Node node : graphPhase2) {
+//            // Every node belongs to a different community.
+//            HyperCommunity community = manager.communityFactory();
+//
+//            // Add community attribute to each node, so modularity alg can identify which
+//            // nodes belong to each community.
+//            node.addAttribute("community", community.getAttribute());
+//        }
+//        
+//        System.out.println("Phase2 modularity: " + modularity.getMeasure());
+        
+        return graphPhase2;
     }
 }

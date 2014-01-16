@@ -10,12 +10,7 @@ public class App
     {
         CommunityDetectionLouvain louvain = new CommunityDetectionLouvain();
         louvain.init("data/dolphins.gml");
-//        while(!louvain.isModularityMaximized()) {
-//            louvain.execute();
-//        }
-        for(int i=0;i<2;i++) {
-            louvain.execute();
-        }
+        louvain.execute();
     }
     
 }
