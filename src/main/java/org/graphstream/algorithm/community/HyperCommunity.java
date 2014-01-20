@@ -1,49 +1,73 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.graphstream.algorithm.community;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import org.graphstream.graph.Node;
 
 /**
- *
+ * The HyperCommunity adds additional functionality to the Community, to serve
+ * the needs of the community detection algorithms.
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class HyperCommunity extends Community {
     
-    LinkedList<Integer> nodesIndexes;
     private int nodesCount;
     private int innerEdgesCount;
     private Map<String,Integer> outerEdgesCount;
+    private Set<String> communityNodes;
     
+    /**
+     * Initializing global variables.
+     */
     public HyperCommunity() {
         super();
         this.nodesCount = 0;
         this.innerEdgesCount = 0;
         this.outerEdgesCount = new HashMap<String,Integer>();
+        this.communityNodes = new HashSet<String>();
     }
     
+    /**
+     * Appends a set of node ids which represents the contents of the community.
+     * @param newNodesSet the set to append.
+     */
+    public void addNodesSet(HashSet<String> newNodesSet) {
+        this.communityNodes.addAll(newNodesSet);
+    }
+    
+    public Set<String> getCommunityNodes() {
+        return this.communityNodes;
+    }
+    
+    /**
+     * Increase the node count by 1.
+     */
     public void increaseNodesCount() {
         this.nodesCount++;
     }
     
+    /**
+     * Decrease the node count by 1.
+     */
     public void descreaseNodeCount() {
         this.nodesCount--;
     }
     
+    /**
+     * @return the number of the nodes that the community has.
+     */
     public int getNodesCount() {
         return this.nodesCount;
     }
     
-    public void seed(int nodeIndex) {
-        nodesIndexes.add(nodeIndex);
-    }
-    
+    /**
+     * The attribute id of the community is the community's id, plus 1, to avoid
+     * having attributes starting from 0.
+     * @return the community's attribute id.
+     */
     public String getAttribute() {
         return String.valueOf(Integer.parseInt(this.getId()) + 1);
     }
@@ -140,6 +164,11 @@ public class HyperCommunity extends Community {
         this.innerEdgesCount -= number;
     }
     
+    /**
+     * For every neighbour node of the community, increase the outer edge count
+     * to 1 (since every node is a community in the beginning). Not used currently.
+     * @param node
+     */
     public void initOuterEdgesCount(Node node) {
         Iterator<Node> neighbours = node.getNeighborNodeIterator();
         while(neighbours.hasNext()) {
@@ -147,6 +176,9 @@ public class HyperCommunity extends Community {
         }
     }
     
+    /**
+     * Divide the inner edges count by 2 (in case they were calculated twice.
+     */
     public void finilizeInnerEdgesCount() {
         this.innerEdgesCount/=2;
     }
