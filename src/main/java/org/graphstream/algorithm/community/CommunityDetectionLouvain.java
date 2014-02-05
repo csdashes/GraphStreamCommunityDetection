@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import org.graphstream.algorithm.measure.Modularity;
+import org.graphstream.algorithm.measure.NormalizedMutualInformation;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -56,7 +57,10 @@ public class CommunityDetectionLouvain {
     // Sprites used to display the results on the screen.
     private SpriteManager sm;
     private Sprite communitiesCount,
-            modularityCount;
+            modularityCount,
+            nmiCount;
+    
+    private NormalizedMutualInformation nmi;
 
     /**
      * Initializing global variables.
@@ -122,6 +126,9 @@ public class CommunityDetectionLouvain {
             communityNodes.add(node.getId());
             node.addAttribute("trueCommunityNodes", communityNodes);
         }
+        
+        nmi = new NormalizedMutualInformation("community","referenceCommunity");
+        nmi.init(graph);
 
         return graph;
     }
@@ -148,7 +155,7 @@ public class CommunityDetectionLouvain {
 
         modularity = new Modularity("community", "weight");
         modularity.init(graph);
-
+       
         Map<String, HyperCommunity> communities = new HashMap<String, HyperCommunity>();
 
         for (Node node : graph) {
@@ -228,6 +235,8 @@ public class CommunityDetectionLouvain {
             }
             deltaQ = modularity.getMeasure() - initialModularity;
         } while (deltaQ > 0); // Loop until there is no improvement in modularity
+        
+        System.out.println("NMI: " + nmi.getMeasure());
 
         return modularity.getMeasure(); // Return the maximum modularity.
     }
@@ -263,6 +272,10 @@ public class CommunityDetectionLouvain {
         modularityCount = sm.addSprite("MC");
         modularityCount.setPosition(Units.PX, 20, 60, 0);
         modularityCount.setAttribute("ui.style", "size: 0px; text-color: rgb(150,100,100); text-size: 20;");
+        
+        nmiCount = sm.addSprite("NMIC");
+        nmiCount.setPosition(Units.PX, 20, 100, 0);
+        nmiCount.setAttribute("ui.style", "size: 0px; text-color: rgb(150,100,100); text-size: 20;");
 
         // Color every node of a community with the same random color.
         color = new Random();
@@ -277,6 +290,8 @@ public class CommunityDetectionLouvain {
                 n.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
                 modularityCount.setAttribute("ui.label",
                         String.format("Modularity: %f", modularity.getMeasure()));
+                nmiCount.setAttribute("ui.label",
+                        String.format("NMI: %f", nmi.getMeasure()));
                 sleep();
             }
 
