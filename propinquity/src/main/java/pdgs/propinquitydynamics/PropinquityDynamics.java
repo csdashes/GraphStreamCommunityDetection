@@ -95,6 +95,20 @@ public class PropinquityDynamics implements Algorithm {
             n.setAttribute("Nr", Nr);
         }
 
+        // Superstep 0 + 1
+        // We are ready to calculate the Angle Propinquity.
+        // We emulate the BSP by iterating all nodes. We know
+        // that each node sends messages to update pm map. So
+        // we will run in each node that will accept a message
+        // and we will do the updates
+        for (Node n : this.graph.getEachNode()) {
+            Set<Integer> Nr = n.getAttribute("Nr");
+
+            for (Integer nn : Nr) {
+                PU(nn, Nr, '+', true);
+            }
+        }
+
     }
 
     // PHASE 2
