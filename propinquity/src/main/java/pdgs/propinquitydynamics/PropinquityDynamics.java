@@ -178,6 +178,12 @@ public class PropinquityDynamics implements Algorithm {
             }
         }
 
+        if (this.debug) {
+            System.out.println("PHASE 2");
+            System.out.println("After initialization");
+            debug();
+        }
+
     }
 
     /**
