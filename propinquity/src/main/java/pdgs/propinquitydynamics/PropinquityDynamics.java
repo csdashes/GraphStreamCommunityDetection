@@ -28,6 +28,46 @@ public class PropinquityDynamics implements Algorithm {
         return out;
     }
 
+    private void PU(Integer u_i, Set<Integer> set, char operator) {
+        PU(u_i, set, operator, false);
+    }
+
+    private void PU(Integer u_i, Set<Integer> set, char operator, boolean skip) {
+        if (operator == '+') {
+            PUup(u_i, set, skip);
+        } else {
+            PUdown(u_i, set, skip);
+        }
+    }
+
+    private void PUdown(Integer u_i, Set<Integer> set, boolean skip) {
+        PropinquityMap pm = this.graph.getNode(u_i).getAttribute("pm");
+
+        for (Integer pu : set) {
+            if (skip) {
+                if (u_i != pu) {
+                    pm.decrease(pu);
+                }
+            } else {
+                pm.decrease(pu);
+            }
+        }
+    }
+
+    private void PUup(Integer u_i, Set<Integer> set, boolean skip) {
+        PropinquityMap pm = this.graph.getNode(u_i).getAttribute("pm");
+
+        for (Integer pu : set) {
+            if (skip) {
+                if (u_i != pu) {
+                    pm.increase(pu);
+                }
+            } else {
+                pm.increase(pu);
+            }
+        }
+    }
+
     public void set(int a, int b) {
         this.a = a;
         this.b = b;
