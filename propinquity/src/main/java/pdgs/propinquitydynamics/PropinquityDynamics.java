@@ -8,6 +8,7 @@ import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import pdgs.utils.MutableInt;
 import pdgs.utils.PropinquityMap;
 
 /**
@@ -154,6 +155,29 @@ public class PropinquityDynamics implements Algorithm {
 
     // PHASE 2
     public void compute() {
+        // Superstep 0 first part
+        // Init apropriate sets (Nd, Ni).
+        for (Node n : this.graph.getEachNode()) {
+            Set<Integer> Ni = new LinkedHashSet<Integer>(10);
+            Set<Integer> Nd = new LinkedHashSet<Integer>(10);
+            n.setAttribute("Ni", Ni);
+            n.setAttribute("Nd", Nd);
+
+            Set<Integer> Nr = n.getAttribute("Nr");
+            PropinquityMap pm = n.getAttribute("pm");
+            for (Entry<Integer, MutableInt> row : pm.entrySet()) {
+                Integer nodeID = row.getKey();
+                Integer propinquity = row.getValue().get();
+
+                if (propinquity < this.a && Nr.contains(nodeID)) {
+                    Nd.add(nodeID);
+                    Nr.remove(nodeID);
+                } else if (propinquity >= this.b && !Nr.contains(nodeID)) {
+                    Ni.add(nodeID);
+                }
+            }
+        }
+
     }
 
     /**
