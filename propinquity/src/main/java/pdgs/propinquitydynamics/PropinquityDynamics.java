@@ -85,12 +85,9 @@ public class PropinquityDynamics implements Algorithm {
 
             // The propinquity map
             PropinquityMap pm = new PropinquityMap(100);
-            // The decompose sets.
-            Set<Integer> Nr; //, Ni, Nd;
-
             // Get all neightbours of the current node.
             // And init Nr.
-            Nr = getNeightboursOf(n);
+            Set<Integer> Nr = getNeightboursOf(n);
 
             n.setAttribute("pm", pm);
             n.setAttribute("Nr", Nr);
