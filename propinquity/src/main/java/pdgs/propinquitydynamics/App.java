@@ -9,5 +9,17 @@ import org.graphstream.stream.GraphParseException;
 public class App {
     public static void main(String[] args) throws IOException, GraphParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
+        graph.display();
+        graph.read("../data/karate.gml");
+
+        PropinquityDynamics pd = new PropinquityDynamics();
+        pd.set(2, 4);
+        pd.init(graph);
+        
+        for (int i = 0; i < 40; i++) {
+            pd.compute();            
+        }
+                
+        pd.getResults();
     }
 }
