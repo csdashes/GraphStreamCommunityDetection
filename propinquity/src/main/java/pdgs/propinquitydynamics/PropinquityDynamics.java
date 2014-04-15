@@ -109,6 +109,12 @@ public class PropinquityDynamics implements Algorithm {
             }
         }
 
+        if (this.debug) {
+            System.out.println("PHASE 1");
+            System.out.println("After Angle Propinquity");
+            debug();
+        }
+
     }
 
     // PHASE 2
