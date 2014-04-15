@@ -115,6 +115,36 @@ public class PropinquityDynamics implements Algorithm {
             debug();
         }
 
+        // Superstep 1 + 2 + 3
+        // We need to DN (donate neighbors) to out neighbors. By this move
+        // we can calculate the Conjugate Propinquity. If your neighbor (B) has
+        // a common neighbor (C) with you (A), then this common neighbor (C) can
+        // understand that (A) and (B) are connected. Therefore, (C) can increase
+        // it's conjugate propinquity with any other vertex (D) that has (A) and (B)
+        // as common neighbors.
+        for (Node n : this.graph.getEachNode()) {
+            Set<Integer> Nr = n.getAttribute("Nr");
+
+            Iterator<Node> neighIt = n.getNeighborNodeIterator();
+
+            while (neighIt.hasNext()) {
+                Node neigh = neighIt.next();
+                // Note: IDs are unique! There is no way to have equal
+                if (neigh.getIndex() < n.getIndex()) {
+                    continue;
+                }
+
+                Set<Integer> neighNr = neigh.getAttribute("Nr");
+
+                // Nc <- Nr ^ Sr
+                Set<Integer> Nc = Sets.intersection(Nr, neighNr);
+
+                for (Integer nn : Nc) {
+                    PU(nn, Nc, '+', true);
+                }
+            }
+        }
+
     }
 
     // PHASE 2
