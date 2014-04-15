@@ -147,7 +147,6 @@ public class PropinquityDynamics implements Algorithm {
             System.out.println("After Conjugate Propinquity");
             debug();
         }
-
     }
 
     // PHASE 2
