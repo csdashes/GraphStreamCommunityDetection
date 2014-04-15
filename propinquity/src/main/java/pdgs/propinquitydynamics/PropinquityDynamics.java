@@ -8,6 +8,7 @@ import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import pdgs.utils.PropinquityMap;
 
 /**
  *
@@ -18,6 +19,15 @@ public class PropinquityDynamics implements Algorithm {
     private int a,b,e;
     private boolean debug = false;
 
+    private Set<Integer> getNeightboursOf(Node n) {
+        Set<Integer> out = new LinkedHashSet<Integer>(10);
+        Iterator<Node> it = n.getNeighborNodeIterator();
+        while (it.hasNext()) {
+            out.add(it.next().getIndex());
+        }
+        return out;
+    }
+
     public void set(int a, int b) {
         this.a = a;
         this.b = b;
@@ -25,6 +35,26 @@ public class PropinquityDynamics implements Algorithm {
     
     // PHASE 1
     public void init(Graph graph) {
+        this.graph = graph;
+
+        // Init data in each node
+        for (Node n : this.graph.getEachNode()) {
+            n.setAttribute("ui.label", n.getIndex());
+            n.setAttribute("ui.style", "size:20px;");
+
+            // The propinquity map
+            PropinquityMap pm = new PropinquityMap(100);
+            // The decompose sets.
+            Set<Integer> Nr; //, Ni, Nd;
+
+            // Get all neightbours of the current node.
+            // And init Nr.
+            Nr = getNeightboursOf(n);
+
+            n.setAttribute("pm", pm);
+            n.setAttribute("Nr", Nr);
+        }
+
     }
 
     // PHASE 2
