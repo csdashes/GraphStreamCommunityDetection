@@ -326,6 +326,13 @@ public class PropinquityDynamics implements Algorithm {
             debug();
         }
 
+        // Finishing step. Reset Nr.
+        for (Node n : this.graph.getEachNode()) {
+            Set<Integer> Nr = n.getAttribute("Nr");
+            Set<Integer> Nd = n.getAttribute("Nd");
+
+            n.setAttribute("Nr", Sets.union(Nr, Nd).copyInto(new LinkedHashSet<Integer>(20)));
+        }
     }
 
     /**
