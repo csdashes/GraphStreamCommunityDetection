@@ -180,6 +180,47 @@ public class PropinquityDynamics implements Algorithm {
             debug();
         }
 
+        // Superstep 0 second part
+        // Here again we update the Angle Propinquity. The difference is that we
+        // need to take care of nodes that should be inserted as new neighbors and
+        // delete neighbors that should not be with us any longer
+        //
+        // Nr will contain all nodes that have enough points to stay as 
+        // our neigbours (NOTE: not more than b but more than a points) and 
+        // there where our neightbors from the beginning.
+        // Ni will contain all nodes that we don't have as neighbors in the inital
+        // topology, but we want them to be in the same cluster with us.
+        // Nd will conatin all nodes that are our neighbors and we don't want them
+        // to be any more.
+        for (Node n : this.graph.getEachNode()) {
+            Set<Integer> Nr = n.getAttribute("Nr");
+            Set<Integer> Ni = n.getAttribute("Ni");
+            Set<Integer> Nd = n.getAttribute("Nd");
+
+            // The Ni nodes are new nodes to us. This means than we need to
+            // inform our current (by current means after cleaning Nr list with Nd)
+            // neighbours. We are the Angle Propinquity between our new Ni neighbours
+            // and our old Nr neighbrous.
+            // The same works for Nd.
+            for (Integer u_i : Nr) {
+                PU(u_i, Ni, '+');
+                PU(u_i, Nd, '-');
+            }
+            
+            // On the other hand, we need to inform our new neigbours to include
+            // our current and the other new neighbours.
+            for (Integer u_i : Ni) {
+                PU(u_i, Nr, '+');
+                PU(u_i, Ni, '+', true);
+            }
+            // When it comes to Nd, we need to take back all points we
+            // added so far.
+            for (Integer u_i : Nd) {
+                PU(u_i, Nr, '-');
+                PU(u_i, Nd, '-', true);
+            }
+        }
+
     }
 
     /**
