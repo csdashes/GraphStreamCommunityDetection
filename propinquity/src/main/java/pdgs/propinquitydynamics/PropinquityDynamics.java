@@ -221,6 +221,11 @@ public class PropinquityDynamics implements Algorithm {
             }
         }
 
+        if (this.debug) {
+            System.out.println("After Angle Propinquity");
+            debug();
+        }
+
     }
 
     /**
