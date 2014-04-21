@@ -8,6 +8,11 @@ import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import static pdgs.utils.CalculationTable.CalculateCdd;
+import static pdgs.utils.CalculationTable.CalculateCii;
+import static pdgs.utils.CalculationTable.CalculateCrd;
+import static pdgs.utils.CalculationTable.CalculateCri;
+import static pdgs.utils.CalculationTable.CalculateCrr;
 import pdgs.utils.MutableInt;
 import pdgs.utils.PropinquityMap;
 
@@ -226,6 +231,95 @@ public class PropinquityDynamics implements Algorithm {
             debug();
         }
 
+        // Not it's time to calculate the Conjugate Propinquity in the same we
+        // discussed before in the Phase 1. The only difference is that we need
+        // to take care again the Nd and Ni.
+        for (Node n : this.graph.getEachNode()) {
+            // Superstep 1 second part
+            Set<Integer> Nr = n.getAttribute("Nr");
+            Set<Integer> Nd = n.getAttribute("Nd");
+            Set<Integer> Ni = n.getAttribute("Ni");
+
+            for (Integer nn : Nr) {
+                if (nn > n.getIndex()) {
+                    Set<Integer> nnNr = this.graph.getNode(nn).getAttribute("Nr");
+                    Set<Integer> nnNi = this.graph.getNode(nn).getAttribute("Ni");
+                    Set<Integer> nnNd = this.graph.getNode(nn).getAttribute("Nd");
+
+                    if (nnNr.contains(n.getIndex())) {
+                        // Calculate Crr, Cri and Crd according to Table 1
+                        Set<Integer> Crr = CalculateCrr(Nr, nnNr);
+                        Set<Integer> Cri = CalculateCri(Nr, Ni, nnNr, nnNi);
+                        Set<Integer> Crd = CalculateCrd(Nr, Nd, nnNr, nnNd);
+
+                        for (Integer u_i : Crr) {
+                            // PU(u_i,Cri,+), PU(u_i,Crd,−)
+                            PU(u_i, Cri, '+');
+                            PU(u_i, Crd, '-');
+                        }
+                        for (Integer u_i : Cri) {
+                            // PU(u_i,Crr,+), PU(u_i,Cri−{u_i},+)
+                            PU(u_i, Crr, '+');
+                            PU(u_i, Cri, '+', true);
+                        }
+                        for (Integer u_i : Crd) {
+                            // PU(u_i,Crr,-), PU(u_i,Crd−{u_i},-)
+                            PU(u_i, Crr, '-');
+                            PU(u_i, Crd, '-', true);
+                        }
+                    }
+
+                    // Note: We might not those 2 here :/
+                    // Please look superstep 2 page 1003
+                    // paper: Parallel Community Detection on Large 
+                    // Networks with Propinquity Dynamics
+//                    if (nnNi.contains(n.getIndex())) {
+//                        Set<Integer> Cii = CalculateCii(Nr, Ni, nnNr, nnNi);
+//
+//                        for (Integer u_i : Cii) {
+//                            PU(u_i, Cii, '+', true);
+//                        }
+//                    }
+//                    if (nnNd.contains(n.getIndex())) {
+//                        Set<Integer> Cdd = CalculateCdd(Nr, Nd, nnNr, nnNd);
+//
+//                        for (Integer u_i : Cdd) {
+//                            PU(u_i, Cdd, '-', true);
+//                        }
+//                    }
+                }
+            }
+
+            for (Integer nn : Ni) {
+                if (nn > n.getIndex()) {
+                    Set<Integer> nnNr = this.graph.getNode(nn).getAttribute("Nr");
+                    Set<Integer> nnNi = this.graph.getNode(nn).getAttribute("Ni");
+
+                    if (nnNi.contains(n.getIndex())) {
+                        Set<Integer> Cii = CalculateCii(Nr, Ni, nnNr, nnNi);
+
+                        for (Integer u_i : Cii) {
+                            PU(u_i, Cii, '+', true);
+                        }
+                    }
+                }
+            }
+
+            for (Integer nn : Nd) {
+                if (nn > n.getIndex()) {
+                    Set<Integer> nnNr = this.graph.getNode(nn).getAttribute("Nr");
+                    Set<Integer> nnNd = this.graph.getNode(nn).getAttribute("Nd");
+
+                    if (nnNd.contains(n.getIndex())) {
+                        Set<Integer> Cdd = CalculateCdd(Nr, Nd, nnNr, nnNd);
+
+                        for (Integer u_i : Cdd) {
+                            PU(u_i, Cdd, '-', true);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
