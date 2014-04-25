@@ -98,6 +98,15 @@ public class PropinquityDynamics implements Algorithm {
             n.setAttribute("Nr", Nr);
         }
 
+        for (Node n : this.graph.getEachNode()) {
+            Set<Integer> Nr = n.getAttribute("Nr");
+            PropinquityMap pm = n.getAttribute("pm");
+            
+            for (Integer nn : Nr) {
+                pm.increase(nn);
+            }
+        }
+
         // Superstep 0 + 1
         // We are ready to calculate the Angle Propinquity.
         // We emulate the BSP by iterating all nodes. We know
