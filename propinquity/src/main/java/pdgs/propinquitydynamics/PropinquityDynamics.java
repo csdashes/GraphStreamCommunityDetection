@@ -23,7 +23,7 @@ import pdgs.utils.PropinquityMap;
 public class PropinquityDynamics implements Algorithm {
     Graph graph;
     private int a,b,e;
-    private boolean debug = false;
+    private boolean debug = false, statistics = false;
 
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
@@ -151,6 +151,10 @@ public class PropinquityDynamics implements Algorithm {
         if (this.debug) {
             System.out.println("After Conjugate Propinquity");
             debug();
+        }
+        
+        if (this.isStatistics()) {
+            
         }
     }
 
@@ -383,6 +387,14 @@ public class PropinquityDynamics implements Algorithm {
 
     public void debugOff() {
         this.debug = false;
+    }
+    
+    public void statisticsOn() {
+        this.statistics = true;
+    }
+
+    public void statisticsOff() {
+        this.statistics = false;
     }
 
     private void debug() {
