@@ -1,8 +1,10 @@
 package pdgs.propinquitydynamics;
 
 import com.google.common.collect.Sets;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
@@ -152,6 +154,24 @@ public class PropinquityDynamics implements Algorithm {
             System.out.println("After Conjugate Propinquity");
             debug();
         }
+        
+        Integer min,max;
+        min = Integer.MAX_VALUE;
+        max = Integer.MIN_VALUE;
+        for (Node n : this.graph.getEachNode()) {
+            PropinquityMap pm = n.getAttribute("pm");
+            
+            for (Entry<Integer,MutableInt> e : pm.entrySet()) {
+                    if (e.getValue().get() < min) {
+                        min = e.getValue().get();
+                    } else if (e.getValue().get() > max) {
+                        max = e.getValue().get();
+                    }
+            }
+        }
+        
+        System.out.println("Max : " + max);
+        System.out.println("Min : " + min);
     }
 
     // PHASE 2
@@ -397,6 +417,21 @@ public class PropinquityDynamics implements Algorithm {
 
     void getResults() {
         for (Node n : this.graph.getEachNode()) {
+            PropinquityMap pm = n.getAttribute("pm");
+            for (Entry<Integer, MutableInt> row : pm.entrySet()) {
+                Integer nodeID = row.getKey();
+                Integer propinquity = row.getValue().get();
+
+                if (propinquity < this.a) {
+                    if(n.getEdgeBetween(nodeID) != null) {
+                        n.getEdgeBetween(nodeID).addAttribute("ui.style", "fill-color: rgb(236,236,236);");
+                    }
+                } else if (propinquity >= this.b) {
+                    if(n.getEdgeBetween(nodeID) == null) {
+                        this.graph.addEdge(n.getId()+"and"+nodeID, n, this.graph.getNode(nodeID));
+                    }
+                }
+            }
             System.out.println("For Node: " + n.getIndex() + " pm: " + n.getAttribute("pm"));
         }
     }
