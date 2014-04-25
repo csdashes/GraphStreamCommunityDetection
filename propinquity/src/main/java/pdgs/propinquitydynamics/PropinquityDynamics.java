@@ -1,10 +1,8 @@
 package pdgs.propinquitydynamics;
 
 import com.google.common.collect.Sets;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
@@ -25,7 +23,7 @@ import pdgs.utils.PropinquityMap;
 public class PropinquityDynamics implements Algorithm {
     Graph graph;
     private int a,b,e;
-    private boolean debug = false;
+    private boolean debug = false, statistics = false;
 
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
@@ -100,6 +98,15 @@ public class PropinquityDynamics implements Algorithm {
             n.setAttribute("Nr", Nr);
         }
 
+        for (Node n : this.graph.getEachNode()) {
+            Set<Integer> Nr = n.getAttribute("Nr");
+            PropinquityMap pm = n.getAttribute("pm");
+            
+            for (Integer nn : Nr) {
+                pm.increase(nn);
+            }
+        }
+
         // Superstep 0 + 1
         // We are ready to calculate the Angle Propinquity.
         // We emulate the BSP by iterating all nodes. We know
@@ -155,23 +162,20 @@ public class PropinquityDynamics implements Algorithm {
             debug();
         }
         
-        Integer min,max;
-        min = Integer.MAX_VALUE;
-        max = Integer.MIN_VALUE;
-        for (Node n : this.graph.getEachNode()) {
-            PropinquityMap pm = n.getAttribute("pm");
+        if (this.statistics) {
+            // We use this class for just to make our work faster
+            PropinquityMap stats = new PropinquityMap(100);
             
-            for (Entry<Integer,MutableInt> e : pm.entrySet()) {
-                    if (e.getValue().get() < min) {
-                        min = e.getValue().get();
-                    } else if (e.getValue().get() > max) {
-                        max = e.getValue().get();
-                    }
+            for (Node n : this.graph.getEachNode()) {
+                PropinquityMap pm = n.getAttribute("pm");
+                
+                for (MutableInt i : pm.values()) {
+                    stats.increase(i.get());
+                }
             }
+            
+            System.out.println(stats);
         }
-        
-        System.out.println("Max : " + max);
-        System.out.println("Min : " + min);
     }
 
     // PHASE 2
@@ -403,6 +407,14 @@ public class PropinquityDynamics implements Algorithm {
 
     public void debugOff() {
         this.debug = false;
+    }
+    
+    public void statisticsOn() {
+        this.statistics = true;
+    }
+
+    public void statisticsOff() {
+        this.statistics = false;
     }
 
     private void debug() {

@@ -14,6 +14,7 @@ public class App {
 
         PropinquityDynamics pd = new PropinquityDynamics();
         pd.set(2, 4);
+        pd.statisticsOn();
         pd.init(graph);
         
         for (int i = 0; i < 40; i++) {
