@@ -153,8 +153,19 @@ public class PropinquityDynamics implements Algorithm {
             debug();
         }
         
-        if (this.isStatistics()) {
+        if (this.statistics) {
+            // We use this class for just to make our work faster
+            PropinquityMap stats = new PropinquityMap(100);
             
+            for (Node n : this.graph.getEachNode()) {
+                PropinquityMap pm = n.getAttribute("pm");
+                
+                for (MutableInt i : pm.values()) {
+                    stats.increase(i.get());
+                }
+            }
+            
+            System.out.println(stats);
         }
     }
 
