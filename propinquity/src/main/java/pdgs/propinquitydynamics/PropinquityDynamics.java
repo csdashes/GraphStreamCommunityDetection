@@ -98,6 +98,8 @@ public class PropinquityDynamics implements Algorithm {
             n.setAttribute("Nr", Nr);
         }
 
+        // The paper algorithm does not include the propinquity increase of
+        // the direct neighbours
         for (Node n : this.graph.getEachNode()) {
             Set<Integer> Nr = n.getAttribute("Nr");
             PropinquityMap pm = n.getAttribute("pm");
