@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
 import org.graphstream.graph.Graph;
@@ -24,6 +25,11 @@ public class PropinquityDynamics implements Algorithm {
     Graph graph;
     private int a,b,e;
     private boolean debug = false, statistics = false;
+    
+    
+    // Used for colors.
+    private Random color;
+    private int r, g, bb;
 
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
@@ -450,7 +456,25 @@ public class PropinquityDynamics implements Algorithm {
                     }
                 }
             }
-            System.out.println("For Node: " + n.getIndex() + " pm: " + n.getAttribute("pm"));
+            //System.out.println("For Node: " + n.getIndex() + " pm: " + n.getAttribute("pm"));
+        }
+        color = new Random();
+        for (Node n : this.graph.getEachNode()) {
+            if(!n.hasAttribute("visited")) {
+                r = color.nextInt(255);
+                g = color.nextInt(255);
+                bb = color.nextInt(255);
+                
+                n.setAttribute("visited", 1);
+                n.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + bb + "); size: 20px;");
+                Iterator<Node> breadth = n.getBreadthFirstIterator();
+                while(breadth.hasNext()) {
+                    Node next = breadth.next();
+                    next.setAttribute("visited", 1);
+                    next.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + bb + "); size: 20px;");
+                }
+            }
+            
         }
         System.out.println("Added: " + added);
         System.out.println("Removed: " + removed);
