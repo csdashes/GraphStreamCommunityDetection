@@ -430,6 +430,7 @@ public class PropinquityDynamics implements Algorithm {
     }
 
     void getResults() {
+        int added = 0, removed = 0;
         for (Node n : this.graph.getEachNode()) {
             PropinquityMap pm = n.getAttribute("pm");
             for (Entry<Integer, MutableInt> row : pm.entrySet()) {
@@ -438,15 +439,20 @@ public class PropinquityDynamics implements Algorithm {
 
                 if (propinquity < this.a) {
                     if(n.getEdgeBetween(nodeID) != null) {
-                        n.getEdgeBetween(nodeID).addAttribute("ui.style", "fill-color: rgb(236,236,236);");
+//                        n.getEdgeBetween(nodeID).addAttribute("ui.style", "fill-color: rgb(236,236,236);");
+                        this.graph.removeEdge(n.getEdgeBetween(nodeID));
+                        removed++;
                     }
                 } else if (propinquity >= this.b) {
                     if(n.getEdgeBetween(nodeID) == null) {
                         this.graph.addEdge(n.getId()+"and"+nodeID, n, this.graph.getNode(nodeID));
+                        added++;
                     }
                 }
             }
             System.out.println("For Node: " + n.getIndex() + " pm: " + n.getAttribute("pm"));
         }
+        System.out.println("Added: " + added);
+        System.out.println("Removed: " + removed);
     }
 }
