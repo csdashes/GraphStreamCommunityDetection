@@ -440,18 +440,18 @@ public class PropinquityDynamics implements Algorithm {
         for (Node n : this.graph.getEachNode()) {
             PropinquityMap pm = n.getAttribute("pm");
             for (Entry<Integer, MutableInt> row : pm.entrySet()) {
-                Integer nodeID = row.getKey();
+                Integer nodeIndex = row.getKey();
                 Integer propinquity = row.getValue().get();
 
                 if (propinquity < this.a) {
-                    if(n.getEdgeBetween(nodeID) != null) {
+                    if(n.getEdgeBetween(nodeIndex) != null) {
 //                        n.getEdgeBetween(nodeID).addAttribute("ui.style", "fill-color: rgb(236,236,236);");
-                        this.graph.removeEdge(n.getEdgeBetween(nodeID));
+                        this.graph.removeEdge(n.getEdgeBetween(nodeIndex));
                         removed++;
                     }
                 } else if (propinquity >= this.b) {
-                    if(n.getEdgeBetween(nodeID) == null) {
-                        this.graph.addEdge(n.getId()+"and"+nodeID, n, this.graph.getNode(nodeID));
+                    if(n.getEdgeBetween(nodeIndex) == null) {
+                        this.graph.addEdge(n.getId()+"and"+nodeIndex, n, this.graph.getNode(nodeIndex));
                         added++;
                     }
                 }
