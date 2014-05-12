@@ -199,14 +199,14 @@ public class PropinquityDynamics implements Algorithm {
             Set<Integer> Nr = n.getAttribute("Nr");
             PropinquityMap pm = n.getAttribute("pm");
             for (Entry<Integer, MutableInt> row : pm.entrySet()) {
-                Integer nodeID = row.getKey();
+                Integer nodeIndex = row.getKey();
                 Integer propinquity = row.getValue().get();
 
-                if (propinquity < this.a && Nr.contains(nodeID)) {
-                    Nd.add(nodeID);
-                    Nr.remove(nodeID);
-                } else if (propinquity >= this.b && !Nr.contains(nodeID)) {
-                    Ni.add(nodeID);
+                if (propinquity <= this.a && Nr.contains(nodeIndex)) {
+                    Nd.add(nodeIndex);
+                    Nr.remove(nodeIndex);
+                } else if (propinquity >= this.b && !Nr.contains(nodeIndex)) {
+                    Ni.add(nodeIndex);
                 }
             }
         }
@@ -227,7 +227,7 @@ public class PropinquityDynamics implements Algorithm {
         // there where our neightbors from the beginning.
         // Ni will contain all nodes that we don't have as neighbors in the inital
         // topology, but we want them to be in the same cluster with us.
-        // Nd will conatin all nodes that are our neighbors and we don't want them
+        // Nd will contain all nodes that are our neighbors and we don't want them
         // to be any more.
         for (Node n : this.graph.getEachNode()) {
             Set<Integer> Nr = n.getAttribute("Nr");
@@ -263,9 +263,9 @@ public class PropinquityDynamics implements Algorithm {
             debug();
         }
 
-        // Not it's time to calculate the Conjugate Propinquity in the same we
+        // Now it's time to calculate the Conjugate Propinquity in the same we
         // discussed before in the Phase 1. The only difference is that we need
-        // to take care again the Nd and Ni.
+        // to take into consideration again the Nd and Ni.
         for (Node n : this.graph.getEachNode()) {
             // Superstep 1 second part
             Set<Integer> Nr = n.getAttribute("Nr");
