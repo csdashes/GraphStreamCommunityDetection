@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
 import org.graphstream.graph.Graph;
@@ -24,7 +25,15 @@ public class PropinquityDynamics implements Algorithm {
     Graph graph;
     private int a,b,e;
     private boolean debug = false, statistics = false;
+<<<<<<< HEAD
     private String[] debugIDs;
+=======
+    
+    
+    // Used for colors.
+    private Random color;
+    private int r, g, bb;
+>>>>>>> FETCH_HEAD
 
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
@@ -194,14 +203,14 @@ public class PropinquityDynamics implements Algorithm {
             Set<Integer> Nr = n.getAttribute("Nr");
             PropinquityMap pm = n.getAttribute("pm");
             for (Entry<Integer, MutableInt> row : pm.entrySet()) {
-                Integer nodeID = row.getKey();
+                Integer nodeIndex = row.getKey();
                 Integer propinquity = row.getValue().get();
 
-                if (propinquity < this.a && Nr.contains(nodeID)) {
-                    Nd.add(nodeID);
-                    Nr.remove(nodeID);
-                } else if (propinquity >= this.b && !Nr.contains(nodeID)) {
-                    Ni.add(nodeID);
+                if (propinquity <= this.a && Nr.contains(nodeIndex)) {
+                    Nd.add(nodeIndex);
+                    Nr.remove(nodeIndex);
+                } else if (propinquity >= this.b && !Nr.contains(nodeIndex)) {
+                    Ni.add(nodeIndex);
                 }
             }
         }
@@ -222,7 +231,7 @@ public class PropinquityDynamics implements Algorithm {
         // there where our neightbors from the beginning.
         // Ni will contain all nodes that we don't have as neighbors in the inital
         // topology, but we want them to be in the same cluster with us.
-        // Nd will conatin all nodes that are our neighbors and we don't want them
+        // Nd will contain all nodes that are our neighbors and we don't want them
         // to be any more.
         for (Node n : this.graph.getEachNode()) {
             Set<Integer> Nr = n.getAttribute("Nr");
@@ -258,9 +267,9 @@ public class PropinquityDynamics implements Algorithm {
             debug(this.debugIDs);
         }
 
-        // Not it's time to calculate the Conjugate Propinquity in the same we
+        // Now it's time to calculate the Conjugate Propinquity in the same we
         // discussed before in the Phase 1. The only difference is that we need
-        // to take care again the Nd and Ni.
+        // to take into consideration again the Nd and Ni.
         for (Node n : this.graph.getEachNode()) {
             // Superstep 1 second part
             Set<Integer> Nr = n.getAttribute("Nr");
@@ -437,23 +446,41 @@ public class PropinquityDynamics implements Algorithm {
         for (Node n : this.graph.getEachNode()) {
             PropinquityMap pm = n.getAttribute("pm");
             for (Entry<Integer, MutableInt> row : pm.entrySet()) {
-                Integer nodeID = row.getKey();
+                Integer nodeIndex = row.getKey();
                 Integer propinquity = row.getValue().get();
 
                 if (propinquity < this.a) {
-                    if(n.getEdgeBetween(nodeID) != null) {
+                    if(n.getEdgeBetween(nodeIndex) != null) {
 //                        n.getEdgeBetween(nodeID).addAttribute("ui.style", "fill-color: rgb(236,236,236);");
-                        this.graph.removeEdge(n.getEdgeBetween(nodeID));
+                        this.graph.removeEdge(n.getEdgeBetween(nodeIndex));
                         removed++;
                     }
                 } else if (propinquity >= this.b) {
-                    if(n.getEdgeBetween(nodeID) == null) {
-                        this.graph.addEdge(n.getId()+"and"+nodeID, n, this.graph.getNode(nodeID));
+                    if(n.getEdgeBetween(nodeIndex) == null) {
+                        this.graph.addEdge(n.getId()+"and"+nodeIndex, n, this.graph.getNode(nodeIndex));
                         added++;
                     }
                 }
             }
-            System.out.println("For Node: " + n.getIndex() + " pm: " + n.getAttribute("pm"));
+            //System.out.println("For Node: " + n.getIndex() + " pm: " + n.getAttribute("pm"));
+        }
+        color = new Random();
+        for (Node n : this.graph.getEachNode()) {
+            if(!n.hasAttribute("visited")) {
+                r = color.nextInt(255);
+                g = color.nextInt(255);
+                bb = color.nextInt(255);
+                
+                n.setAttribute("visited", 1);
+                n.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + bb + "); size: 20px;");
+                Iterator<Node> breadth = n.getBreadthFirstIterator();
+                while(breadth.hasNext()) {
+                    Node next = breadth.next();
+                    next.setAttribute("visited", 1);
+                    next.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + bb + "); size: 20px;");
+                }
+            }
+            
         }
         System.out.println("Added: " + added);
         System.out.println("Removed: " + removed);
