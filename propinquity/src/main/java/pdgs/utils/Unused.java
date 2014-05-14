@@ -10,9 +10,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.file.FileSink;
 import org.graphstream.stream.file.FileSinkGML;
 
@@ -60,5 +63,31 @@ public class Unused {
         FileSink fs = new FileSinkGML();
 
         fs.writeAll(graph, "../data/erdos02.gml");
+        
+        
+        String[] idArray = {"95", "76", "467", "3784", "1031", "2661", "401", "4295", "6297", "2022", "421", "6927", "220", "409", "403", "503", "423", "259", "416", "451", "482", "485", "6255", "5520", "5374", "361", "787", "321", "320"};
+
+        Graph subgraph = new DefaultGraph("erdos part");
+
+        for (String id : idArray) {
+            Node n = subgraph.addNode(id);
+            n.addAttribute("label", graph.getNode(id).getAttribute("name"));
+        }
+
+        for (String id : idArray) {
+            Iterator<Edge> it_n = graph.getNode(id).getEdgeIterator();
+
+            while (it_n.hasNext()) {
+                Edge e = it_n.next();
+
+                try {
+                    subgraph.addEdge(e.getId(), e.getSourceNode().getId(), e.getTargetNode().getId());
+                } catch (Exception ex) {
+                }
+            }
+        }
+
+        subgraph.display();
+
     }
 }
