@@ -25,15 +25,12 @@ public class PropinquityDynamics implements Algorithm {
     Graph graph;
     private int a,b,e;
     private boolean debug = false, statistics = false;
-<<<<<<< HEAD
     private String[] debugIDs;
-=======
     
     
     // Used for colors.
     private Random color;
     private int r, g, bb;
->>>>>>> FETCH_HEAD
 
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
