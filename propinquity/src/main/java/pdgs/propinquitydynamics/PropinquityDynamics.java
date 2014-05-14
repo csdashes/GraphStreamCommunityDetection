@@ -24,6 +24,7 @@ public class PropinquityDynamics implements Algorithm {
     Graph graph;
     private int a,b,e;
     private boolean debug = false, statistics = false;
+    private String[] debugIDs;
 
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
@@ -126,7 +127,7 @@ public class PropinquityDynamics implements Algorithm {
         if (this.debug) {
             System.out.println("PHASE 1");
             System.out.println("After Angle Propinquity");
-            debug();
+            debug(this.debugIDs);
         }
 
         // Superstep 1 + 2 + 3
@@ -161,7 +162,7 @@ public class PropinquityDynamics implements Algorithm {
 
         if (this.debug) {
             System.out.println("After Conjugate Propinquity");
-            debug();
+            debug(this.debugIDs);
         }
         
         if (this.statistics) {
@@ -208,7 +209,7 @@ public class PropinquityDynamics implements Algorithm {
         if (this.debug) {
             System.out.println("PHASE 2");
             System.out.println("After initialization");
-            debug();
+            debug(this.debugIDs);
         }
 
         // Superstep 0 second part
@@ -254,7 +255,7 @@ public class PropinquityDynamics implements Algorithm {
 
         if (this.debug) {
             System.out.println("After Angle Propinquity");
-            debug();
+            debug(this.debugIDs);
         }
 
         // Not it's time to calculate the Conjugate Propinquity in the same we
@@ -349,7 +350,7 @@ public class PropinquityDynamics implements Algorithm {
 
         if (this.debug) {
             System.out.println("After Conjugate Propinquity");
-            debug();
+            debug(this.debugIDs);
         }
 
         // Finishing step. Reset Nr.
@@ -403,8 +404,9 @@ public class PropinquityDynamics implements Algorithm {
         this.e = e;
     }
     
-    public void debugOn() {
+    public void debugOn(String[] ids) {
         this.debug = true;
+        this.debugIDs = ids;
     }
 
     public void debugOff() {
@@ -419,8 +421,9 @@ public class PropinquityDynamics implements Algorithm {
         this.statistics = false;
     }
 
-    private void debug() {
-        for (Node n : this.graph.getEachNode()) {
+    private void debug(String[] ids) {
+        for (String id : ids) {
+            Node n = this.graph.getNode(id);
             System.out.println("Node: " + n.getIndex());
             System.out.println("Nr: " + n.getAttribute("Nr"));
             System.out.println("Ni: " + n.getAttribute("Ni"));

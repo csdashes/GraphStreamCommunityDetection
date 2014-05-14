@@ -12,8 +12,10 @@ public class App {
         graph.display();
         graph.read("../data/karate.gml");
 
+        String[] monitoredIDs = {"220","409", "403"};
         PropinquityDynamics pd = new PropinquityDynamics();
         pd.set(2, 4);
+        pd.debugOn(monitoredIDs);
         pd.statisticsOn();
         pd.init(graph);
         
