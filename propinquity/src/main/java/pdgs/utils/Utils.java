@@ -20,13 +20,15 @@ public class Utils {
         for (Node n : graph.getEachNode()) {
             n.addAttribute("ui_label", n.getAttribute("ui.label"));
             n.addAttribute("ui_style", n.getAttribute("ui.style"));
-            n.clearAttributes();
+            n.removeAttribute("ui.label");
+            n.removeAttribute("ui.style");
         }
         for (Edge e : graph.getEachEdge()) {
             e.addAttribute("weight", e.getAttribute("ui.label"));
             e.addAttribute("ui_label", e.getAttribute("ui.label"));
             e.addAttribute("ui_style", e.getAttribute("ui.style"));
-            e.clearAttributes();
+            e.removeAttribute("ui.label");
+            e.removeAttribute("ui.style");
         }
 
         FileSinkGML gml = new FileSinkGML();
