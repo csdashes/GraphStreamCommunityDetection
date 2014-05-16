@@ -1,6 +1,7 @@
 package pdgs.propinquitydynamics;
 
 import com.google.common.collect.Sets;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map.Entry;
@@ -23,11 +24,12 @@ import pdgs.utils.PropinquityMap;
  * @author Anastasis Andronidis <anastasis90@yahoo.gr>
  */
 public class PropinquityDynamics implements Algorithm {
+
     Graph graph;
-    private int a,b,e;
+    private int a, b, e;
     private boolean debug = false, statistics = false;
     private String[] debugIDs;
-    
+
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
         Iterator<Node> it = n.getNeighborNodeIterator();
@@ -81,15 +83,15 @@ public class PropinquityDynamics implements Algorithm {
         this.a = a;
         this.b = b;
     }
-    
+
     // PHASE 1
     public void init(Graph graph) {
         this.graph = graph;
 
         // Init data in each node
         for (Node n : this.graph.getEachNode()) {
-            n.setAttribute("ui.label", n.getIndex()+"#"+n.getId());
-            n.setAttribute("ui.style", "size:20px;");
+            //n.setAttribute("ui.label", n.getIndex() + "#" + n.getId());
+            //n.setAttribute("ui.style", "size:20px;");
 
             // The propinquity map
             PropinquityMap pm = new PropinquityMap(100);
@@ -106,7 +108,7 @@ public class PropinquityDynamics implements Algorithm {
         for (Node n : this.graph.getEachNode()) {
             Set<Integer> Nr = n.getAttribute("Nr");
             PropinquityMap pm = n.getAttribute("pm");
-            
+
             for (Integer nn : Nr) {
                 pm.increase(nn);
             }
@@ -166,19 +168,19 @@ public class PropinquityDynamics implements Algorithm {
             System.out.println("After Conjugate Propinquity");
             debug(this.debugIDs);
         }
-        
+
         if (this.statistics) {
             // We use this class for just to make our work faster
             PropinquityMap stats = new PropinquityMap(100);
-            
+
             for (Node n : this.graph.getEachNode()) {
                 PropinquityMap pm = n.getAttribute("pm");
-                
+
                 for (MutableInt i : pm.values()) {
                     stats.increase(i.get());
                 }
             }
-            
+
             System.out.println(stats);
         }
     }
@@ -220,9 +222,9 @@ public class PropinquityDynamics implements Algorithm {
             }
             for (Integer id : Nd) {
                 pm.decrease(id);
-            }            
+            }
         }
-        
+
         if (this.debug) {
             System.out.println("PHASE 2");
             System.out.println("After initialization");
@@ -255,7 +257,7 @@ public class PropinquityDynamics implements Algorithm {
                 PU(u_i, Ni, '+');
                 PU(u_i, Nd, '-');
             }
-            
+
             // On the other hand, we need to inform our new neigbours to include
             // our current and the other new neighbours.
             for (Integer u_i : Ni) {
@@ -420,7 +422,7 @@ public class PropinquityDynamics implements Algorithm {
     public void setE(int e) {
         this.e = e;
     }
-    
+
     public void debugOn(String[] ids) {
         this.debug = true;
         this.debugIDs = ids;
@@ -429,7 +431,7 @@ public class PropinquityDynamics implements Algorithm {
     public void debugOff() {
         this.debug = false;
     }
-    
+
     public void statisticsOn() {
         this.statistics = true;
     }
@@ -449,7 +451,7 @@ public class PropinquityDynamics implements Algorithm {
         }
     }
 
-    void getResults() {
+    void getResults() throws IOException {
         int added = 0, removed = 0;
         for (Node n : this.graph.getEachNode()) {
             PropinquityMap pm = n.getAttribute("pm");
@@ -458,13 +460,13 @@ public class PropinquityDynamics implements Algorithm {
                 Integer propinquity = row.getValue().get();
 
                 if (propinquity < this.a) {
-                    if(n.getEdgeBetween(nodeIndex) != null) {
+                    if (n.getEdgeBetween(nodeIndex) != null) {
                         this.graph.removeEdge(n.getEdgeBetween(nodeIndex));
                         removed++;
                     }
                 } else if (propinquity >= this.b) {
-                    if(n.getEdgeBetween(nodeIndex) == null) {
-                        this.graph.addEdge(n.getId()+"and"+nodeIndex, n, this.graph.getNode(nodeIndex));
+                    if (n.getEdgeBetween(nodeIndex) == null) {
+                        this.graph.addEdge(n.getId() + "and" + nodeIndex, n, this.graph.getNode(nodeIndex));
                         added++;
                     }
                 }
@@ -473,31 +475,30 @@ public class PropinquityDynamics implements Algorithm {
 
         // Used for colors.
         Random color = new Random();
-        
+
         int sad = color.nextInt(255);
         this.graph.getNode(10).setAttribute("visited", 1);
         this.graph.getNode(10).addAttribute("ui.style", "fill-color: rgb(" + sad + "," + sad + "," + sad + "); size: 20px;");
         this.graph.getNode(11).setAttribute("visited", 1);
         this.graph.getNode(11).addAttribute("ui.style", "fill-color: rgb(" + sad + "," + sad + "," + sad + "); size: 20px;");
-        
+
         for (Node n : this.graph.getEachNode()) {
-            if(!n.hasAttribute("visited")) {
+            if (!n.hasAttribute("visited")) {
                 int r = color.nextInt(255);
                 int g = color.nextInt(255);
                 int b = color.nextInt(255);
-                
+
                 n.setAttribute("visited", 1);
                 n.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
                 Iterator<Node> breadth = n.getBreadthFirstIterator();
-                while(breadth.hasNext()) {
+                while (breadth.hasNext()) {
                     Node next = breadth.next();
-                    if(!next.hasAttribute("visited")) {
-                    next.setAttribute("visited", 1);
-                    next.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
+                    if (!next.hasAttribute("visited")) {
+                        next.setAttribute("visited", 1);
+                        next.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
                     }
                 }
             }
-            
         }
         for (Edge edge : this.graph.getEachEdge()) {
             Node node0 = edge.getNode0();
