@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import static pdgs.utils.CalculationTable.CalculateCdd;
@@ -27,11 +28,6 @@ public class PropinquityDynamics implements Algorithm {
     private boolean debug = false, statistics = false;
     private String[] debugIDs;
     
-    
-    // Used for colors.
-    private Random color;
-    private int r, g, bb;
-
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
         Iterator<Node> it = n.getNeighborNodeIterator();
@@ -92,7 +88,7 @@ public class PropinquityDynamics implements Algorithm {
 
         // Init data in each node
         for (Node n : this.graph.getEachNode()) {
-            n.setAttribute("ui.label", n.getIndex());
+            n.setAttribute("ui.label", n.getIndex()+"#"+n.getId());
             n.setAttribute("ui.style", "size:20px;");
 
             // The propinquity map
@@ -463,7 +459,6 @@ public class PropinquityDynamics implements Algorithm {
 
                 if (propinquity < this.a) {
                     if(n.getEdgeBetween(nodeIndex) != null) {
-//                        n.getEdgeBetween(nodeID).addAttribute("ui.style", "fill-color: rgb(236,236,236);");
                         this.graph.removeEdge(n.getEdgeBetween(nodeIndex));
                         removed++;
                     }
@@ -474,26 +469,45 @@ public class PropinquityDynamics implements Algorithm {
                     }
                 }
             }
-            //System.out.println("For Node: " + n.getIndex() + " pm: " + n.getAttribute("pm"));
         }
-        color = new Random();
+
+        // Used for colors.
+        Random color = new Random();
+        
+        int sad = color.nextInt(255);
+        this.graph.getNode(10).setAttribute("visited", 1);
+        this.graph.getNode(10).addAttribute("ui.style", "fill-color: rgb(" + sad + "," + sad + "," + sad + "); size: 20px;");
+        this.graph.getNode(11).setAttribute("visited", 1);
+        this.graph.getNode(11).addAttribute("ui.style", "fill-color: rgb(" + sad + "," + sad + "," + sad + "); size: 20px;");
+        
         for (Node n : this.graph.getEachNode()) {
             if(!n.hasAttribute("visited")) {
-                r = color.nextInt(255);
-                g = color.nextInt(255);
-                bb = color.nextInt(255);
+                int r = color.nextInt(255);
+                int g = color.nextInt(255);
+                int b = color.nextInt(255);
                 
                 n.setAttribute("visited", 1);
-                n.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + bb + "); size: 20px;");
+                n.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
                 Iterator<Node> breadth = n.getBreadthFirstIterator();
                 while(breadth.hasNext()) {
                     Node next = breadth.next();
+                    if(!next.hasAttribute("visited")) {
                     next.setAttribute("visited", 1);
-                    next.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + bb + "); size: 20px;");
+                    next.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
+                    }
                 }
             }
             
         }
+        for (Edge edge : this.graph.getEachEdge()) {
+            PropinquityMap node0pm = edge.getNode0().getAttribute("pm");
+            Node node1 = edge.getNode1();
+            edge.setAttribute("ui.label", node0pm.get(node1.getIndex()).toString());
+            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + node0pm.get(node1.getIndex()).toString() + ";");
+        }
+        this.graph.removeNode(7);
+        this.graph.removeNode(9);
+
         System.out.println("Added: " + added);
         System.out.println("Removed: " + removed);
     }
