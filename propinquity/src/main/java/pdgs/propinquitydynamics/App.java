@@ -10,16 +10,16 @@ public class App {
     public static void main(String[] args) throws IOException, GraphParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.display();
-        graph.read("../data/karate.gml");
+        graph.read("../data/erdos02-subset.gml");
 
         String[] monitoredIDs = {"220","409", "403"};
         PropinquityDynamics pd = new PropinquityDynamics();
-        pd.set(2, 4);
+        pd.set(2, 10);
         pd.debugOn(monitoredIDs);
         pd.statisticsOn();
         pd.init(graph);
         
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 2; i++) {
             pd.compute();            
         }
                 

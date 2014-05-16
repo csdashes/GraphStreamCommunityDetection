@@ -212,6 +212,21 @@ public class PropinquityDynamics implements Algorithm {
             }
         }
 
+        // We take care of the direct connections here. If we delete a neightbor,
+        // we must decrease the propinquity etc...
+        for (Node n : this.graph.getEachNode()) {
+            PropinquityMap pm = n.getAttribute("pm");
+            Set<Integer> Ni = n.getAttribute("Ni");
+            Set<Integer> Nd = n.getAttribute("Nd");
+
+            for (Integer id : Ni) {
+                pm.increase(id);
+            }
+            for (Integer id : Nd) {
+                pm.decrease(id);
+            }            
+        }
+        
         if (this.debug) {
             System.out.println("PHASE 2");
             System.out.println("After initialization");
@@ -362,9 +377,9 @@ public class PropinquityDynamics implements Algorithm {
         // Finishing step. Reset Nr.
         for (Node n : this.graph.getEachNode()) {
             Set<Integer> Nr = n.getAttribute("Nr");
-            Set<Integer> Nd = n.getAttribute("Nd");
+            Set<Integer> Ni = n.getAttribute("Ni");
 
-            n.setAttribute("Nr", Sets.union(Nr, Nd).copyInto(new LinkedHashSet<Integer>(20)));
+            n.setAttribute("Nr", Sets.union(Nr, Ni).copyInto(new LinkedHashSet<Integer>(20)));
         }
     }
 
