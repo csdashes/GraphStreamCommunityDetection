@@ -90,8 +90,8 @@ public class PropinquityDynamics implements Algorithm {
 
         // Init data in each node
         for (Node n : this.graph.getEachNode()) {
-            //n.setAttribute("ui.label", n.getIndex() + "#" + n.getId());
-            //n.setAttribute("ui.style", "size:20px;");
+            n.setAttribute("ui.label", n.getIndex() + "#" + n.getId());
+            n.setAttribute("ui.style", "size:20px;");
 
             // The propinquity map
             PropinquityMap pm = new PropinquityMap(100);
