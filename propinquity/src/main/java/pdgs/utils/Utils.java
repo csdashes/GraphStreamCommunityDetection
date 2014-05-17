@@ -22,10 +22,10 @@ public class Utils {
         // Used for colors.
         Random color = new Random();
 
+        int fixedColor = color.nextInt(255);
         for (Integer id : ids) {
-            int sad = color.nextInt(255);
             graph.getNode(id).setAttribute("visited", 1);
-            graph.getNode(id).addAttribute("ui.style", "fill-color: rgb(" + sad + "," + sad + "," + sad + "); size: 20px;");            
+            graph.getNode(id).addAttribute("ui.style", "fill-color: rgb(" + fixedColor + "," + fixedColor + "," + fixedColor + "); size: 20px;");            
         }
 
         for (Node n : graph.getEachNode()) {
