@@ -20,6 +20,7 @@ import pdgs.utils.PropinquityMap;
 /**
  *
  * @author Anastasis Andronidis <anastasis90@yahoo.gr>
+ * @author Ilias Trichopoulos  <itrichop@csd.auth.gr>
  */
 public class PropinquityDynamics implements Algorithm {
 
@@ -473,8 +474,8 @@ public class PropinquityDynamics implements Algorithm {
 
     public void applyFinalTopology() {
         // Remove all edges to rebuild the graph based on Nr
-        for (Edge e : this.graph.getEdgeSet()) {
-            this.graph.removeEdge(e.getIndex());
+        for (Edge edge : this.graph.getEdgeSet()) {
+            this.graph.removeEdge(edge.getIndex());
         }
         
         for (Node n : this.graph.getEachNode()) {
