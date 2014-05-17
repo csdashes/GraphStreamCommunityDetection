@@ -544,7 +544,7 @@ public class PropinquityDynamics implements Algorithm {
     public void getResultsWithFractionWeights() throws IOException {
         applyFinalTopology();
         colorCommunities();
-        PropToNumEdges();
+        propToNumEdges();
 //        this.graph.removeNode(7);
 //        this.graph.removeNode(9);
     }
