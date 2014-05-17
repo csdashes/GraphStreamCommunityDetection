@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import static pdgs.utils.CalculationTable.CalculateCdd;
@@ -21,9 +22,22 @@ import pdgs.utils.PropinquityMap;
  * @author Anastasis Andronidis <anastasis90@yahoo.gr>
  */
 public class PropinquityDynamics implements Algorithm {
+
     Graph graph;
-    private int a,b,e;
+    private int a, b, e = -1;
     private boolean debug = false, statistics = false;
+    private String[] debugIDs;
+
+    private void debug(String[] ids) {
+        for (String id : ids) {
+            Node n = this.graph.getNode(id);
+            System.out.println("Node: " + n.getIndex());
+            System.out.println("Nr: " + n.getAttribute("Nr"));
+            System.out.println("Ni: " + n.getAttribute("Ni"));
+            System.out.println("Nd: " + n.getAttribute("Nd"));
+            System.out.println("pm: " + n.getAttribute("pm"));
+        }
+    }
 
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
@@ -78,14 +92,14 @@ public class PropinquityDynamics implements Algorithm {
         this.a = a;
         this.b = b;
     }
-    
+
     // PHASE 1
     public void init(Graph graph) {
         this.graph = graph;
 
         // Init data in each node
         for (Node n : this.graph.getEachNode()) {
-            n.setAttribute("ui.label", n.getIndex());
+            n.setAttribute("ui.label", n.getIndex() + "#" + n.getId());
             n.setAttribute("ui.style", "size:20px;");
 
             // The propinquity map
@@ -96,6 +110,17 @@ public class PropinquityDynamics implements Algorithm {
 
             n.setAttribute("pm", pm);
             n.setAttribute("Nr", Nr);
+        }
+
+        // The paper algorithm does not include the propinquity increase of
+        // the direct neighbours
+        for (Node n : this.graph.getEachNode()) {
+            Set<Integer> Nr = n.getAttribute("Nr");
+            PropinquityMap pm = n.getAttribute("pm");
+
+            for (Integer nn : Nr) {
+                pm.increase(nn);
+            }
         }
 
         // Superstep 0 + 1
@@ -115,7 +140,7 @@ public class PropinquityDynamics implements Algorithm {
         if (this.debug) {
             System.out.println("PHASE 1");
             System.out.println("After Angle Propinquity");
-            debug();
+            debug(this.debugIDs);
         }
 
         // Superstep 1 + 2 + 3
@@ -150,27 +175,30 @@ public class PropinquityDynamics implements Algorithm {
 
         if (this.debug) {
             System.out.println("After Conjugate Propinquity");
-            debug();
+            debug(this.debugIDs);
         }
-        
+
         if (this.statistics) {
             // We use this class for just to make our work faster
             PropinquityMap stats = new PropinquityMap(100);
-            
+
             for (Node n : this.graph.getEachNode()) {
                 PropinquityMap pm = n.getAttribute("pm");
-                
+
                 for (MutableInt i : pm.values()) {
                     stats.increase(i.get());
                 }
             }
-            
+
             System.out.println(stats);
         }
     }
 
     // PHASE 2
     public void compute() {
+        // Init e to count topology differences
+        this.e = 0;
+        
         // Superstep 0 first part
         // Init apropriate sets (Nd, Ni).
         for (Node n : this.graph.getEachNode()) {
@@ -182,22 +210,39 @@ public class PropinquityDynamics implements Algorithm {
             Set<Integer> Nr = n.getAttribute("Nr");
             PropinquityMap pm = n.getAttribute("pm");
             for (Entry<Integer, MutableInt> row : pm.entrySet()) {
-                Integer nodeID = row.getKey();
+                Integer nodeIndex = row.getKey();
                 Integer propinquity = row.getValue().get();
 
-                if (propinquity < this.a && Nr.contains(nodeID)) {
-                    Nd.add(nodeID);
-                    Nr.remove(nodeID);
-                } else if (propinquity >= this.b && !Nr.contains(nodeID)) {
-                    Ni.add(nodeID);
+                if (propinquity <= this.a && Nr.contains(nodeIndex)) {
+                    Nd.add(nodeIndex);
+                    Nr.remove(nodeIndex);
+                    this.e++;
+                } else if (propinquity >= this.b && !Nr.contains(nodeIndex)) {
+                    Ni.add(nodeIndex);
+                    this.e++;
                 }
+            }
+        }
+
+        // We take care of the direct connections here. If we delete a neightbor,
+        // we must decrease the propinquity etc...
+        for (Node n : this.graph.getEachNode()) {
+            PropinquityMap pm = n.getAttribute("pm");
+            Set<Integer> Ni = n.getAttribute("Ni");
+            Set<Integer> Nd = n.getAttribute("Nd");
+
+            for (Integer id : Ni) {
+                pm.increase(id);
+            }
+            for (Integer id : Nd) {
+                pm.decrease(id);
             }
         }
 
         if (this.debug) {
             System.out.println("PHASE 2");
             System.out.println("After initialization");
-            debug();
+            debug(this.debugIDs);
         }
 
         // Superstep 0 second part
@@ -210,7 +255,7 @@ public class PropinquityDynamics implements Algorithm {
         // there where our neightbors from the beginning.
         // Ni will contain all nodes that we don't have as neighbors in the inital
         // topology, but we want them to be in the same cluster with us.
-        // Nd will conatin all nodes that are our neighbors and we don't want them
+        // Nd will contain all nodes that are our neighbors and we don't want them
         // to be any more.
         for (Node n : this.graph.getEachNode()) {
             Set<Integer> Nr = n.getAttribute("Nr");
@@ -226,7 +271,7 @@ public class PropinquityDynamics implements Algorithm {
                 PU(u_i, Ni, '+');
                 PU(u_i, Nd, '-');
             }
-            
+
             // On the other hand, we need to inform our new neigbours to include
             // our current and the other new neighbours.
             for (Integer u_i : Ni) {
@@ -243,12 +288,12 @@ public class PropinquityDynamics implements Algorithm {
 
         if (this.debug) {
             System.out.println("After Angle Propinquity");
-            debug();
+            debug(this.debugIDs);
         }
 
-        // Not it's time to calculate the Conjugate Propinquity in the same we
+        // Now it's time to calculate the Conjugate Propinquity in the same we
         // discussed before in the Phase 1. The only difference is that we need
-        // to take care again the Nd and Ni.
+        // to take into consideration again the Nd and Ni.
         for (Node n : this.graph.getEachNode()) {
             // Superstep 1 second part
             Set<Integer> Nr = n.getAttribute("Nr");
@@ -338,15 +383,15 @@ public class PropinquityDynamics implements Algorithm {
 
         if (this.debug) {
             System.out.println("After Conjugate Propinquity");
-            debug();
+            debug(this.debugIDs);
         }
 
         // Finishing step. Reset Nr.
         for (Node n : this.graph.getEachNode()) {
             Set<Integer> Nr = n.getAttribute("Nr");
-            Set<Integer> Nd = n.getAttribute("Nd");
+            Set<Integer> Ni = n.getAttribute("Ni");
 
-            n.setAttribute("Nr", Sets.union(Nr, Nd).copyInto(new LinkedHashSet<Integer>(20)));
+            n.setAttribute("Nr", Sets.union(Nr, Ni).copyInto(new LinkedHashSet<Integer>(20)));
         }
     }
 
@@ -379,27 +424,45 @@ public class PropinquityDynamics implements Algorithm {
     }
 
     /**
-     * @return the e
+     * The variable <b>e</b> counts the global additions and removals of edges.
+     * We say that if <b>e</b> is 0, then propinquity dynamics algorithm
+     * has converged.
+     * 
+     * @return the number of added or removed edges in one phase 2 loop
      */
     public int getE() {
         return e;
     }
 
     /**
-     * @param e the e to set
-     */
-    public void setE(int e) {
-        this.e = e;
+     * Helper function to easy declare that if <b>e</b> == 0, then return true.
+     * 
+     * @return true if e == 0
+     */    
+    public boolean didAbsoluteConvergence() {
+        return this.e == 0;
     }
-    
-    public void debugOn() {
+
+    /**
+     * Helper function to easy declare that if <b>e</b> <= <b>threshold</b>, then return true.
+     *
+     * @param threshold the threshold we want to say that the algorithm 
+     *                  has converged
+     * @return true if e <= threshold
+     */
+    public boolean didConvergence(int threshold) {
+        return this.e <= threshold;
+    }
+
+    public void debugOn(String[] ids) {
         this.debug = true;
+        this.debugIDs = ids;
     }
 
     public void debugOff() {
         this.debug = false;
     }
-    
+
     public void statisticsOn() {
         this.statistics = true;
     }
@@ -408,19 +471,20 @@ public class PropinquityDynamics implements Algorithm {
         this.statistics = false;
     }
 
-    private void debug() {
-        for (Node n : this.graph.getEachNode()) {
-            System.out.println("Node: " + n.getIndex());
-            System.out.println("Nr: " + n.getAttribute("Nr"));
-            System.out.println("Ni: " + n.getAttribute("Ni"));
-            System.out.println("Nd: " + n.getAttribute("Nd"));
-            System.out.println("pm: " + n.getAttribute("pm"));
+    public void applyFinalTopology() {
+        // Remove all edges to rebuild the graph based on Nr
+        for (Edge e : this.graph.getEdgeSet()) {
+            this.graph.removeEdge(e.getIndex());
         }
-    }
-
-    void getResults() {
+        
         for (Node n : this.graph.getEachNode()) {
-            System.out.println("For Node: " + n.getIndex() + " pm: " + n.getAttribute("pm"));
+            Set<Integer> Nr = n.getAttribute("Nr");
+            
+            for (Integer neighborIndex : Nr) {
+                if (n.getEdgeBetween(neighborIndex) == null) {
+                    this.graph.addEdge(n.getId() + "and" + neighborIndex, n, this.graph.getNode(neighborIndex));
+                }
+            }            
         }
     }
 }

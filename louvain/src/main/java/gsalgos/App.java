@@ -12,8 +12,9 @@ public class App
 //        louvain.init("data/polbooks.gml");
 //        louvain.init("data/smalltest.gml");
 //        louvain.init("data/dolphins.gml");
-//        louvain.init("data/karate.gml");
-        louvain.init("data/smalltest.dgs");
+//        louvain.init("../data/karate.gml");
+//        louvain.init("../data/smalltest.dgs");
+        louvain.init("../data/export.gml");
         louvain.execute();
     }
     
