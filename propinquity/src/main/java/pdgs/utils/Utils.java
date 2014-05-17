@@ -63,7 +63,7 @@ public class Utils {
                 Set<Integer> node0Nr = node.getAttribute("Nr");
 
                 int propSum = 0;
-                if (node.getAttribute("NrSum")) {
+                if (node.getAttribute("NrSum") != null) {
                     propSum = (Integer) node.getAttribute("NrSum");
                 } else {
                     for (Integer n : node0Nr) {
