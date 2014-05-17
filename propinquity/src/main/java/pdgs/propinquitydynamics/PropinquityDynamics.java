@@ -459,7 +459,7 @@ public class PropinquityDynamics implements Algorithm {
                 Integer nodeIndex = row.getKey();
                 Integer propinquity = row.getValue().get();
 
-                if (propinquity < this.a) {
+                if (propinquity <= this.a) {
                     if (n.getEdgeBetween(nodeIndex) != null) {
                         this.graph.removeEdge(n.getEdgeBetween(nodeIndex));
                         removed++;
