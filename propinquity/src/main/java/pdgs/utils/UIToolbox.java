@@ -4,10 +4,20 @@
  */
 package pdgs.utils;
 
+import org.graphstream.graph.Node;
+
 /**
  *
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class UIToolbox {
     
+    /**
+     * Method to add styling attributes (ui.label, ui.style) to a node
+     * @param n
+     */
+    private void styleNode(Node n) {
+        n.setAttribute("ui.label", n.getIndex());
+        n.setAttribute("ui.style", "size:20px;");
+    }
 }
