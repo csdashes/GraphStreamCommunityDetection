@@ -64,7 +64,6 @@ public class CommunityDetectionLouvain {
 
     /**
      * Initializing global variables.
-     *
      * @param fileName the input path of the file.
      * @throws IOException
      * @throws GraphParseException
@@ -80,7 +79,6 @@ public class CommunityDetectionLouvain {
 
     /**
      * The controller of the algorithm.
-     *
      * @throws IOException
      * @throws GraphParseException
      */
@@ -149,7 +147,6 @@ public class CommunityDetectionLouvain {
 
     /**
      * The first phase of the algorithm.
-     *
      * @param graph the graph received from the initialization or the folding
      * phase
      * @return the new modularity value.
@@ -248,7 +245,6 @@ public class CommunityDetectionLouvain {
      * After the maximum modularity was reached, revert to the original graph,
      * printing the communities (by using the same color in the nodes of the
      * same community).
-     *
      * @param graph the graph where each node represents a final community.
      */
     public void printFinalGraph(Graph graph) {
@@ -264,7 +260,7 @@ public class CommunityDetectionLouvain {
         sm = new SpriteManager(finalGraph);
         communitiesCount = sm.addSprite("CC");
         communitiesCount.setPosition(Units.PX, 20, 20, 0);
-        communitiesCount.setAttribute("ui.label", // 3
+        communitiesCount.setAttribute("ui.label",
                 String.format("Communities: %d", graph.getNodeCount()));
         communitiesCount.setAttribute("ui.style", "size: 0px; text-color: rgb(150,100,100); text-size: 20;");
 
@@ -312,7 +308,6 @@ public class CommunityDetectionLouvain {
     /**
      * Second phase of the algorithm. Creating a graph where each node
      * represents a community.
-     *
      * @param graph the output graph of the first phase.
      * @return the folded graph where each node represents a community.
      */
@@ -338,11 +333,9 @@ public class CommunityDetectionLouvain {
                 double edgeWeightBetweenThem = (Double)node.getEdgeBetween(neighbour).getAttribute("weight");
                 String neighbourCommunity = neighbour.getAttribute("community");
                 if (neighbourCommunity.equals(node.getAttribute("community"))) {
-                    //community.increaseInnerEdgesCount();
                     community.increaseInnerEdgesWeightCount(edgeWeightBetweenThem);
                     community.addNodesSet((HashSet<String>) node.getAttribute("trueCommunityNodes"));
                 } else {
-                    //community.increaseOuterEdgesCount(neighbourCommunity);
                     community.increaseEdgeWeightToCommunity(neighbourCommunity, edgeWeightBetweenThem);
                 }
             }
@@ -357,7 +350,7 @@ public class CommunityDetectionLouvain {
             }
         }
 
-        // Finilize the inner edges count (divide it by 2)
+        // Finilize the inner edges weight count (divide it by 2)
         for (Iterator<Entry<String, HyperCommunity>> it = communities.entrySet().iterator(); it.hasNext();) {
             Entry<String, HyperCommunity> entry = it.next();
             communities.get(entry.getKey()).finilizeInnerEdgesWeightCount();
@@ -379,8 +372,9 @@ public class CommunityDetectionLouvain {
         // For every community
         for (Iterator<Entry<String, HyperCommunity>> it = communities.entrySet().iterator(); it.hasNext();) {
             communityEntry = it.next();
-            // and for every community that the above community is connected to, create the two nodes and the between them
-            // edge, with a weight equal to the number of the outer edges between these two communities.
+            // and for every community that the above community is connected to,
+            // create the two nodes and the between them edge, with a weight equal
+            // to the total weight of the outer edges between these two communities.
             Map<String, Double> outerEdgesWeights = communityEntry.getValue().getEdgeWeightToCommunity();
             for (Iterator<Entry<String, Double>> outerEdgesWeightIt = outerEdgesWeights.entrySet().iterator(); outerEdgesWeightIt.hasNext();) {
                 edgeWeightToCommunity = outerEdgesWeightIt.next();
@@ -404,15 +398,15 @@ public class CommunityDetectionLouvain {
                 }
             }
             
-            // Add a self-edge to every node, with a weight that represents the inner edges of the community.
+            // Add a self-edge to every node, with a weight that represents the total 
+            // sum of the inner edges weights of the community.
             innerEdgesWeight = communityEntry.getValue().getInnerEdgesWeightCount();
             edgeIdentifierSelfie = communityEntry.getKey() + ":" + communityEntry.getKey();
             edge = graph.addEdge(edgeIdentifierSelfie,
                     communityEntry.getKey(),
                     communityEntry.getKey());
             edge.addAttribute("weight", Double.parseDouble(String.valueOf(innerEdgesWeight)));
-            // edge.addAttribute("ui.label", innerEdges); // Used only when displaying the graph (optional)
-        }
+            }
 
         return graph;
     }
