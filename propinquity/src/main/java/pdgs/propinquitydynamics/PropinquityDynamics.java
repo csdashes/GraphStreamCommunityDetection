@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import static pdgs.utils.CalculationTable.CalculateCdd;
@@ -471,27 +472,19 @@ public class PropinquityDynamics implements Algorithm {
     }
 
     public void applyFinalTopology() {
-        int added = 0, removed = 0;
-        for (Node n : this.graph.getEachNode()) {
-            PropinquityMap pm = n.getAttribute("pm");
-            for (Entry<Integer, MutableInt> row : pm.entrySet()) {
-                Integer nodeIndex = row.getKey();
-                Integer propinquity = row.getValue().get();
-
-                if (propinquity <= this.a) {
-                    if (n.getEdgeBetween(nodeIndex) != null) {
-                        this.graph.removeEdge(n.getEdgeBetween(nodeIndex));
-                        removed++;
-                    }
-                } else if (propinquity >= this.b) {
-                    if (n.getEdgeBetween(nodeIndex) == null) {
-                        this.graph.addEdge(n.getId() + "and" + nodeIndex, n, this.graph.getNode(nodeIndex));
-                        added++;
-                    }
-                }
-            }
+        // Remove all edges to rebuild the graph based on Nr
+        for (Edge e : this.graph.getEdgeSet()) {
+            this.graph.removeEdge(e.getIndex());
         }
-        System.out.println("Added: " + added);
-        System.out.println("Removed: " + removed);
+        
+        for (Node n : this.graph.getEachNode()) {
+            Set<Integer> Nr = n.getAttribute("Nr");
+            
+            for (Integer neighborIndex : Nr) {
+                if (n.getEdgeBetween(neighborIndex) == null) {
+                    this.graph.addEdge(n.getId() + "and" + neighborIndex, n, this.graph.getNode(neighborIndex));
+                }
+            }            
+        }
     }
 }
