@@ -22,7 +22,7 @@ public class App {
         
         int i = 0;
         // We need to be sure that we dont have an infinite loop
-        while ( i<100 && !pd.didAbsoluteConvergence()) {
+        while (i<100 && !pd.didAbsoluteConvergence()) {
             pd.compute();
             i++;
         }
@@ -33,6 +33,7 @@ public class App {
         Integer[] fixedCommunity = {10,11};
         Utils.ColorCommunities(graph, fixedCommunity);
         Utils.FractionWithTotalPropinquity(graph);
+
 //        Utils.ExportGraphIntoGML(graph, "../data/export");
     }
 }
