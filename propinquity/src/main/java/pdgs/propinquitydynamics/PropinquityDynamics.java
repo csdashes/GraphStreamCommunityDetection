@@ -451,7 +451,7 @@ public class PropinquityDynamics implements Algorithm {
         }
     }
 
-    void getResults() throws IOException {
+    private void applyFinalTopology() {
         int added = 0, removed = 0;
         for (Node n : this.graph.getEachNode()) {
             PropinquityMap pm = n.getAttribute("pm");
@@ -472,7 +472,34 @@ public class PropinquityDynamics implements Algorithm {
                 }
             }
         }
+        System.out.println("Added: " + added);
+        System.out.println("Removed: " + removed);
+    }
 
+    private void weightsAsMinFractions() {
+        for (Edge edge : this.graph.getEachEdge()) {
+            Node node0 = edge.getNode0();
+            PropinquityMap node0pm = node0.getAttribute("pm");
+            Node node1 = edge.getNode1();
+
+            // get the propinquity
+            int prop = node0pm.get(node1.getIndex()).get();
+            double norm_node0_prop = (double) prop / (double) node0.getEdgeSet().size();
+            double norm_node1_prop = (double) prop / (double) node1.getEdgeSet().size();
+
+            double out;
+            if (norm_node1_prop > norm_node0_prop) {
+                out = norm_node0_prop;
+            } else {
+                out = norm_node1_prop;
+            }
+
+            edge.setAttribute("ui.label", String.format("%.2f", out));
+            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + out * 3 + ";");
+        }
+    }
+
+    private void colorCommunities() {
         // Used for colors.
         Random color = new Random();
 
@@ -500,30 +527,20 @@ public class PropinquityDynamics implements Algorithm {
                 }
             }
         }
-        for (Edge edge : this.graph.getEachEdge()) {
-            Node node0 = edge.getNode0();
-            PropinquityMap node0pm = node0.getAttribute("pm");
-            Node node1 = edge.getNode1();
-            
-            // get the propinquity
-            int prop = node0pm.get(node1.getIndex()).get();
-            double norm_node0_prop = (double)prop / (double)node0.getEdgeSet().size();
-            double norm_node1_prop = (double)prop / (double)node1.getEdgeSet().size();
-            
-            double out;
-            if (norm_node1_prop > norm_node0_prop) {
-                out = norm_node0_prop;
-            } else {
-                out = norm_node1_prop;
-            }
-            
-            edge.setAttribute("ui.label", String.format("%.2f", out));
-            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + out*3 + ";");
-        }
-        this.graph.removeNode(7);
-        this.graph.removeNode(9);
+    }
 
-        System.out.println("Added: " + added);
-        System.out.println("Removed: " + removed);
+    public void getOriginalResults() throws IOException {
+        applyFinalTopology();
+        colorCommunities();
+//        this.graph.removeNode(7);
+//        this.graph.removeNode(9);
+    }
+    
+    public void getResultsWithFractionWeights() throws IOException {
+        applyFinalTopology();
+        colorCommunities();
+        weightsAsMinFractions();
+//        this.graph.removeNode(7);
+//        this.graph.removeNode(9);
     }
 }
