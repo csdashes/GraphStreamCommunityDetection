@@ -20,11 +20,15 @@ public class App {
 //        pd.statisticsOn();
         pd.init(graph);
         
-        for (int i = 0; i < 2; i++) {
-            pd.compute();            
+        int i = 0;
+        // We need to be sure that we dont have an infinite loop
+        while ( i<100 && !pd.didAbsoluteConvergence()) {
+            pd.compute();
+            i++;
         }
                 
         pd.getResults();
+        System.out.println("Number of iterations: " + i);
 //        Utils.exportGraphIntoGML(graph, "../data/export");
     }
 }
