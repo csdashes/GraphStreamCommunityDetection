@@ -215,7 +215,7 @@ public class CommunityDetectionLouvain {
                     node.changeAttribute("community", bestCommunity);
                 }
                 // Commented for the moment. It could be used for performace improvement.
-                // Count the inner and outer edges that the node that changes community is connected to, 
+                // Count the inner and outer edges that the node (which changes community) is connected to, 
                 // simmultaniously with the community calculation.
 //                    if(node.getAttribute("community") != oldCommunity) {
 //                        neighbours = node.getNeighborNodeIterator();
@@ -297,7 +297,6 @@ public class CommunityDetectionLouvain {
                         String.format("NMI: %f", nmi.getMeasure()));
                 sleep();
             }
-
         }
 
         // If an edge connects nodes that belong to different communities, color
@@ -308,7 +307,6 @@ public class CommunityDetectionLouvain {
                 edge.addAttribute("ui.style", "fill-color: rgb(236,236,236);");
             }
         }
-
     }
 
     /**
@@ -340,7 +338,7 @@ public class CommunityDetectionLouvain {
                 double edgeWeightBetweenThem = (Double)node.getEdgeBetween(neighbour).getAttribute("weight");
                 String neighbourCommunity = neighbour.getAttribute("community");
                 if (neighbourCommunity.equals(node.getAttribute("community"))) {
-                    community.increaseInnerEdgesCount();
+                    //community.increaseInnerEdgesCount();
                     community.increaseInnerEdgesWeightCount(edgeWeightBetweenThem);
                     community.addNodesSet((HashSet<String>) node.getAttribute("trueCommunityNodes"));
                 } else {
@@ -362,7 +360,7 @@ public class CommunityDetectionLouvain {
         // Finilize the inner edges count (divide it by 2)
         for (Iterator<Entry<String, HyperCommunity>> it = communities.entrySet().iterator(); it.hasNext();) {
             Entry<String, HyperCommunity> entry = it.next();
-            communities.get(entry.getKey()).finilizeInnerEdgesCount();
+            communities.get(entry.getKey()).finilizeInnerEdgesWeightCount();
         }
 
         // Creation of the folded graph.
