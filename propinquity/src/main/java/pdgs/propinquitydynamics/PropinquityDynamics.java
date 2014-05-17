@@ -28,6 +28,17 @@ public class PropinquityDynamics implements Algorithm {
     private boolean debug = false, statistics = false;
     private String[] debugIDs;
 
+    private void debug(String[] ids) {
+        for (String id : ids) {
+            Node n = this.graph.getNode(id);
+            System.out.println("Node: " + n.getIndex());
+            System.out.println("Nr: " + n.getAttribute("Nr"));
+            System.out.println("Ni: " + n.getAttribute("Ni"));
+            System.out.println("Nd: " + n.getAttribute("Nd"));
+            System.out.println("pm: " + n.getAttribute("pm"));
+        }
+    }
+
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
         Iterator<Node> it = n.getNeighborNodeIterator();
@@ -438,16 +449,6 @@ public class PropinquityDynamics implements Algorithm {
         this.statistics = false;
     }
 
-    private void debug(String[] ids) {
-        for (String id : ids) {
-            Node n = this.graph.getNode(id);
-            System.out.println("Node: " + n.getIndex());
-            System.out.println("Nr: " + n.getAttribute("Nr"));
-            System.out.println("Ni: " + n.getAttribute("Ni"));
-            System.out.println("Nd: " + n.getAttribute("Nd"));
-            System.out.println("pm: " + n.getAttribute("pm"));
-        }
-    }
 
     private void applyFinalTopology() {
         int added = 0, removed = 0;
