@@ -11,7 +11,10 @@ import org.graphstream.ui.spriteManager.Sprite;
 import org.graphstream.ui.spriteManager.SpriteManager;
 
 /**
- *
+ * This class provides styling methods for several graph elements and graph 
+ * Viewers.
+ * To use it, create a UIToolbox object, providing a Graph object (where the 
+ * styling will be applied) as a parameter.
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class UIToolbox {
