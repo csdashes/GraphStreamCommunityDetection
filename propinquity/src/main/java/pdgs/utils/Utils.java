@@ -62,9 +62,14 @@ public class Utils {
                 PropinquityMap node0pm = node.getAttribute("pm");
                 Set<Integer> node0Nr = node.getAttribute("Nr");
 
-                Integer node0PropSum = 0;
-                for (Integer n : node0Nr) {
-                    node0PropSum += node0pm.get(n).get();
+                int node0PropSum = 0;
+                if (node.getAttribute("NrSum")) {
+                    node0PropSum = (Integer) node.getAttribute("NrSum");
+                } else {
+                    for (Integer n : node0Nr) {
+                        node0PropSum += node0pm.get(n).get();
+                    }
+                    node.setAttribute("NrSum", node0PropSum);
                 }
 
                 if (node0PropSum > maxPropSum) {
