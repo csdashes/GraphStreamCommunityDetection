@@ -483,24 +483,21 @@ public class PropinquityDynamics implements Algorithm {
      */
     private void propToNumEdges() {
         for (Edge edge : this.graph.getEachEdge()) {
-            Node node0 = edge.getNode0();
-            PropinquityMap node0pm = node0.getAttribute("pm");
-            Node node1 = edge.getNode1();
-
-            // get the propinquity
-            int prop = node0pm.get(node1.getIndex()).get();
-            double norm_node0_prop = (double) prop / (double) node0.getEdgeSet().size();
-            double norm_node1_prop = (double) prop / (double) node1.getEdgeSet().size();
-
-            double out;
-            if (norm_node1_prop > norm_node0_prop) {
-                out = norm_node0_prop;
-            } else {
-                out = norm_node1_prop;
+            Node[] nodes = {edge.getNode0(), edge.getNode1()};
+            
+            int maxNumEdges = 0;
+            for (Node node : nodes) {
+                if (node.getEdgeSet().size() > maxNumEdges) {
+                    maxNumEdges = node.getEdgeSet().size();
+                }
             }
-
-            edge.setAttribute("ui.label", String.format("%.2f", out));
-            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + out * 3 + ";");
+            
+            // get the propinquity
+            int prop = ((PropinquityMap) nodes[0].getAttribute("pm")).get(nodes[1].getIndex()).get();            
+            double weight = (double) prop / (double) maxNumEdges;
+            
+            edge.setAttribute("ui.label", String.format("%.2f", weight));
+            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + weight * 3 + ";");
         }
     }
     
@@ -511,37 +508,28 @@ public class PropinquityDynamics implements Algorithm {
      */
     private void propToTotalProp() {
         for (Edge edge : this.graph.getEachEdge()) {
-            Node node0 = edge.getNode0();
-            PropinquityMap node0pm = node0.getAttribute("pm");
-            Set<Integer> node0Nr = node0.getAttribute("Nr");
-            Node node1 = edge.getNode1();
-            PropinquityMap node1pm = node1.getAttribute("pm");
-            Set<Integer> node1Nr = node1.getAttribute("Nr");
+            Node[] nodes = {edge.getNode0(), edge.getNode1()};
+            
+            int maxPropSum = 0;
+            for (Node node : nodes) {
+                PropinquityMap node0pm = node.getAttribute("pm");
+                Set<Integer> node0Nr = node.getAttribute("Nr");
+                
+                Integer node0PropSum = 0;
+                for (Integer n : node0Nr) {
+                    node0PropSum += node0pm.get(n).get();
+                }
 
-            Integer node0PropSum = 0;
-            for (Integer n : node0Nr) {
-                node0PropSum += node0pm.get(n).get();
+                if (node0PropSum > maxPropSum) {
+                    maxPropSum = node0PropSum;
+                }
             }
-
-            Integer node1PropSum = 0;
-            for (Integer n : node1Nr) {
-                node1PropSum += node1pm.get(n).get();
-            }
-
-            // get the propinquity
-            int prop = node0pm.get(node1.getIndex()).get();
-            double norm_node0_prop = (double) prop / (double) node0PropSum;
-            double norm_node1_prop = (double) prop / (double) node1PropSum;
-
-            double out;
-            if (norm_node1_prop > norm_node0_prop) {
-                out = norm_node0_prop;
-            } else {
-                out = norm_node1_prop;
-            }
-
-            edge.setAttribute("ui.label", String.format("%.2f", out));
-            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + out * 10 + ";");
+            
+            int prop = ((PropinquityMap) nodes[0].getAttribute("pm")).get(nodes[1].getIndex()).get();
+            double weight = (double) prop / (double) maxPropSum;
+            
+            edge.setAttribute("ui.label", String.format("%.2f", weight));
+            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + weight * 10 + ";");
         }
     }
 
