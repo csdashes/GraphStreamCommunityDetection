@@ -362,7 +362,7 @@ public class CommunityDetectionLouvain {
         // Finilize the inner edges count (divide it by 2)
         for (Iterator<Entry<String, HyperCommunity>> it = communities.entrySet().iterator(); it.hasNext();) {
             Entry<String, HyperCommunity> entry = it.next();
-            communities.get(entry.getKey()).finilizeInnerEdgesCount();
+            communities.get(entry.getKey()).finilizeInnerEdgesWeightCount();
         }
 
         // Creation of the folded graph.
