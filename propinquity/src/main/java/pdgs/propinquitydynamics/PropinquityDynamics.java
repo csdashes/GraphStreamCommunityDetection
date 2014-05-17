@@ -593,7 +593,7 @@ public class PropinquityDynamics implements Algorithm {
     public void getResultsWithAbsoluteFractionWeights() {
         applyFinalTopology();
         colorCommunities();
-        propToNumEdges();
+        propToTotalProp();
 //        this.graph.removeNode(7);
 //        this.graph.removeNode(9);
     }
