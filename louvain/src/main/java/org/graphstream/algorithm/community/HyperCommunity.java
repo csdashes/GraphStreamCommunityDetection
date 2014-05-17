@@ -204,9 +204,9 @@ public class HyperCommunity extends Community {
     }
     
     /**
-     * Divide the inner edges count by 2 (in case they were calculated twice.
+     * Divide the inner edges weight counter by 2 (in case they were calculated twice).
      */
-    public void finilizeInnerEdgesCount() {
-        this.innerEdgesCount/=2;
+    public void finilizeInnerEdgesWeightCount() {
+        this.innerEdgesWeightCount/=2;
     }
 }
