@@ -23,7 +23,8 @@ public class App {
         for (int i = 0; i < 2; i++) {
             pd.compute();            
         }
-                
+        
+        pd.applyFinalTopology();
         pd.getResultsWithFractionWeights();
         
         // Erdos02-subgraph specific vertices

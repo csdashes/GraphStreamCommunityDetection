@@ -449,8 +449,7 @@ public class PropinquityDynamics implements Algorithm {
         this.statistics = false;
     }
 
-
-    private void applyFinalTopology() {
+    public void applyFinalTopology() {
         int added = 0, removed = 0;
         for (Node n : this.graph.getEachNode()) {
             PropinquityMap pm = n.getAttribute("pm");
@@ -532,18 +531,11 @@ public class PropinquityDynamics implements Algorithm {
         }
     }
 
-
-    public void getOriginalResults() {
-        applyFinalTopology();
-    }
-    
     public void getResultsWithFractionWeights() {
-        applyFinalTopology();
         propToNumEdges();
     }
     
     public void getResultsWithAbsoluteFractionWeights() {
-        applyFinalTopology();
         propToTotalProp();
     }
 }
