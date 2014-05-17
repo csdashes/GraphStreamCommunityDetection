@@ -1,11 +1,9 @@
 package pdgs.propinquitydynamics;
 
 import com.google.common.collect.Sets;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
 import org.graphstream.graph.Edge;
