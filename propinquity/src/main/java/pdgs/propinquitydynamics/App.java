@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
-//import pdgs.utils.Utils;
+import pdgs.utils.Utils;
 
 public class App {
     public static void main(String[] args) throws IOException, GraphParseException {
@@ -26,9 +26,13 @@ public class App {
             pd.compute();
             i++;
         }
-                
-        pd.getResults();
-        System.out.println("Number of iterations: " + i);
-//        Utils.exportGraphIntoGML(graph, "../data/export");
+        
+        pd.applyFinalTopology();
+        
+        // Erdos02-subgraph specific vertices
+        Integer[] fixedCommunity = {10,11};
+        Utils.ColorCommunities(graph, fixedCommunity);
+        Utils.FractionWithTotalPropinquity(graph);
+//        Utils.ExportGraphIntoGML(graph, "../data/export");
     }
 }

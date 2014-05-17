@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
 import org.graphstream.graph.Edge;
@@ -29,6 +28,17 @@ public class PropinquityDynamics implements Algorithm {
     private int a, b, e = -1;
     private boolean debug = false, statistics = false;
     private String[] debugIDs;
+
+    private void debug(String[] ids) {
+        for (String id : ids) {
+            Node n = this.graph.getNode(id);
+            System.out.println("Node: " + n.getIndex());
+            System.out.println("Nr: " + n.getAttribute("Nr"));
+            System.out.println("Ni: " + n.getAttribute("Ni"));
+            System.out.println("Nd: " + n.getAttribute("Nd"));
+            System.out.println("pm: " + n.getAttribute("pm"));
+        }
+    }
 
     private Set<Integer> getNeightboursOf(Node n) {
         Set<Integer> out = new LinkedHashSet<Integer>(10);
@@ -462,18 +472,7 @@ public class PropinquityDynamics implements Algorithm {
         this.statistics = false;
     }
 
-    private void debug(String[] ids) {
-        for (String id : ids) {
-            Node n = this.graph.getNode(id);
-            System.out.println("Node: " + n.getIndex());
-            System.out.println("Nr: " + n.getAttribute("Nr"));
-            System.out.println("Ni: " + n.getAttribute("Ni"));
-            System.out.println("Nd: " + n.getAttribute("Nd"));
-            System.out.println("pm: " + n.getAttribute("pm"));
-        }
-    }
-
-    void getResults() throws IOException {
+    public void applyFinalTopology() {
         int added = 0, removed = 0;
         for (Node n : this.graph.getEachNode()) {
             PropinquityMap pm = n.getAttribute("pm");
@@ -481,7 +480,7 @@ public class PropinquityDynamics implements Algorithm {
                 Integer nodeIndex = row.getKey();
                 Integer propinquity = row.getValue().get();
 
-                if (propinquity < this.a) {
+                if (propinquity <= this.a) {
                     if (n.getEdgeBetween(nodeIndex) != null) {
                         this.graph.removeEdge(n.getEdgeBetween(nodeIndex));
                         removed++;
@@ -494,43 +493,6 @@ public class PropinquityDynamics implements Algorithm {
                 }
             }
         }
-
-        // Used for colors.
-        Random color = new Random();
-
-        int sad = color.nextInt(255);
-        this.graph.getNode(10).setAttribute("visited", 1);
-        this.graph.getNode(10).addAttribute("ui.style", "fill-color: rgb(" + sad + "," + sad + "," + sad + "); size: 20px;");
-        this.graph.getNode(11).setAttribute("visited", 1);
-        this.graph.getNode(11).addAttribute("ui.style", "fill-color: rgb(" + sad + "," + sad + "," + sad + "); size: 20px;");
-
-        for (Node n : this.graph.getEachNode()) {
-            if (!n.hasAttribute("visited")) {
-                int r = color.nextInt(255);
-                int g = color.nextInt(255);
-                int b = color.nextInt(255);
-
-                n.setAttribute("visited", 1);
-                n.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
-                Iterator<Node> breadth = n.getBreadthFirstIterator();
-                while (breadth.hasNext()) {
-                    Node next = breadth.next();
-                    if (!next.hasAttribute("visited")) {
-                        next.setAttribute("visited", 1);
-                        next.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
-                    }
-                }
-            }
-        }
-        for (Edge edge : this.graph.getEachEdge()) {
-            PropinquityMap node0pm = edge.getNode0().getAttribute("pm");
-            Node node1 = edge.getNode1();
-            edge.setAttribute("ui.label", node0pm.get(node1.getIndex()).toString());
-            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + node0pm.get(node1.getIndex()).toString() + ";");
-        }
-        this.graph.removeNode(7);
-        this.graph.removeNode(9);
-
         System.out.println("Added: " + added);
         System.out.println("Removed: " + removed);
     }
