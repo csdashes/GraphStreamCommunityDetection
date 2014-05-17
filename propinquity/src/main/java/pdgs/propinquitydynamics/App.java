@@ -24,7 +24,7 @@ public class App {
             pd.compute();            
         }
                 
-        pd.getResults();
+        pd.getResultsWithFractionWeights();
 //        Utils.exportGraphIntoGML(graph, "../data/export");
     }
 }
