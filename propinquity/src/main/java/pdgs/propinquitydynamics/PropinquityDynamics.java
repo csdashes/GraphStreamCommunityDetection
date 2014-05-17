@@ -534,21 +534,15 @@ public class PropinquityDynamics implements Algorithm {
 
     public void getOriginalResults() {
         applyFinalTopology();
-//        this.graph.removeNode(7);
-//        this.graph.removeNode(9);
     }
     
     public void getResultsWithFractionWeights() {
         applyFinalTopology();
         propToNumEdges();
-//        this.graph.removeNode(7);
-//        this.graph.removeNode(9);
     }
     
     public void getResultsWithAbsoluteFractionWeights() {
         applyFinalTopology();
         propToTotalProp();
-//        this.graph.removeNode(7);
-//        this.graph.removeNode(9);
     }
 }
