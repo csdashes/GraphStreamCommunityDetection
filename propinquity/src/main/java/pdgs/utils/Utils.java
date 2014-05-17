@@ -26,7 +26,7 @@ public class Utils {
      * 
      * @param graph
      */
-    public static void propToNumEdges(Graph graph) {
+    public static void FractionWithNumberOfEdges(Graph graph) {
         for (Edge edge : graph.getEachEdge()) {
             Node[] nodes = {edge.getNode0(), edge.getNode1()};
 
@@ -53,7 +53,7 @@ public class Utils {
      * 
      * @param graph
      */
-    public static void propToTotalProp(Graph graph) {
+    public static void FractionWithTotalPropinquity(Graph graph) {
         for (Edge edge : graph.getEachEdge()) {
             Node[] nodes = {edge.getNode0(), edge.getNode1()};
 
