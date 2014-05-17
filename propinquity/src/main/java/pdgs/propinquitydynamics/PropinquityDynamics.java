@@ -187,6 +187,9 @@ public class PropinquityDynamics implements Algorithm {
 
     // PHASE 2
     public void compute() {
+        // Init e to count topology differences
+        this.e = 0;
+        
         // Superstep 0 first part
         // Init apropriate sets (Nd, Ni).
         for (Node n : this.graph.getEachNode()) {
@@ -204,8 +207,10 @@ public class PropinquityDynamics implements Algorithm {
                 if (propinquity <= this.a && Nr.contains(nodeIndex)) {
                     Nd.add(nodeIndex);
                     Nr.remove(nodeIndex);
+                    this.e++;
                 } else if (propinquity >= this.b && !Nr.contains(nodeIndex)) {
                     Ni.add(nodeIndex);
+                    this.e++;
                 }
             }
         }
