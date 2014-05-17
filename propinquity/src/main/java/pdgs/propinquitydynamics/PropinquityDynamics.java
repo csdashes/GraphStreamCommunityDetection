@@ -26,7 +26,7 @@ import pdgs.utils.PropinquityMap;
 public class PropinquityDynamics implements Algorithm {
 
     Graph graph;
-    private int a, b, e;
+    private int a, b, e = -1;
     private boolean debug = false, statistics = false;
     private String[] debugIDs;
 
