@@ -25,11 +25,11 @@ public class App {
         }
         
         pd.applyFinalTopology();
-        pd.getResultsWithFractionWeights();
         
         // Erdos02-subgraph specific vertices
         Integer[] fixedCommunity = {10,11};
         Utils.colorCommunities(graph, fixedCommunity);
+        Utils.propToTotalProp(graph);
 //        Utils.exportGraphIntoGML(graph, "../data/export");
     }
 }
