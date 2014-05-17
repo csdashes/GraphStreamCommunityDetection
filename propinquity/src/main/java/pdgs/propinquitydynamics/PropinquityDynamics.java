@@ -533,46 +533,15 @@ public class PropinquityDynamics implements Algorithm {
         }
     }
 
-    private void colorCommunities() {
-        // Used for colors.
-        Random color = new Random();
-
-        int sad = color.nextInt(255);
-        this.graph.getNode(10).setAttribute("visited", 1);
-        this.graph.getNode(10).addAttribute("ui.style", "fill-color: rgb(" + sad + "," + sad + "," + sad + "); size: 20px;");
-        this.graph.getNode(11).setAttribute("visited", 1);
-        this.graph.getNode(11).addAttribute("ui.style", "fill-color: rgb(" + sad + "," + sad + "," + sad + "); size: 20px;");
-
-        for (Node n : this.graph.getEachNode()) {
-            if (!n.hasAttribute("visited")) {
-                int r = color.nextInt(255);
-                int g = color.nextInt(255);
-                int b = color.nextInt(255);
-
-                n.setAttribute("visited", 1);
-                n.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
-                Iterator<Node> breadth = n.getBreadthFirstIterator();
-                while (breadth.hasNext()) {
-                    Node next = breadth.next();
-                    if (!next.hasAttribute("visited")) {
-                        next.setAttribute("visited", 1);
-                        next.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
-                    }
-                }
-            }
-        }
-    }
 
     public void getOriginalResults() {
         applyFinalTopology();
-        colorCommunities();
 //        this.graph.removeNode(7);
 //        this.graph.removeNode(9);
     }
     
     public void getResultsWithFractionWeights() {
         applyFinalTopology();
-        colorCommunities();
         propToNumEdges();
 //        this.graph.removeNode(7);
 //        this.graph.removeNode(9);
@@ -580,7 +549,6 @@ public class PropinquityDynamics implements Algorithm {
     
     public void getResultsWithAbsoluteFractionWeights() {
         applyFinalTopology();
-        colorCommunities();
         propToTotalProp();
 //        this.graph.removeNode(7);
 //        this.graph.removeNode(9);
