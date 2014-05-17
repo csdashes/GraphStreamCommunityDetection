@@ -80,7 +80,7 @@ public class Utils {
         }
     }
     
-    public static void colorCommunities(Graph graph, Integer[] ids) {
+    public static void ColorCommunities(Graph graph, Integer[] ids) {
         // Used for colors.
         Random color = new Random();
 
@@ -110,7 +110,7 @@ public class Utils {
         }
     }
     
-    public static void exportGraphIntoGML(Graph graph, String fileName) throws IOException {
+    public static void ExportGraphIntoGML(Graph graph, String fileName) throws IOException {
         for (Node n : graph.getEachNode()) {
             n.addAttribute("ui_label", n.getAttribute("ui.label"));
             n.addAttribute("ui_style", n.getAttribute("ui.style"));

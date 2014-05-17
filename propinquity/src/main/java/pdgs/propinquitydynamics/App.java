@@ -28,8 +28,8 @@ public class App {
         
         // Erdos02-subgraph specific vertices
         Integer[] fixedCommunity = {10,11};
-        Utils.colorCommunities(graph, fixedCommunity);
+        Utils.ColorCommunities(graph, fixedCommunity);
         Utils.FractionWithTotalPropinquity(graph);
-//        Utils.exportGraphIntoGML(graph, "../data/export");
+//        Utils.ExportGraphIntoGML(graph, "../data/export");
     }
 }
