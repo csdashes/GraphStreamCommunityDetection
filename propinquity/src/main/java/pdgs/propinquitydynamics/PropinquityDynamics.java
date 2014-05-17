@@ -503,6 +503,47 @@ public class PropinquityDynamics implements Algorithm {
             edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + out * 3 + ";");
         }
     }
+    
+    /** 
+     * Take the propinquity between two vertices and divide it with the summary 
+     * of each outgoing edge weight, of each vertex. Then set the smaller fraction 
+     * as the weight of the edge.
+     */
+    private void propToTotalProp() {
+        for (Edge edge : this.graph.getEachEdge()) {
+            Node node0 = edge.getNode0();
+            PropinquityMap node0pm = node0.getAttribute("pm");
+            Set<Integer> node0Nr = node0.getAttribute("Nr");
+            Node node1 = edge.getNode1();
+            PropinquityMap node1pm = node1.getAttribute("pm");
+            Set<Integer> node1Nr = node1.getAttribute("Nr");
+
+            Integer node0PropSum = 0;
+            for (Integer n : node0Nr) {
+                node0PropSum += node0pm.get(n).get();
+            }
+
+            Integer node1PropSum = 0;
+            for (Integer n : node1Nr) {
+                node1PropSum += node1pm.get(n).get();
+            }
+
+            // get the propinquity
+            int prop = node0pm.get(node1.getIndex()).get();
+            double norm_node0_prop = (double) prop / (double) node0PropSum;
+            double norm_node1_prop = (double) prop / (double) node1PropSum;
+
+            double out;
+            if (norm_node1_prop > norm_node0_prop) {
+                out = norm_node0_prop;
+            } else {
+                out = norm_node1_prop;
+            }
+
+            edge.setAttribute("ui.label", String.format("%.2f", out));
+            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + out * 10 + ";");
+        }
+    }
 
     private void colorCommunities() {
         // Used for colors.
@@ -537,6 +578,14 @@ public class PropinquityDynamics implements Algorithm {
     public void getOriginalResults() {
         applyFinalTopology();
         colorCommunities();
+//        this.graph.removeNode(7);
+//        this.graph.removeNode(9);
+    }
+    
+    public void getResultsWithFractionWeights() {
+        applyFinalTopology();
+        colorCommunities();
+        propToNumEdges();
 //        this.graph.removeNode(7);
 //        this.graph.removeNode(9);
     }
