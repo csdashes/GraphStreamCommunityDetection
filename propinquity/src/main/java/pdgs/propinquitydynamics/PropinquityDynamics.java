@@ -410,17 +410,34 @@ public class PropinquityDynamics implements Algorithm {
     }
 
     /**
-     * @return the e
+     * The variable <b>e</b> counts the global additions and removals of edges.
+     * We say that if <b>e</b> is 0, then propinquity dynamics algorithm
+     * has converged.
+     * 
+     * @return the number of added or removed edges in one phase 2 loop
      */
     public int getE() {
         return e;
     }
 
     /**
-     * @param e the e to set
+     * Helper function to easy declare that if <b>e</b> == 0, then return true.
+     * 
+     * @return true if e == 0
+     */    
+    public boolean didAbsoluteConvergence() {
+        return this.e == 0;
+    }
+
+    /**
+     * Helper function to easy declare that if <b>e</b> <= <b>threshold</b>, then return true.
+     *
+     * @param threshold the threshold we want to say that the algorithm 
+     *                  has converged
+     * @return true if e <= threshold
      */
-    public void setE(int e) {
-        this.e = e;
+    public boolean didConvergence(int threshold) {
+        return this.e <= threshold;
     }
 
     public void debugOn(String[] ids) {
