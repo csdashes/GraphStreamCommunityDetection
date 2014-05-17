@@ -23,6 +23,8 @@ public class Utils {
      * Take the propinquity between two vertices and divide it with the biggest
      * number of edges between the two. Then set the fraction as the weight of
      * the edge.
+     * 
+     * @param graph
      */
     public static void propToNumEdges(Graph graph) {
         for (Edge edge : graph.getEachEdge()) {
@@ -48,6 +50,8 @@ public class Utils {
      * Take the propinquity between two vertices and divide it with the summary
      * of each outgoing edge weight, of each vertex. Then set the smaller
      * fraction as the weight of the edge.
+     * 
+     * @param graph
      */
     public static void propToTotalProp(Graph graph) {
         for (Edge edge : graph.getEachEdge()) {
