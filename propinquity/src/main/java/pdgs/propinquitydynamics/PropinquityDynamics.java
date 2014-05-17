@@ -476,7 +476,12 @@ public class PropinquityDynamics implements Algorithm {
         System.out.println("Removed: " + removed);
     }
 
-    private void weightsAsMinFractions() {
+    /** 
+     * Take the propinquity between two vertices and divide it with the biggest 
+     * number of edges between the two. Then set the fraction as the weight of
+     * the edge.
+     */
+    private void propToNumEdges() {
         for (Edge edge : this.graph.getEachEdge()) {
             Node node0 = edge.getNode0();
             PropinquityMap node0pm = node0.getAttribute("pm");
@@ -539,7 +544,7 @@ public class PropinquityDynamics implements Algorithm {
     public void getResultsWithFractionWeights() throws IOException {
         applyFinalTopology();
         colorCommunities();
-        weightsAsMinFractions();
+        PropToNumEdges();
 //        this.graph.removeNode(7);
 //        this.graph.removeNode(9);
     }
