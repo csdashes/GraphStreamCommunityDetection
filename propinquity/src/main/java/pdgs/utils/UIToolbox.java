@@ -19,6 +19,14 @@ import org.graphstream.ui.spriteManager.SpriteManager;
  */
 public class UIToolbox {
 
+    private static String GetRGB() {
+        Random color = new Random(System.currentTimeMillis());
+        int r = color.nextInt(256);
+        int g = color.nextInt(256);
+        int b = color.nextInt(256);
+        
+        return r + "," + g + "," + b;
+    }
     /**
      * Method to add styling attributes (ui.label, ui.style) to a node
      *
@@ -33,14 +41,14 @@ public class UIToolbox {
         Map<String, String> colorMap = new HashMap<String, String>(numOfCommunities);
 
         // Generate colors
-        Random color = new Random(System.currentTimeMillis());
         for (int i = 0; i < numOfCommunities; i++) {
-            int r = color.nextInt(256);
-            int g = color.nextInt(256);
-            int b = color.nextInt(256);
-
-            // We might have same colors... we need to fix that at some point.
-            colorMap.put(i + 1 + "", r + "," + g + "," + b);
+            String newColor = GetRGB();
+            
+            while (colorMap.containsValue(newColor)) {
+                newColor = GetRGB();
+            }
+            
+            colorMap.put(i + 1 + "", newColor);
         }
 
         // Set the colors
