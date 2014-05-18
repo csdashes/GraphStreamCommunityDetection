@@ -10,6 +10,44 @@ import org.graphstream.graph.Node;
  */
 public class ExtractCommunities {
 
+    public static int MaxToMin(Graph graph, Integer[] fixedIDs) {
+        // fixedIDs is not supported yet!
+        SortedMap<Double, List<Integer>> edgeWeightsMap = new TreeMap<Double, List<Integer>>(Collections.reverseOrder());
+        
+        for (Edge e : graph.getEachEdge()) {
+            Double w = e.getAttribute("weight");
+            
+            if (edgeWeightsMap.containsKey(w)) {
+                edgeWeightsMap.get(w).add(e.getIndex());
+            } else {
+                List<Integer> l = new ArrayList<Integer>(4);
+                l.add(e.getIndex());
+                edgeWeightsMap.put(w, l);
+            }
+        }
+
+        int communityNum = 0;
+        for (Entry<Double, List<Integer>> entry : edgeWeightsMap.entrySet()) {
+            for (Integer edgeID : entry.getValue()) {
+                Edge e = graph.getEdge(edgeID);
+                
+                Node[] nodes = {e.getNode0(), e.getNode1()};
+                
+                if (nodes[0].getAttribute("community") == null && nodes[1].getAttribute("community") == null) {
+                    communityNum++;
+                    nodes[0].setAttribute("community", communityNum);
+                    nodes[1].setAttribute("community", communityNum);
+                } else if (nodes[0].getAttribute("community") != null && nodes[1].getAttribute("community") == null) {
+                    nodes[1].setAttribute("community", (Integer) nodes[0].getAttribute("community"));
+                } else if (nodes[0].getAttribute("community") == null && nodes[1].getAttribute("community") != null) {
+                    nodes[0].setAttribute("community", (Integer) nodes[1].getAttribute("community"));
+                }
+            }
+        }
+        
+        return communityNum;
+    }
+
     /**
      * Find disjoined communities by BFS. The first community has number 1.
      *
