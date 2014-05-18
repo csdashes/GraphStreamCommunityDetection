@@ -14,8 +14,8 @@ import static pdgs.utils.CalculationTable.CalculateCii;
 import static pdgs.utils.CalculationTable.CalculateCrd;
 import static pdgs.utils.CalculationTable.CalculateCri;
 import static pdgs.utils.CalculationTable.CalculateCrr;
-import pdgs.utils.MutableInt;
-import pdgs.utils.PropinquityMap;
+import pdgs.propinquitydynamics.utils.MutableInt;
+import pdgs.propinquitydynamics.utils.PropinquityMap;
 
 /**
  *
