@@ -1,5 +1,7 @@
-package org.graphstream.algorithm.community;
+package th.algorithms.louvain;
 
+import th.algorithms.louvain.utils.HyperCommunityManager;
+import th.algorithms.louvain.utils.HyperCommunity;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import java.io.IOException;

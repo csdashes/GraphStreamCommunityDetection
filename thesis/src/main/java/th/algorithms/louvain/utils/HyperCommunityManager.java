@@ -1,4 +1,4 @@
-package org.graphstream.algorithm.community;
+package th.algorithms.louvain.utils;
 
 /**
  * 
