@@ -93,7 +93,7 @@ public class Utils {
                     + sourceGraph.getNodeCount() + " targetGraph: "
                     + targetGraph.getNodeCount());
         }
-        
+
         for (Node n : sourceGraph) {
             targetGraph.getNode(n.getIndex()).setAttribute("community", (Integer) n.getAttribute("community"));
         }
@@ -124,6 +124,7 @@ public class Utils {
      * updating to gs-code 1.3 and use Graphs.clone(Graph graph) instead).
      *
      * @param g the graph to clone
+     *
      * @return a copy of g
      */
     public static Graph clone(Graph g) {

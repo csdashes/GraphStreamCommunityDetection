@@ -24,9 +24,10 @@ public class UIToolbox {
         int r = color.nextInt(256);
         int g = color.nextInt(256);
         int b = color.nextInt(256);
-        
+
         return r + "," + g + "," + b;
     }
+
     /**
      * Method to add styling attributes (ui.label, ui.style) to a node
      *
@@ -43,7 +44,7 @@ public class UIToolbox {
         // Set the colors
         for (Node n : graph.getEachNode()) {
             Integer com = (Integer) n.getAttribute("community");
-            
+
             if (!colorMap.containsKey(com)) {
                 String newColor = GetRGB();
                 // Assert that the color is unique
@@ -52,7 +53,7 @@ public class UIToolbox {
                 }
                 colorMap.put(com, newColor);
             }
-            
+
             n.addAttribute("ui.style", "fill-color: rgb(" + colorMap.get(com) + "); size: 20px;");
         }
     }

@@ -11,6 +11,7 @@ import pdgs.utils.UIToolbox;
 import pdgs.utils.Utils;
 
 public class App {
+
     public static void main(String[] args) throws IOException, GraphParseException, ParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.display();
@@ -22,18 +23,18 @@ public class App {
 //        pd.debugOn(monitoredIDs);
 //        pd.statisticsOn();
         pd.init(graph);
-        
+
         int i = 0;
         // We need to be sure that we dont have an infinite loop
-        while (i<100 && !pd.didAbsoluteConvergence()) {
+        while (i < 100 && !pd.didAbsoluteConvergence()) {
             pd.compute();
             i++;
         }
-        
+
         pd.applyFinalTopology();
-        
+
         // Erdos02-subgraph specific vertices
-        Integer[] fixedCommunity = {10,11};
+        Integer[] fixedCommunity = {10, 11};
         ExtractCommunities.BFS(graph, fixedCommunity);
         UIToolbox.ColorCommunities(graph);
         Utils.FractionWithTotalPropinquity(graph);
@@ -43,7 +44,7 @@ public class App {
         originGraph.read("../data/erdos02-subset.gml");
         Utils.CopyCommunities(graph, originGraph);
         UIToolbox.ColorCommunities(originGraph);
-        
+
 //        Utils.ExportGraphIntoGML(graph, "../data/export");
     }
 }
