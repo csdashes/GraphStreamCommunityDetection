@@ -38,14 +38,14 @@ public class UIToolbox {
      * Add a sprite in the graph Viewer window. Default X coordinate: 20.
      * @param spriteId the id for the specific Sprite.
      * @param spriteName the text that will be displayed as name of the sprite.
-     * @param spriteValue the value (int) next to the name of the sprite.
+     * @param spriteValue the value (Number) next to the name of the sprite.
      * @param spritePosition the Y coordinate of the sprite. Default X position is 20. 
      */
-    public void addSprite(String spriteId, String spriteName, Integer spriteValue, int spritePosition) {
+    public void addSprite(String spriteId, String spriteName, Number spriteValue, int spritePosition) {
         Sprite spr = this.sm.addSprite(spriteId);
         spr.setPosition(StyleConstants.Units.PX, 20, spritePosition, 0);
         spr.setAttribute("ui.label",
-                String.format(spriteName+": %d", spriteValue));
+                String.format(spriteName+": %s", spriteValue));
         spr.setAttribute("ui.style", "size: 0px; text-color: rgb(150,100,100); text-size: 20;");
     }
     
