@@ -34,15 +34,15 @@ public class App {
         
         // Erdos02-subgraph specific vertices
         Integer[] fixedCommunity = {10,11};
-        int comNum = ExtractCommunities.BFS(graph, fixedCommunity);
-        UIToolbox.ColorCommunities(graph, comNum);
+        ExtractCommunities.BFS(graph, fixedCommunity);
+        UIToolbox.ColorCommunities(graph);
         Utils.FractionWithTotalPropinquity(graph);
 
         Graph originGraph = new DefaultGraph("Propinquity Dynamics");
         originGraph.display();
         originGraph.read("../data/erdos02-subset.gml");
         Utils.CopyCommunities(graph, originGraph);
-        UIToolbox.ColorCommunities(originGraph, comNum);
+        UIToolbox.ColorCommunities(originGraph);
         
 //        Utils.ExportGraphIntoGML(graph, "../data/export");
     }

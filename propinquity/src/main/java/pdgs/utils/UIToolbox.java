@@ -37,23 +37,22 @@ public class UIToolbox {
         n.setAttribute("ui.style", "size:20px;");
     }
 
-    public static void ColorCommunities(Graph graph, int numOfCommunities) {
-        Map<String, String> colorMap = new HashMap<String, String>(numOfCommunities);
-
-        // Generate colors
-        for (int i = 0; i < numOfCommunities; i++) {
-            String newColor = GetRGB();
-            
-            while (colorMap.containsValue(newColor)) {
-                newColor = GetRGB();
-            }
-            
-            colorMap.put(i + 1 + "", newColor);
-        }
+    public static void ColorCommunities(Graph graph) {
+        Map<Integer, String> colorMap = new HashMap<Integer, String>(10);
 
         // Set the colors
         for (Node n : graph.getEachNode()) {
-            String com = ((Integer) n.getAttribute("community")).toString();
+            Integer com = (Integer) n.getAttribute("community");
+            
+            if (!colorMap.containsKey(com)) {
+                String newColor = GetRGB();
+                // Assert that the color is unique
+                while (colorMap.containsValue(newColor)) {
+                    newColor = GetRGB();
+                }
+                colorMap.put(com, newColor);
+            }
+            
             n.addAttribute("ui.style", "fill-color: rgb(" + colorMap.get(com) + "); size: 20px;");
         }
     }
