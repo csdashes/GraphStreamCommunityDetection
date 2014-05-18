@@ -11,7 +11,7 @@ import th.utils.ExtractCommunities;
 import th.utils.UIToolbox;
 import th.utils.Utils;
 
-public class App {
+public class Main {
 
     public static void main(String[] args) throws IOException, GraphParseException, ParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
