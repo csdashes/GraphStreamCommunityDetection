@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.graphstream.algorithm.community.CommunityDetectionLouvain;
 import org.graphstream.stream.GraphParseException;
 
-public class App 
+public class Main 
 {
     public static void main( String[] args ) throws IOException, GraphParseException
     {
