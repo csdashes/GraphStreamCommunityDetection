@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package th.utils;
+package th.algorithms.propinquitydynamics.utils;
 
 import com.google.common.collect.Sets;
 import java.util.Set;

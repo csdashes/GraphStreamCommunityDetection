@@ -9,11 +9,11 @@ import org.graphstream.algorithm.Algorithm;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import static th.utils.CalculationTable.CalculateCdd;
-import static th.utils.CalculationTable.CalculateCii;
-import static th.utils.CalculationTable.CalculateCrd;
-import static th.utils.CalculationTable.CalculateCri;
-import static th.utils.CalculationTable.CalculateCrr;
+import static th.algorithms.propinquitydynamics.utils.CalculationTable.CalculateCdd;
+import static th.algorithms.propinquitydynamics.utils.CalculationTable.CalculateCii;
+import static th.algorithms.propinquitydynamics.utils.CalculationTable.CalculateCrd;
+import static th.algorithms.propinquitydynamics.utils.CalculationTable.CalculateCri;
+import static th.algorithms.propinquitydynamics.utils.CalculationTable.CalculateCrr;
 import th.algorithms.propinquitydynamics.utils.MutableInt;
 import th.algorithms.propinquitydynamics.utils.PropinquityMap;
 
