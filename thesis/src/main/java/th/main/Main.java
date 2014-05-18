@@ -6,6 +6,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
 import org.graphstream.util.parser.ParseException;
+import th.algorithms.louvain.CommunityDetectionLouvain;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
 import th.utils.ExtractCommunities;
 import th.utils.UIToolbox;
@@ -40,16 +41,13 @@ public class Main {
         UIToolbox.ColorCommunities(graph);
     }
 
-    public static void main(String[] args) throws IOException, GraphParseException, ParseException {
+    public static void ErdozSubgraphwithOriginalPDAndTwoDisplays() throws IOException, ParseException, GraphParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.display();
         graph.read("../data/erdos02-subset.gml");
 
-//        String[] monitoredIDs = {"220","409", "403"};
         PropinquityDynamics pd = new PropinquityDynamics();
         pd.set(2, 10);
-//        pd.debugOn(monitoredIDs);
-//        pd.statisticsOn();
         pd.init(graph);
 
         int i = 0;
@@ -71,19 +69,34 @@ public class Main {
         originGraph.display();
         originGraph.read("../data/erdos02-subset.gml");
         Utils.CopyCommunities(graph, originGraph);
-        UIToolbox.ColorCommunities(originGraph);
 
-//        Utils.ExportGraphIntoGML(graph, "../data/export");
+        UIToolbox.ColorCommunities(originGraph);
+    }
+
+    public static void WriteToFileExample() throws IOException, GraphParseException {
+        Graph graph = new DefaultGraph("Propinquity Dynamics");
+        graph.read("../data/erdos02-subset.gml");
         
-        
+        graph.removeNode(7);
+
+        Utils.ExportGraphIntoGML(graph, "../data/export");
+    }
+    
+    public static void LouvainExample() throws IOException, GraphParseException {
         // ex-Louvain Main
-//        CommunityDetectionLouvain louvain = new CommunityDetectionLouvain();
+        CommunityDetectionLouvain louvain = new CommunityDetectionLouvain();
 //        louvain.init("data/polbooks.gml");
 //        louvain.init("data/smalltest.gml");
 //        louvain.init("data/dolphins.gml");
-//        louvain.init("../data/karate.gml");
+        louvain.init("../data/karate.gml");
 //        louvain.init("../data/smalltest.dgs");
 //        louvain.init("../data/export.gml");
-//        louvain.execute();
+        louvain.execute();
+
+    }
+    
+    public static void main(String[] args) throws IOException, GraphParseException, ParseException {
+        // We must create a menu. I am too lazy right now to do it -.-
+        ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin();
     }
 }
