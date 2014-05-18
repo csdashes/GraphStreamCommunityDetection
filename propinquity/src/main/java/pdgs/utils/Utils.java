@@ -11,6 +11,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.AdjacencyListGraph;
 import org.graphstream.stream.file.FileSinkGML;
+import org.graphstream.util.parser.ParseException;
 
 /**
  *
@@ -82,6 +83,19 @@ public class Utils {
 
             edge.setAttribute("ui.label", String.format("%.2f", weight));
             edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + weight * 10 + ";");
+        }
+    }
+
+    public static void CopyCommunities(Graph sourceGraph, Graph targetGraph) throws ParseException {
+        // Check if the graphs have the same amount of vertices
+        if (sourceGraph.getNodeCount() != targetGraph.getNodeCount()) {
+            throw new org.graphstream.util.parser.ParseException("Graphs have different number of vertices! sourceGraph: "
+                    + sourceGraph.getNodeCount() + " targetGraph: "
+                    + targetGraph.getNodeCount());
+        }
+        
+        for (Node n : sourceGraph) {
+            targetGraph.getNode(n.getIndex()).setAttribute("community", (Integer) n.getAttribute("community"));
         }
     }
 
