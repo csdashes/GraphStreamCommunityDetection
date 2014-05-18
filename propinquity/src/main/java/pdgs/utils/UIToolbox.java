@@ -19,12 +19,6 @@ import org.graphstream.ui.spriteManager.SpriteManager;
  */
 public class UIToolbox {
 
-    private final SpriteManager sm;
-
-    public UIToolbox(Graph graph) {
-        this.sm = new SpriteManager(graph);
-    }
-
     /**
      * Method to add styling attributes (ui.label, ui.style) to a node
      *
@@ -33,6 +27,33 @@ public class UIToolbox {
     public static void StyleNode(Node n) {
         n.setAttribute("ui.label", n.getIndex());
         n.setAttribute("ui.style", "size:20px;");
+    }
+
+    public static void ColorCommunities(Graph graph, int numOfCommunities) {
+        Map<String, String> colorMap = new HashMap<String, String>(numOfCommunities);
+
+        // Generate colors
+        Random color = new Random(System.currentTimeMillis());
+        for (int i = 0; i < numOfCommunities; i++) {
+            int r = color.nextInt(256);
+            int g = color.nextInt(256);
+            int b = color.nextInt(256);
+
+            // We might have same colors... we need to fix that at some point.
+            colorMap.put(i + 1 + "", r + "," + g + "," + b);
+        }
+
+        // Set the colors
+        for (Node n : graph.getEachNode()) {
+            String com = ((Integer) n.getAttribute("community")).toString();
+            n.addAttribute("ui.style", "fill-color: rgb(" + colorMap.get(com) + "); size: 20px;");
+        }
+    }
+
+    private final SpriteManager sm;
+
+    public UIToolbox(Graph graph) {
+        this.sm = new SpriteManager(graph);
     }
 
     /**
@@ -59,26 +80,5 @@ public class UIToolbox {
      */
     public void removeSprite(String spriteName) {
         this.sm.removeSprite(spriteName);
-    }
-
-    public static void ColorCommunities(Graph graph, int numOfCommunities) {
-        Map<String, String> colorMap = new HashMap<String, String>(numOfCommunities);
-
-        // Generate colors
-        Random color = new Random(System.currentTimeMillis());
-        for (int i = 0; i < numOfCommunities; i++) {
-            int r = color.nextInt(256);
-            int g = color.nextInt(256);
-            int b = color.nextInt(256);
-
-            // We might have same colors... we need to fix that at some point.
-            colorMap.put(i + 1 + "", r + "," + g + "," + b);
-        }
-
-        // Set the colors
-        for (Node n : graph.getEachNode()) {
-            String com = ((Integer) n.getAttribute("community")).toString();
-            n.addAttribute("ui.style", "fill-color: rgb(" + colorMap.get(com) + "); size: 20px;");
-        }
     }
 }
