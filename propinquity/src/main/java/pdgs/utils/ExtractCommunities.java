@@ -36,8 +36,10 @@ public class ExtractCommunities {
                 Iterator<Node> breadth = n.getBreadthFirstIterator();
                 while (breadth.hasNext()) {
                     Node next = breadth.next();
-                    next.setAttribute("visited", 1);
-                    next.setAttribute("community", communityNum);
+                    if (!next.hasAttribute("visited")) {
+                        next.setAttribute("visited", 1);
+                        next.setAttribute("community", communityNum);                        
+                    }
                 }
             }
         }
