@@ -21,7 +21,7 @@ public class ExtractCommunities {
     public static int BFS(Graph graph, Integer[] fixedIDs) {
         int communityNum = 0;
         
-        if (fixedIDs.length > 0) { communityNum++; };
+        if (fixedIDs.length > 0) { communityNum++; }
         for (Integer id : fixedIDs) {
             graph.getNode(id).setAttribute("visited", 1);
             graph.getNode(id).setAttribute("community", communityNum);
