@@ -1,6 +1,13 @@
 package th.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 
@@ -9,6 +16,10 @@ import org.graphstream.graph.Node;
  * @author Anastasis Andronidis <anastasis90@yahoo.gr>
  */
 public class ExtractCommunities {
+
+    public static int MaxToMin(Graph graph) {
+        return MaxToMin(graph, new Integer[0]);
+    }
 
     public static int MaxToMin(Graph graph, Integer[] fixedIDs) {
         // fixedIDs is not supported yet!
