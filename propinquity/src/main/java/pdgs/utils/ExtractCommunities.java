@@ -30,7 +30,7 @@ public class ExtractCommunities {
         for (Node n : graph.getEachNode()) {
             if (!n.hasAttribute("visited")) {
                 n.setAttribute("visited", 1);
-                n.setAttribute("community", communityNum++);
+                n.setAttribute("community", ++communityNum);
                 
                 // Go for BFS
                 Iterator<Node> breadth = n.getBreadthFirstIterator();
