@@ -44,6 +44,7 @@ public class Utils {
 
             edge.setAttribute("ui.label", String.format("%.2f", weight));
             edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + weight * 3 + ";");
+            edge.setAttribute("weight", weight);
         }
     }
 
@@ -83,6 +84,7 @@ public class Utils {
 
             edge.setAttribute("ui.label", String.format("%.2f", weight));
             edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + weight * 10 + ";");
+            edge.setAttribute("weight", weight);
         }
     }
 
