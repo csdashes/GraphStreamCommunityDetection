@@ -19,7 +19,7 @@ import org.graphstream.ui.spriteManager.SpriteManager;
  */
 public class UIToolbox {
     
-    private SpriteManager sm;
+    private final SpriteManager sm;
     
     public UIToolbox(Graph graph) {
         this.sm = new SpriteManager(graph);
