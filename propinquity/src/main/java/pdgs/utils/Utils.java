@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package pdgs.utils;
 
 import java.io.IOException;
@@ -20,6 +16,7 @@ import org.graphstream.stream.file.FileSinkGML;
 /**
  *
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
+ * @author Anastasis Andronidis <anastasis90@yahoo.gr>
  */
 public class Utils {
 

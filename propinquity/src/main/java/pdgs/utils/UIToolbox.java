@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package pdgs.utils;
 
 import org.graphstream.graph.Graph;
@@ -16,6 +12,7 @@ import org.graphstream.ui.spriteManager.SpriteManager;
  * To use it, create a UIToolbox object, providing a Graph object (where the 
  * styling will be applied) as a parameter.
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
+ * @author Anastasis Andronidis <anastasis90@yahoo.gr>
  */
 public class UIToolbox {
     
