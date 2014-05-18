@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package pdgs.propinquitydynamics.utils;
+package th.propinquitydynamics.utils;
 
 import java.util.HashMap;
 

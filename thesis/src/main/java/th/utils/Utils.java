@@ -1,6 +1,6 @@
-package pdgs.utils;
+package th.utils;
 
-import pdgs.propinquitydynamics.utils.PropinquityMap;
+import th.propinquitydynamics.utils.PropinquityMap;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Collection;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package pdgs.examples;
+package th.examples;
 
 /**
  *
@@ -14,7 +14,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
-import pdgs.propinquitydynamics.PropinquityDynamics;
+import th.propinquitydynamics.PropinquityDynamics;
 
 public class Example {
     public static void main(String[] args) throws IOException, GraphParseException {

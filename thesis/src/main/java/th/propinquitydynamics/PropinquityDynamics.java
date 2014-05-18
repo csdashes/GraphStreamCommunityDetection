@@ -1,4 +1,4 @@
-package pdgs.propinquitydynamics;
+package th.propinquitydynamics;
 
 import com.google.common.collect.Sets;
 import java.util.Iterator;
@@ -9,13 +9,13 @@ import org.graphstream.algorithm.Algorithm;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import static pdgs.utils.CalculationTable.CalculateCdd;
-import static pdgs.utils.CalculationTable.CalculateCii;
-import static pdgs.utils.CalculationTable.CalculateCrd;
-import static pdgs.utils.CalculationTable.CalculateCri;
-import static pdgs.utils.CalculationTable.CalculateCrr;
-import pdgs.propinquitydynamics.utils.MutableInt;
-import pdgs.propinquitydynamics.utils.PropinquityMap;
+import static th.utils.CalculationTable.CalculateCdd;
+import static th.utils.CalculationTable.CalculateCii;
+import static th.utils.CalculationTable.CalculateCrd;
+import static th.utils.CalculationTable.CalculateCri;
+import static th.utils.CalculationTable.CalculateCrr;
+import th.propinquitydynamics.utils.MutableInt;
+import th.propinquitydynamics.utils.PropinquityMap;
 
 /**
  *

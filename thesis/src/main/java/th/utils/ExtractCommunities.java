@@ -1,4 +1,4 @@
-package pdgs.utils;
+package th.utils;
 
 import java.util.Iterator;
 import org.graphstream.graph.Graph;

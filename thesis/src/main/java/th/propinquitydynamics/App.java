@@ -1,4 +1,4 @@
-package pdgs.propinquitydynamics;
+package th.propinquitydynamics;
 
 import java.io.IOException;
 
@@ -6,9 +6,9 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
 import org.graphstream.util.parser.ParseException;
-import pdgs.utils.ExtractCommunities;
-import pdgs.utils.UIToolbox;
-import pdgs.utils.Utils;
+import th.utils.ExtractCommunities;
+import th.utils.UIToolbox;
+import th.utils.Utils;
 
 public class App {
 
