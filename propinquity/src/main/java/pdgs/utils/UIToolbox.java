@@ -63,9 +63,9 @@ public class UIToolbox {
         // Generate colors
         Random color = new Random(System.currentTimeMillis());
         for (int i=0; i<numOfCommunities; i++) {
-            int r = color.nextInt(255);
-            int g = color.nextInt(255);
-            int b = color.nextInt(255);
+            int r = color.nextInt(256);
+            int g = color.nextInt(256);
+            int b = color.nextInt(256);
 
             // We might have same colors... we need to fix that at some point.
             colorMap.put(i+1+"", r + "," + g + "," + b);
