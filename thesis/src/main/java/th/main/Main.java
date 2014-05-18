@@ -13,6 +13,33 @@ import th.utils.Utils;
 
 public class Main {
 
+    public static void ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin() throws IOException, GraphParseException {
+        Graph graph = new DefaultGraph("Propinquity Dynamics");
+        graph.display();
+        graph.read("../data/erdos02-subset.gml");
+
+        PropinquityDynamics pd = new PropinquityDynamics();
+        pd.set(2, 10);
+        
+        pd.init(graph);
+
+        int i = 0;
+        // We need to be sure that we dont have an infinite loop
+        while (i < 100 && !pd.didAbsoluteConvergence()) {
+            pd.compute();
+            i++;
+        }
+        pd.applyFinalTopology();
+        
+        // Set the edge weight to fractions
+        Utils.FractionWithNumberOfEdges(graph);
+        //Utils.FractionWithTotalPropinquity(graph);
+        
+        // Use our custom extraction algorithm to retrive internal communities
+        ExtractCommunities.MaxToMin(graph);
+        UIToolbox.ColorCommunities(graph);
+    }
+
     public static void main(String[] args) throws IOException, GraphParseException, ParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.display();
