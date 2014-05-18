@@ -45,6 +45,14 @@ public class ExtractCommunities {
             }
         }
         
+        // Search for vertices that have no edges, and set them as
+        // independed communities
+        for (Node n : graph.getEachNode()) {
+            if (n.getAttribute("community") == null) {
+                n.setAttribute("community", ++communityNum);
+            }
+        }
+        
         return communityNum;
     }
 
