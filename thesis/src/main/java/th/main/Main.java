@@ -8,6 +8,8 @@ import org.graphstream.stream.GraphParseException;
 import org.graphstream.util.parser.ParseException;
 import th.algorithms.louvain.CommunityDetectionLouvain;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
+import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithNumberOfEdges;
+import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithTotalPropinquity;
 import th.utils.ExtractCommunities;
 import th.utils.UIToolbox;
 import th.utils.Utils;
@@ -33,7 +35,7 @@ public class Main {
         pd.applyFinalTopology();
         
         // Set the edge weight to fractions
-        Utils.FractionWithNumberOfEdges(graph);
+        FractionWithNumberOfEdges(graph);
         //Utils.FractionWithTotalPropinquity(graph);
         
         // Use our custom extraction algorithm to retrive internal communities
@@ -63,7 +65,7 @@ public class Main {
         Integer[] fixedCommunity = {10, 11};
         ExtractCommunities.BFS(graph, fixedCommunity);
         UIToolbox.ColorCommunities(graph);
-        Utils.FractionWithTotalPropinquity(graph);
+        FractionWithTotalPropinquity(graph);
 
         Graph originGraph = new DefaultGraph("Propinquity Dynamics");
         originGraph.display();
