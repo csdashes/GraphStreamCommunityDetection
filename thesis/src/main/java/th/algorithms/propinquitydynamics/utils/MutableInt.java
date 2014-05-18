@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package th.propinquitydynamics.utils;
+package th.algorithms.propinquitydynamics.utils;
 
 /**
  *

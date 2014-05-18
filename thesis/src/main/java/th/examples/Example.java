@@ -14,7 +14,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
-import th.propinquitydynamics.PropinquityDynamics;
+import th.algorithms.propinquitydynamics.PropinquityDynamics;
 
 public class Example {
     public static void main(String[] args) throws IOException, GraphParseException {

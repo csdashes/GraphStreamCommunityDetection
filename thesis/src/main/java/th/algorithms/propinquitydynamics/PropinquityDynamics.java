@@ -1,4 +1,4 @@
-package th.propinquitydynamics;
+package th.algorithms.propinquitydynamics;
 
 import com.google.common.collect.Sets;
 import java.util.Iterator;
@@ -14,8 +14,8 @@ import static th.utils.CalculationTable.CalculateCii;
 import static th.utils.CalculationTable.CalculateCrd;
 import static th.utils.CalculationTable.CalculateCri;
 import static th.utils.CalculationTable.CalculateCrr;
-import th.propinquitydynamics.utils.MutableInt;
-import th.propinquitydynamics.utils.PropinquityMap;
+import th.algorithms.propinquitydynamics.utils.MutableInt;
+import th.algorithms.propinquitydynamics.utils.PropinquityMap;
 
 /**
  *

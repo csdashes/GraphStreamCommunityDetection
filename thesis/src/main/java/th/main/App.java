@@ -1,4 +1,4 @@
-package th.propinquitydynamics;
+package th.main;
 
 import java.io.IOException;
 
@@ -6,6 +6,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
 import org.graphstream.util.parser.ParseException;
+import th.algorithms.propinquitydynamics.PropinquityDynamics;
 import th.utils.ExtractCommunities;
 import th.utils.UIToolbox;
 import th.utils.Utils;
