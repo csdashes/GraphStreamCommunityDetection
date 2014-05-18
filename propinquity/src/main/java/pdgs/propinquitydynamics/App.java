@@ -5,12 +5,13 @@ import java.io.IOException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
+import org.graphstream.util.parser.ParseException;
 import pdgs.utils.ExtractCommunities;
 import pdgs.utils.UIToolbox;
 import pdgs.utils.Utils;
 
 public class App {
-    public static void main(String[] args) throws IOException, GraphParseException {
+    public static void main(String[] args) throws IOException, GraphParseException, ParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.display();
         graph.read("../data/erdos02-subset.gml");
@@ -37,6 +38,12 @@ public class App {
         UIToolbox.ColorCommunities(graph, comNum);
         Utils.FractionWithTotalPropinquity(graph);
 
+        Graph originGraph = new DefaultGraph("Propinquity Dynamics");
+        originGraph.display();
+        originGraph.read("../data/erdos02-subset.gml");
+        Utils.CopyCommunities(graph, originGraph);
+        UIToolbox.ColorCommunities(originGraph, comNum);
+        
 //        Utils.ExportGraphIntoGML(graph, "../data/export");
     }
 }
