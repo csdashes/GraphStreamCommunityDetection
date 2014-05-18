@@ -41,7 +41,7 @@ public class UIToolbox {
      * @param spriteValue the value (int) next to the name of the sprite.
      * @param spritePosition the Y coordinate of the sprite. Default X position is 20. 
      */
-    public void addSprite(String spriteId, String spriteName, int spriteValue, int spritePosition) {
+    public void addSprite(String spriteId, String spriteName, Integer spriteValue, int spritePosition) {
         Sprite spr = this.sm.addSprite(spriteId);
         spr.setPosition(StyleConstants.Units.PX, 20, spritePosition, 0);
         spr.setAttribute("ui.label",
