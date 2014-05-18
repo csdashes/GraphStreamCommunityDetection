@@ -1,6 +1,8 @@
 package pdgs.utils;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -55,33 +57,24 @@ public class UIToolbox {
         this.sm.removeSprite(spriteName);
     }
     
-    public static void ColorCommunities(Graph graph, Integer[] ids) {
-        // Used for colors.
-        Random color = new Random();
+    public static void ColorCommunities(Graph graph, int numOfCommunities) {
+        Map<String,String> colorMap = new HashMap<String,String>(numOfCommunities);
 
-        int fixedColor = color.nextInt(255);
-        for (Integer id : ids) {
-            graph.getNode(id).setAttribute("visited", 1);
-            graph.getNode(id).addAttribute("ui.style", "fill-color: rgb(" + fixedColor + "," + fixedColor + "," + fixedColor + "); size: 20px;");
+        // Generate colors
+        Random color = new Random(System.currentTimeMillis());
+        for (int i=0; i<numOfCommunities; i++) {
+            int r = color.nextInt(255);
+            int g = color.nextInt(255);
+            int b = color.nextInt(255);
+
+            // We might have same colors... we need to fix that at some point.
+            colorMap.put(i+1+"", r + "," + g + "," + b);
         }
-
+        
+        // Set the colors
         for (Node n : graph.getEachNode()) {
-            if (!n.hasAttribute("visited")) {
-                int r = color.nextInt(255);
-                int g = color.nextInt(255);
-                int b = color.nextInt(255);
-
-                n.setAttribute("visited", 1);
-                n.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
-                Iterator<Node> breadth = n.getBreadthFirstIterator();
-                while (breadth.hasNext()) {
-                    Node next = breadth.next();
-                    if (!next.hasAttribute("visited")) {
-                        next.setAttribute("visited", 1);
-                        next.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
-                    }
-                }
-            }
+            String com = ((Integer) n.getAttribute("community")).toString();
+            n.addAttribute("ui.style", "fill-color: rgb(" + colorMap.get(com) + "); size: 20px;");
         }
     }
 }

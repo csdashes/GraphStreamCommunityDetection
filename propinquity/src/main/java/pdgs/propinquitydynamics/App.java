@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
+import pdgs.utils.ExtractCommunities;
 import pdgs.utils.UIToolbox;
 import pdgs.utils.Utils;
 
@@ -32,7 +33,8 @@ public class App {
         
         // Erdos02-subgraph specific vertices
         Integer[] fixedCommunity = {10,11};
-        UIToolbox.ColorCommunities(graph, fixedCommunity);
+        int comNum = ExtractCommunities.BFS(graph, fixedCommunity);
+        UIToolbox.ColorCommunities(graph, comNum);
         Utils.FractionWithTotalPropinquity(graph);
 
 //        Utils.ExportGraphIntoGML(graph, "../data/export");
