@@ -47,5 +47,16 @@ public class Main {
         UIToolbox.ColorCommunities(originGraph);
 
 //        Utils.ExportGraphIntoGML(graph, "../data/export");
+        
+        
+        // ex-Louvain Main
+//        CommunityDetectionLouvain louvain = new CommunityDetectionLouvain();
+//        louvain.init("data/polbooks.gml");
+//        louvain.init("data/smalltest.gml");
+//        louvain.init("data/dolphins.gml");
+//        louvain.init("../data/karate.gml");
+//        louvain.init("../data/smalltest.dgs");
+//        louvain.init("../data/export.gml");
+//        louvain.execute();
     }
 }
