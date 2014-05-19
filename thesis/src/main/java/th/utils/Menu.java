@@ -27,6 +27,7 @@ public class Menu {
             try {
                 System.out.println("Enter number of choise: ");
                 selection = scanner.nextInt();
+                flag = false;
             } catch (InputMismatchException e) {
                 System.out.println("Wrong input. Try again.\n");
             }
