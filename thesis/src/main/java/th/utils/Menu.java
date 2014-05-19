@@ -9,7 +9,7 @@ import java.util.Scanner;
  */
 public class Menu {
     
-    static int printMenu() {
+    static public int printMenu() {
         Scanner scanner = new Scanner(System.in);
         int selection = -1;
         boolean flag = true;
