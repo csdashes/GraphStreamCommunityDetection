@@ -114,9 +114,12 @@ public class CommunityDetectionLouvain {
 
         // Add an initial weight of 1.0 in each edge
         for (Edge edge : graph.getEdgeSet()) {
-            //edge.addAttribute("weight", 1.0);
-            Double tmp = Double.parseDouble((String)edge.getAttribute("weight"));
-            edge.changeAttribute("weight", tmp);
+            if(edge.hasAttribute("weight")) {
+                Double tmp = Double.parseDouble((String)edge.getAttribute("weight"));
+                edge.changeAttribute("weight", tmp);
+            } else {
+                edge.addAttribute("weight", 1.0);
+            }
             edge.addAttribute("ui.label", edge.getAttribute("weight"));
         }
 
