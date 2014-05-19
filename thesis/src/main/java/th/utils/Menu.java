@@ -1,5 +1,6 @@
 package th.utils;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -11,6 +12,7 @@ public class Menu {
     static int printMenu() {
         Scanner scanner = new Scanner(System.in);
         int selection = -1;
+        boolean flag = true;
         
         System.out.println("Welcome to the Super Awesome Community Detection App!");
         System.out.println("Choose the application that you want to run:");
@@ -21,8 +23,14 @@ public class Menu {
         System.out.println("3. Louvain (example)");
         System.out.println("0. EXIT");
         
-        System.out.println("Enter number of choise: ");
-        selection = scanner.nextInt();
+        while(flag) {
+            try {
+                System.out.println("Enter number of choise: ");
+                selection = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Wrong input. Try again.\n");
+            }
+        }
         
         return selection;
     }
