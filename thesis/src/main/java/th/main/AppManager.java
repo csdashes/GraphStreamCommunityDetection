@@ -7,11 +7,11 @@ import org.graphstream.stream.GraphParseException;
 import org.graphstream.util.parser.ParseException;
 import th.algorithms.louvain.CommunityDetectionLouvain;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
+import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithNumberOfEdges;
+import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithTotalPropinquity;
 import th.utils.ExtractCommunities;
 import th.utils.Menu;
 import th.utils.UIToolbox;
-import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithNumberOfEdges;
-import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithTotalPropinquity;
 import th.utils.Utils;
 
 /**
