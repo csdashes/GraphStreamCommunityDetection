@@ -43,7 +43,7 @@ public class Menu {
         
         System.out.println("Choose the dataset to use:");
         System.out.println("1. Pol Books");
-        System.out.println("2. Lusseau's network of bottlenose dolpins");
+        System.out.println("2. Lusseau's network of bottlenose dolphins");
         System.out.println("3. Zachary's karate club");
         System.out.println("4. Erdos02");
         System.out.println("5. Erdos02 subset");
