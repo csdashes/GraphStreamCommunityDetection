@@ -38,6 +38,7 @@ public class AppManager {
                 case 3:
                     //Execute 3rd function
                     LouvainExample();
+                    break;
                 case 0:
                     //Exit
                     return;
