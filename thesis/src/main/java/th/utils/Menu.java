@@ -35,4 +35,30 @@ public class Menu {
         
         return selection;
     }
+    
+    static public int printDatasetMenu() {
+        Scanner scanner = new Scanner(System.in);
+        int selection = -1;
+        boolean flag = true;
+        
+        System.out.println("Choose the dataset to use:");
+        System.out.println("1. Pol Books");
+        System.out.println("2. Lusseau's network of bottlenose dolpins");
+        System.out.println("3. Zachary's karate club");
+        System.out.println("4. Erdos02");
+        System.out.println("5. Erdos02 subset");
+        System.out.println("0. EXIT");
+        
+        while(flag) {
+            try {
+                System.out.println("Enter number of choise: ");
+                selection = scanner.nextInt();
+                flag = false;
+            } catch (InputMismatchException e) {
+                System.out.println("Wrong input. Try again.\n");
+            }
+        }
+        
+        return selection;
+    }
 }
