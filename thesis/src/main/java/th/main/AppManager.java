@@ -21,23 +21,46 @@ import th.utils.Utils;
 public class AppManager {
 
     public void printUserMenu() throws IOException, GraphParseException, ParseException {
-        int selection;
+        int methodSelection, datasetSelection;
+        String datasetFile = null;
         boolean flag = true;
 
         while (flag) {
-            selection = Menu.printMenu();
-            switch (selection) {
+            methodSelection = Menu.printMenu();
+            if(methodSelection != 0) {
+                datasetSelection = Menu.printDatasetMenu();
+                switch (datasetSelection) {
+                    case 1:
+                        datasetFile = "../data/polbooks.gml";
+                        break;
+                    case 2:
+                        datasetFile = "../data/dolphins.gml";
+                        break;
+                    case 3:
+                        datasetFile = "../data/karate.gml";
+                        break;
+                    case 4:
+                        datasetFile = "../data/erdos02.gml";
+                        break;
+                    case 5:
+                        datasetFile = "../data/erdos02-subset.gml";
+                        break;
+                    case 0:
+                        return;
+                }
+            }
+            switch (methodSelection) {
                 case 1:
                     //Execute 1st function
-                    ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin();
+                    ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(datasetFile);
                     break;
                 case 2:
                     //Execute 2st function
-                    ErdozSubgraphwithOriginalPDAndTwoDisplays();
+                    ErdozSubgraphwithOriginalPDAndTwoDisplays(datasetFile);
                     break;
                 case 3:
                     //Execute 3rd function
-                    LouvainExample();
+                    LouvainExample(datasetFile);
                     break;
                 case 0:
                     //Exit
@@ -46,10 +69,10 @@ public class AppManager {
         }
     }
 
-    private void ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin() throws IOException, GraphParseException {
+    private void ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(String datasetFile) throws IOException, GraphParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.display();
-        graph.read("../data/erdos02-subset.gml");
+        graph.read(datasetFile);
 
         PropinquityDynamics pd = new PropinquityDynamics();
         pd.set(2, 10);
@@ -73,10 +96,10 @@ public class AppManager {
         UIToolbox.ColorCommunities(graph);
     }
 
-    private void ErdozSubgraphwithOriginalPDAndTwoDisplays() throws IOException, ParseException, GraphParseException {
+    private void ErdozSubgraphwithOriginalPDAndTwoDisplays(String datasetFile) throws IOException, ParseException, GraphParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.display();
-        graph.read("../data/erdos02-subset.gml");
+        graph.read(datasetFile);
 
         PropinquityDynamics pd = new PropinquityDynamics();
         pd.set(2, 10);
@@ -105,15 +128,10 @@ public class AppManager {
         UIToolbox.ColorCommunities(originGraph);
     }
 
-    private void LouvainExample() throws IOException, GraphParseException {
-        // ex-Louvain Main
+    private void LouvainExample(String datasetFile) throws IOException, GraphParseException {
+        
         CommunityDetectionLouvain louvain = new CommunityDetectionLouvain();
-//        louvain.init("data/polbooks.gml");
-//        louvain.init("data/smalltest.gml");
-//        louvain.init("data/dolphins.gml");
-        louvain.init("../data/karate.gml");
-//        louvain.init("../data/smalltest.dgs");
-//        louvain.init("../data/export.gml");
+        louvain.init(datasetFile);
         louvain.execute();
     }
 
