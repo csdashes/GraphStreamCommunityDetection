@@ -2,9 +2,11 @@ package th.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.graphstream.graph.Edge;
@@ -23,45 +25,77 @@ public class ExtractCommunities {
 
     public static int MaxToMin(Graph graph, Integer[] fixedIDs) {
         // fixedIDs is not supported yet!
+        
         SortedMap<Double, List<Integer>> edgeWeightsMap = new TreeMap<Double, List<Integer>>(Collections.reverseOrder());
-        
-        for (Edge e : graph.getEachEdge()) {
-            Double w = e.getAttribute("weight");
-            
-            if (edgeWeightsMap.containsKey(w)) {
-                edgeWeightsMap.get(w).add(e.getIndex());
-            } else {
-                List<Integer> l = new ArrayList<Integer>(4);
-                l.add(e.getIndex());
-                edgeWeightsMap.put(w, l);
-            }
-        }
-
+        Set<Edge> subEdgeGraph = new HashSet<Edge>(50);
         int communityNum = 0;
-        for (Entry<Double, List<Integer>> entry : edgeWeightsMap.entrySet()) {
-            for (Integer edgeID : entry.getValue()) {
-                Edge e = graph.getEdge(edgeID);
-                
-                Node[] nodes = {e.getNode0(), e.getNode1()};
-                
-                if (nodes[0].getAttribute("community") == null && nodes[1].getAttribute("community") == null) {
-                    communityNum++;
-                    nodes[0].setAttribute("community", communityNum);
-                    nodes[1].setAttribute("community", communityNum);
-                } else if (nodes[0].getAttribute("community") != null && nodes[1].getAttribute("community") == null) {
-                    nodes[1].setAttribute("community", (Integer) nodes[0].getAttribute("community"));
-                } else if (nodes[0].getAttribute("community") == null && nodes[1].getAttribute("community") != null) {
-                    nodes[0].setAttribute("community", (Integer) nodes[1].getAttribute("community"));
+        
+        for (Node n : graph) {
+            if (!n.hasAttribute("visited")) {
+                n.setAttribute("visited", 1);
+                for (Edge e : n.getEdgeSet()) {
+                    subEdgeGraph.add(e);
                 }
+
+                // Set vertices that have no edges, as
+                // independed communities
+                if (subEdgeGraph.isEmpty()) {
+                    n.setAttribute("community", ++communityNum);
+                }
+                
+                // Go for BFS
+                Iterator<Node> breadth = n.getBreadthFirstIterator();
+                while (breadth.hasNext()) {
+                    Node next = breadth.next();
+                    if (!next.hasAttribute("visited")) {
+                        next.setAttribute("visited", 1);
+                        for (Edge e : next.getEdgeSet()) {
+                            subEdgeGraph.add(e);
+                        }
+                    }
+                }
+                
+                // Create edge weight map
+                for (Edge e : subEdgeGraph) {
+                    Double w = e.getAttribute("weight");
+
+                    if (edgeWeightsMap.containsKey(w)) {
+                        edgeWeightsMap.get(w).add(e.getIndex());
+                    } else {
+                        List<Integer> l = new ArrayList<Integer>(4);
+                        l.add(e.getIndex());
+                        edgeWeightsMap.put(w, l);
+                    }
+                }
+                
+                for (Entry<Double, List<Integer>> entry : edgeWeightsMap.entrySet()) {
+                    for (Integer edgeID : entry.getValue()) {
+                        Edge e = graph.getEdge(edgeID);
+
+                        Node[] nodes = {e.getNode0(), e.getNode1()};
+
+                        // If non of the 2 vertices has a community
+                        if (nodes[0].getAttribute("community") == null && nodes[1].getAttribute("community") == null) {
+                            communityNum++;
+                            nodes[0].setAttribute("community", communityNum);
+                            nodes[1].setAttribute("community", communityNum);
+                        } else if (nodes[0].getAttribute("community") != null && nodes[1].getAttribute("community") == null) {
+                            nodes[1].setAttribute("community", (Integer) nodes[0].getAttribute("community"));
+                        } else if (nodes[0].getAttribute("community") == null && nodes[1].getAttribute("community") != null) {
+                            nodes[0].setAttribute("community", (Integer) nodes[1].getAttribute("community"));
+                        }
+                    }
+                }
+                
+                // clear resources
+                edgeWeightsMap.clear();
+                subEdgeGraph.clear();
             }
         }
-        
-        // Search for vertices that have no edges, and set them as
-        // independed communities
+                
+        // Delete visited attribute
         for (Node n : graph.getEachNode()) {
-            if (n.getAttribute("community") == null) {
-                n.setAttribute("community", ++communityNum);
-            }
+            n.removeAttribute("visited");
         }
         
         return communityNum;
