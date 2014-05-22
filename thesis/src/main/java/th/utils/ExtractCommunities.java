@@ -30,10 +30,14 @@ public class ExtractCommunities {
     }
 
     public static int MaxToMin(Graph graph) {
-        return MaxToMin(graph, new Integer[0]);
+        return MaxToMin(graph, new Integer[0], 0);
     }
 
-    public static int MaxToMin(Graph graph, Integer[] fixedIDs) {
+    public static int MaxToMin(Graph graph, int minNumVertexThreshold) {
+        return MaxToMin(graph, new Integer[0], minNumVertexThreshold);
+    }
+
+    public static int MaxToMin(Graph graph, Integer[] fixedIDs, int minNumVertexThreshold) {
         // fixedIDs is not supported yet!
 
         SortedMap<Double, List<Integer>> edgeWeightsMap = new TreeMap<Double, List<Integer>>(Collections.reverseOrder());
