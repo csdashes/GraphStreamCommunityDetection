@@ -67,6 +67,10 @@ public class ExtractCommunities {
         return communityNum;
     }
 
+    public static int BFS(Graph graph) {
+        return BFS(graph, new Integer[0]);
+    }
+
     /**
      * Find disjoined communities by BFS. The first community has number 1.
      *
