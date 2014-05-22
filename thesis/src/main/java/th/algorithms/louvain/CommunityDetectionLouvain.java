@@ -133,7 +133,7 @@ public class CommunityDetectionLouvain {
             node.addAttribute("trueCommunityNodes", communityNodes);
         }
         
-        nmi = new NormalizedMutualInformation("community","referenceCommunity");
+        nmi = new NormalizedMutualInformation("community","groundTruth");
         nmi.init(graph);
 
         return graph;
