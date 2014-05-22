@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
+import org.graphstream.algorithm.measure.NormalizedMutualInformation;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -16,6 +17,7 @@ import static th.algorithms.propinquitydynamics.utils.CalculationTable.Calculate
 import static th.algorithms.propinquitydynamics.utils.CalculationTable.CalculateCrr;
 import th.algorithms.propinquitydynamics.utils.MutableInt;
 import th.algorithms.propinquitydynamics.utils.PropinquityMap;
+import th.utils.UIToolbox;
 
 /**
  *
@@ -487,5 +489,14 @@ public class PropinquityDynamics implements Algorithm {
                 }
             }            
         }
+    }
+    
+        public void applyNMI(Graph graph) {
+        NormalizedMutualInformation nmi;
+        nmi = new NormalizedMutualInformation("community","groundTruth");
+        nmi.init(graph);
+        
+        UIToolbox ui = new UIToolbox(graph);
+        ui.addSprite("NMI", nmi.getMeasure(), 100);
     }
 }
