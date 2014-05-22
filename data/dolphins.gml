@@ -5,311 +5,373 @@ graph
   [
     id 0
     label "Beak"
+    groundTruth 1
   ]
   node
   [
     id 1
     label "Beescratch"
+    groundTruth 0
   ]
   node
   [
     id 2
     label "Bumper"
+    groundTruth 1
   ]
   node
   [
     id 3
     label "CCL"
+    groundTruth 1
   ]
   node
   [
     id 4
     label "Cross"
+    groundTruth 1
   ]
   node
   [
     id 5
     label "DN16"
+    groundTruth 0
   ]
   node
   [
     id 6
     label "DN21"
+    groundTruth 0
   ]
   node
   [
     id 7
     label "DN63"
+    groundTruth 0
   ]
   node
   [
     id 8
     label "Double"
+    groundTruth 1
   ]
   node
   [
     id 9
     label "Feather"
+    groundTruth 0
   ]
   node
   [
     id 10
     label "Fish"
+    groundTruth 1
   ]
   node
   [
     id 11
     label "Five"
+    groundTruth 1
   ]
   node
   [
     id 12
     label "Fork"
+    groundTruth 1
   ]
   node
   [
     id 13
     label "Gallatin"
+    groundTruth 0
   ]
   node
   [
     id 14
     label "Grin"
+    groundTruth 1
   ]
   node
   [
     id 15
     label "Haecksel"
+    groundTruth 1
   ]
   node
   [
     id 16
     label "Hook"
+    groundTruth 1
   ]
   node
   [
     id 17
     label "Jet"
+    groundTruth 0
   ]
   node
   [
     id 18
     label "Jonah"
+    groundTruth 1
   ]
   node
   [
     id 19
     label "Knit"
+    groundTruth 0
   ]
   node
   [
     id 20
     label "Kringel"
+    groundTruth 1
   ]
   node
   [
     id 21
     label "MN105"
+    groundTruth 1
   ]
   node
   [
     id 22
     label "MN23"
+    groundTruth 0
   ]
   node
   [
     id 23
     label "MN60"
+    groundTruth 1
   ]
   node
   [
     id 24
     label "MN83"
+    groundTruth 1
   ]
   node
   [
     id 25
     label "Mus"
+    groundTruth 0
   ]
   node
   [
     id 26
     label "Notch"
+    groundTruth 0
   ]
   node
   [
     id 27
     label "Number1"
+    groundTruth 0
   ]
   node
   [
     id 28
     label "Oscar"
+    groundTruth 1
   ]
   node
   [
     id 29
     label "Patchback"
+    groundTruth 1
   ]
   node
   [
     id 30
     label "PL"
+    groundTruth 1
   ]
   node
   [
     id 31
     label "Quasi"
+    groundTruth 0
   ]
   node
   [
     id 32
     label "Ripplefluke"
+    groundTruth 0
   ]
   node
   [
     id 33
     label "Scabs"
+    groundTruth 1
   ]
   node
   [
     id 34
     label "Shmuddel"
+    groundTruth 1
   ]
   node
   [
     id 35
     label "SMN5"
+    groundTruth 1
   ]
   node
   [
     id 36
     label "SN100"
+    groundTruth 1
   ]
   node
   [
     id 37
     label "SN4"
+    groundTruth 1
   ]
   node
   [
     id 38
     label "SN63"
+    groundTruth 1
   ]
   node
   [
     id 39
     label "SN89"
+    groundTruth 1
   ]
   node
   [
     id 40
     label "SN9"
+    groundTruth 1
   ]
   node
   [
     id 41
     label "SN90"
+    groundTruth 0
   ]
   node
   [
     id 42
     label "SN96"
+    groundTruth 1
   ]
   node
   [
     id 43
     label "Stripes"
+    groundTruth 1
   ]
   node
   [
     id 44
     label "Thumper"
+    groundTruth 1
   ]
   node
   [
     id 45
     label "Topless"
+    groundTruth 1
   ]
   node
   [
     id 46
     label "TR120"
+    groundTruth 1
   ]
   node
   [
     id 47
     label "TR77"
+    groundTruth 1
   ]
   node
   [
     id 48
     label "TR82"
+    groundTruth 0
   ]
   node
   [
     id 49
     label "TR88"
+    groundTruth 1
   ]
   node
   [
     id 50
     label "TR99"
+    groundTruth 1
   ]
   node
   [
     id 51
     label "Trigger"
+    groundTruth 1
   ]
   node
   [
     id 52
     label "TSN103"
+    groundTruth 1
   ]
   node
   [
     id 53
     label "TSN83"
+    groundTruth 1
   ]
   node
   [
     id 54
     label "Upbang"
+    groundTruth 0
   ]
   node
   [
     id 55
     label "Vau"
+    groundTruth 1
   ]
   node
   [
     id 56
     label "Wave"
+    groundTruth 0
   ]
   node
   [
     id 57
     label "Web"
+    groundTruth 0
   ]
   node
   [
     id 58
     label "Whitetip"
+    groundTruth 1
   ]
   node
   [
     id 59
     label "Zap"
+    groundTruth 1
   ]
   node
   [
     id 60
     label "Zig"
+    groundTruth 0
   ]
   node
   [
     id 61
     label "Zipfel"
+    groundTruth 1
   ]
   edge
   [
