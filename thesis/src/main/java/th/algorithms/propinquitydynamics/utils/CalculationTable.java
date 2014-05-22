@@ -7,6 +7,7 @@
 package th.algorithms.propinquitydynamics.utils;
 
 import com.google.common.collect.Sets;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -21,22 +22,22 @@ public class CalculationTable {
 
     public static Set<Integer> CalculateCri(Set<Integer> Nr, Set<Integer> Ni, Set<Integer> nnNr, Set<Integer> nnNi) {
         // (Nr ^ nnNi) + (Ni ^ nnNr) + (Ni ^ nnNi)
-        return Sets.union(Sets.union(Sets.intersection(Nr, nnNi), Sets.intersection(Ni, nnNr)), Sets.intersection(Ni, nnNi));
+        return Sets.union(Sets.union(Sets.intersection(Nr, nnNi), Sets.intersection(Ni, nnNr)), Sets.intersection(Ni, nnNi)).copyInto(new HashSet<Integer>(20));
     }
 
     public static Set<Integer> CalculateCrd(Set<Integer> Nr, Set<Integer> Nd, Set<Integer> nnNr, Set<Integer> nnNd) {
         // (Nr ^ nnNd) + (Nd ^ nnNr) + (Nd ^ nnNd)
-        return Sets.union(Sets.union(Sets.intersection(Nr, nnNd), Sets.intersection(Nd, nnNr)), Sets.intersection(Nd, nnNd));
+        return Sets.union(Sets.union(Sets.intersection(Nr, nnNd), Sets.intersection(Nd, nnNr)), Sets.intersection(Nd, nnNd)).copyInto(new HashSet<Integer>(20));
     }
 
     public static Set<Integer> CalculateCii(Set<Integer> Nr, Set<Integer> Ni, Set<Integer> nnNr, Set<Integer> nnNi) {
         // (Nr + Ni) ^ (nnNr + nnNi)
-        return Sets.intersection(Sets.union(Nr, Ni), Sets.union(nnNr, nnNi));
+        return Sets.intersection(Sets.union(Nr, Ni), Sets.union(nnNr, nnNi)).copyInto(new HashSet<Integer>(20));
     }
 
     public static Set<Integer> CalculateCdd(Set<Integer> Nr, Set<Integer> Nd, Set<Integer> nnNr, Set<Integer> nnNd) {
         // (Nr + Nd) ^ (nnNr + nnNd)
-        return Sets.intersection(Sets.union(Nr, Nd), Sets.union(nnNr, nnNd));
+        return Sets.intersection(Sets.union(Nr, Nd), Sets.union(nnNr, nnNd)).copyInto(new HashSet<Integer>(20));
     }
 
 }
