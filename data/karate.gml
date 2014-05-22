@@ -1,134 +1,173 @@
 graph
 [
-  node [ id 1 ]
-  node [ id 2 ]
+  node [ 
+    id 1 
+    groundTruth 0
+  ]
+  node
+  [
+    id 2
+    groundTruth 0
+  ]
   node
   [
     id 3
+    groundTruth 0
   ]
   node
   [
     id 4
+    groundTruth 0
   ]
   node
   [
     id 5
+    groundTruth 0
   ]
   node
   [
     id 6
+    groundTruth 0
   ]
   node
   [
     id 7
+    groundTruth 0
   ]
   node
   [
     id 8
+    groundTruth 0
   ]
   node
   [
     id 9
+    groundTruth 1
   ]
   node
   [
     id 10
+    groundTruth 1
   ]
   node
   [
     id 11
+    groundTruth 0
   ]
   node
   [
     id 12
+    groundTruth 0
   ]
   node
   [
     id 13
+    groundTruth 0
   ]
   node
   [
     id 14
+    groundTruth 0
   ]
   node
   [
     id 15
+    groundTruth 1
   ]
   node
   [
     id 16
+    groundTruth 1
   ]
   node
   [
     id 17
+    groundTruth 0
   ]
   node
   [
     id 18
+    groundTruth 0
   ]
   node
   [
     id 19
+    groundTruth 1
   ]
   node
   [
     id 20
+    groundTruth 0
   ]
   node
   [
     id 21
+    groundTruth 1
   ]
   node
   [
     id 22
+    groundTruth 0
   ]
   node
   [
     id 23
+    groundTruth 1
   ]
   node
   [
     id 24
+    groundTruth 1
   ]
   node
   [
     id 25
+    groundTruth 1
   ]
   node
   [
     id 26
+    groundTruth 1
   ]
   node
   [
     id 27
+    groundTruth 1
   ]
   node
   [
     id 28
+    groundTruth 1
   ]
   node
   [
     id 29
+    groundTruth 1
   ]
   node
   [
     id 30
+    groundTruth 1
   ]
   node
   [
     id 31
+    groundTruth 1
   ]
   node
   [
     id 32
+    groundTruth 1
   ]
   node
   [
     id 33
+    groundTruth 1
   ]
   node
   [
     id 34
+    groundTruth 1
   ]
   edge
   [
