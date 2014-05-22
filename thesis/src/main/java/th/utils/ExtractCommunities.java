@@ -2,11 +2,9 @@ package th.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.graphstream.graph.Edge;
@@ -37,10 +35,10 @@ public class ExtractCommunities {
 
     public static int MaxToMin(Graph graph, Integer[] fixedIDs) {
         // fixedIDs is not supported yet!
-        
+
         SortedMap<Double, List<Integer>> edgeWeightsMap = new TreeMap<Double, List<Integer>>(Collections.reverseOrder());
         int communityNum = 0;
-        
+
         for (Node n : graph) {
             if (!n.hasAttribute("visited")) {
                 n.setAttribute("visited", 1);
@@ -54,7 +52,7 @@ public class ExtractCommunities {
                 if (edgeWeightsMap.isEmpty()) {
                     n.setAttribute("community", ++communityNum);
                 }
-                
+
                 // Go for BFS
                 Iterator<Node> breadth = n.getBreadthFirstIterator();
                 while (breadth.hasNext()) {
@@ -67,7 +65,7 @@ public class ExtractCommunities {
                         }
                     }
                 }
-                
+
                 for (Entry<Double, List<Integer>> entry : edgeWeightsMap.entrySet()) {
                     for (Integer edgeID : entry.getValue()) {
                         Edge e = graph.getEdge(edgeID);
@@ -86,17 +84,17 @@ public class ExtractCommunities {
                         }
                     }
                 }
-                
+
                 // clear resources
                 edgeWeightsMap.clear();
             }
         }
-                
+
         // Delete visited attribute
         for (Node n : graph.getEachNode()) {
             n.removeAttribute("visited");
         }
-        
+
         return communityNum;
     }
 
