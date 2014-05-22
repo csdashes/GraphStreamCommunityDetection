@@ -1,8 +1,8 @@
 package th.algorithms.propinquitydynamics;
 
 import com.google.common.collect.Sets;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
@@ -43,7 +43,7 @@ public class PropinquityDynamics implements Algorithm {
     }
 
     private Set<Integer> getNeightboursOf(Node n) {
-        Set<Integer> out = new LinkedHashSet<Integer>(10);
+        Set<Integer> out = new HashSet<Integer>(10);
         Iterator<Node> it = n.getNeighborNodeIterator();
         while (it.hasNext()) {
             out.add(it.next().getIndex());
@@ -205,8 +205,8 @@ public class PropinquityDynamics implements Algorithm {
         // Superstep 0 first part
         // Init apropriate sets (Nd, Ni).
         for (Node n : this.graph.getEachNode()) {
-            Set<Integer> Ni = new LinkedHashSet<Integer>(10);
-            Set<Integer> Nd = new LinkedHashSet<Integer>(10);
+            Set<Integer> Ni = new HashSet<Integer>(10);
+            Set<Integer> Nd = new HashSet<Integer>(10);
             n.setAttribute("Ni", Ni);
             n.setAttribute("Nd", Nd);
 
@@ -394,7 +394,7 @@ public class PropinquityDynamics implements Algorithm {
             Set<Integer> Nr = n.getAttribute("Nr");
             Set<Integer> Ni = n.getAttribute("Ni");
 
-            n.setAttribute("Nr", Sets.union(Nr, Ni).copyInto(new LinkedHashSet<Integer>(20)));
+            n.setAttribute("Nr", Sets.union(Nr, Ni).copyInto(new HashSet<Integer>(20)));
         }
     }
 
