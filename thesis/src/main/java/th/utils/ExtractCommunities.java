@@ -19,6 +19,18 @@ import org.graphstream.graph.Node;
  */
 public class ExtractCommunities {
 
+    private static void addEdgeWeightToMap(SortedMap<Double, List<Integer>> edgeWeightsMap, Edge e) {
+        Double w = e.getAttribute("weight");
+
+        if (edgeWeightsMap.containsKey(w)) {
+            edgeWeightsMap.get(w).add(e.getIndex());
+        } else {
+            List<Integer> l = new ArrayList<Integer>(4);
+            l.add(e.getIndex());
+            edgeWeightsMap.put(w, l);
+        }
+    }
+
     public static int MaxToMin(Graph graph) {
         return MaxToMin(graph, new Integer[0]);
     }
@@ -27,19 +39,19 @@ public class ExtractCommunities {
         // fixedIDs is not supported yet!
         
         SortedMap<Double, List<Integer>> edgeWeightsMap = new TreeMap<Double, List<Integer>>(Collections.reverseOrder());
-        Set<Edge> subEdgeGraph = new HashSet<Edge>(50);
         int communityNum = 0;
         
         for (Node n : graph) {
             if (!n.hasAttribute("visited")) {
                 n.setAttribute("visited", 1);
+                // Create edge weight map
                 for (Edge e : n.getEdgeSet()) {
-                    subEdgeGraph.add(e);
+                    addEdgeWeightToMap(edgeWeightsMap, e);
                 }
 
                 // Set vertices that have no edges, as
                 // independed communities
-                if (subEdgeGraph.isEmpty()) {
+                if (edgeWeightsMap.isEmpty()) {
                     n.setAttribute("community", ++communityNum);
                 }
                 
@@ -49,22 +61,10 @@ public class ExtractCommunities {
                     Node next = breadth.next();
                     if (!next.hasAttribute("visited")) {
                         next.setAttribute("visited", 1);
+                        // Create edge weight map
                         for (Edge e : next.getEdgeSet()) {
-                            subEdgeGraph.add(e);
+                            addEdgeWeightToMap(edgeWeightsMap, e);
                         }
-                    }
-                }
-                
-                // Create edge weight map
-                for (Edge e : subEdgeGraph) {
-                    Double w = e.getAttribute("weight");
-
-                    if (edgeWeightsMap.containsKey(w)) {
-                        edgeWeightsMap.get(w).add(e.getIndex());
-                    } else {
-                        List<Integer> l = new ArrayList<Integer>(4);
-                        l.add(e.getIndex());
-                        edgeWeightsMap.put(w, l);
                     }
                 }
                 
@@ -89,7 +89,6 @@ public class ExtractCommunities {
                 
                 // clear resources
                 edgeWeightsMap.clear();
-                subEdgeGraph.clear();
             }
         }
                 
