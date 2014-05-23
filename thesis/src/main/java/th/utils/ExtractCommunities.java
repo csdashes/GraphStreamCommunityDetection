@@ -43,6 +43,7 @@ public class ExtractCommunities {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static void AddNextSteps(Node n, Queue<Node> head, SortedMap<Double, Set<Node>> consequent, Double currentSearchWeight, int community) {
         for (Edge e : n.getEachEdge()) {
             Double weight = e.getAttribute("weight");
