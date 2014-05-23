@@ -1,7 +1,7 @@
 package th.utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import org.graphstream.graph.Graph;
@@ -52,11 +52,11 @@ public class UIToolbox {
             }
             
             Integer com = null;
-            if (n.getAttribute("community") instanceof ArrayList<?>) {
-                if (((ArrayList<Integer>) n.getAttribute("community")).size() > 1) {
+            if (n.getAttribute("community") instanceof HashSet<?>) {
+                if (((HashSet<Integer>) n.getAttribute("community")).size() > 1) {
                     com = -1;
                 } else {
-                    com = ((ArrayList<Integer>) n.getAttribute("community")).get(0);
+                    com = ((HashSet<Integer>) n.getAttribute("community")).iterator().next();
                 }
             } else {
                 com = (Integer) n.getAttribute("community");
