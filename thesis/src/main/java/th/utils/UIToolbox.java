@@ -21,9 +21,10 @@ public class UIToolbox {
 
     private static String GetRGB() {
         Random color = new Random(System.currentTimeMillis());
-        int r = color.nextInt(256);
-        int g = color.nextInt(256);
-        int b = color.nextInt(256);
+        // Black should be special
+        int r = color.nextInt(254)+2;
+        int g = color.nextInt(254)+2;
+        int b = color.nextInt(254)+2;
 
         return r + "," + g + "," + b;
     }
@@ -43,6 +44,10 @@ public class UIToolbox {
 
         // Set the colors
         for (Node n : graph.getEachNode()) {
+            if (!n.hasAttribute("community")) {
+                // Don't color it. Black is our special color.
+                continue;
+            }
             Integer com = (Integer) n.getAttribute("community");
 
             if (!colorMap.containsKey(com)) {
