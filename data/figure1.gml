@@ -8,6 +8,10 @@ graph
   node [ id 6 ]
   node [ id 7 ]
   node [ id 8 ]
+  node [ id 9 ]
+  node [ id 10 ]
+  node [ id 11 ]
+  node [ id 12 ]
   edge
   [
     source 1
@@ -71,6 +75,41 @@ graph
   edge
   [
     source 7
+    target 8
+  ]
+  edge
+  [
+    source 9
+    target 10
+  ]
+  edge
+  [
+    source 9
+    target 11
+  ]
+  edge
+  [
+    source 10
+    target 11
+  ]
+  edge
+  [
+    source 9
+    target 6
+  ]
+  edge
+  [
+    source 11
+    target 3
+  ]
+  edge
+  [
+    source 7
+    target 12
+  ]
+  edge
+  [
+    source 12
     target 8
   ]
 ]
