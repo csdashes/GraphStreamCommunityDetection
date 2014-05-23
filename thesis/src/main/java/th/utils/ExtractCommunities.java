@@ -20,6 +20,18 @@ import org.graphstream.graph.Node;
  * @author Anastasis Andronidis <anastasis90@yahoo.gr>
  */
 public class ExtractCommunities {
+    
+    private static boolean AreWeTheStrongestEdge(Node n, Double w) {
+        // We add only if we are the strongest edge to this vertex
+        boolean areWeTheStrongestEdge = true;
+        for (Edge ne : n.getEdgeSet()) {
+            boolean c = Math.round(w * 100.0) / 100.0 < Math.round((Double) ne.getAttribute("weight") * 100.0) / 100.0;
+            if (c) {
+                areWeTheStrongestEdge = false;
+            }
+        }
+        return areWeTheStrongestEdge;
+    }
 
     private static void AddToConsequentMap(SortedMap<Double, Set<Node>> map, Double w, Node n) {
         if (map.containsKey(w)) {
@@ -31,25 +43,20 @@ public class ExtractCommunities {
         }
     }
 
-    private static void AddNextSteps(Node n, Queue<Node> head, SortedMap<Double, Set<Node>> consequent, Double currentSearchWeight) {
+    private static void AddNextSteps(Node n, Queue<Node> head, SortedMap<Double, Set<Node>> consequent, Double currentSearchWeight, int community) {
         for (Edge e : n.getEachEdge()) {
             Double weight = e.getAttribute("weight");
             Node neightbor = e.getOpposite(n);
 
             if (neightbor.hasAttribute("visited")) {
-                continue;
-            }
-
-            if (weight < currentSearchWeight) {
-                // We add only if we are the strongest edge to this vertex
-                boolean areWeTheStrongestEdge = true;
-                for (Edge ne : neightbor.getEdgeSet()) {
-                    boolean c = Math.round(weight * 100.0) / 100.0 < Math.round((Double) ne.getAttribute("weight") * 100.0) / 100.0;
-                    if (c) {
-                        areWeTheStrongestEdge = false;
+                if (neightbor.hasAttribute("community")) {
+                    // We add only if we are the strongest edge to this vertex
+                    if (AreWeTheStrongestEdge(neightbor, weight)) {
+                        ((Set<Integer>) neightbor.getAttribute("community")).add(community);
                     }
                 }
-                if (areWeTheStrongestEdge) {
+            } else if (weight < currentSearchWeight) {
+                if (AreWeTheStrongestEdge(neightbor, weight)) {
                     AddToConsequentMap(consequent, weight, neightbor);
                 }
                 // If we are equal, go and it to head
@@ -67,16 +74,20 @@ public class ExtractCommunities {
 
         // Find max weight for first iter.
 
-        AddNextSteps(n, head, subsequent, currentSearchWeight);
+        AddNextSteps(n, head, subsequent, currentSearchWeight, community);
         n.addAttribute("visited", 1);
-        n.addAttribute("community", community);
+        Set<Integer> s = new HashSet<Integer>();
+        s.add(community);
+        n.addAttribute("community", s);
 
         while (!subsequent.isEmpty() || !head.isEmpty()) {
             while (!head.isEmpty()) {
                 Node next = head.poll();
-                AddNextSteps(next, head, subsequent, currentSearchWeight);
+                AddNextSteps(next, head, subsequent, currentSearchWeight, community);
                 next.addAttribute("visited", 1);
-                next.addAttribute("community", community);
+                Set< Integer> se = new HashSet<Integer>();
+                se.add(community);
+                next.addAttribute("community", se);
             }
 
             if (!subsequent.isEmpty()) {
