@@ -17,7 +17,7 @@ import org.graphstream.graph.Node;
  */
 public class ExtractCommunities {
 
-    private static void addEdgeWeightToMap(SortedMap<Double, List<Integer>> edgeWeightsMap, Edge e) {
+    private static void AddEdgeWeightToMap(SortedMap<Double, List<Integer>> edgeWeightsMap, Edge e) {
         Double w = e.getAttribute("weight");
 
         if (edgeWeightsMap.containsKey(w)) {
@@ -48,7 +48,7 @@ public class ExtractCommunities {
                 n.setAttribute("visited", 1);
                 // Create edge weight map
                 for (Edge e : n.getEdgeSet()) {
-                    addEdgeWeightToMap(edgeWeightsMap, e);
+                    AddEdgeWeightToMap(edgeWeightsMap, e);
                 }
 
                 // Set vertices that have no edges, as
@@ -65,7 +65,7 @@ public class ExtractCommunities {
                         next.setAttribute("visited", 1);
                         // Create edge weight map
                         for (Edge e : next.getEdgeSet()) {
-                            addEdgeWeightToMap(edgeWeightsMap, e);
+                            AddEdgeWeightToMap(edgeWeightsMap, e);
                         }
                     }
                 }
