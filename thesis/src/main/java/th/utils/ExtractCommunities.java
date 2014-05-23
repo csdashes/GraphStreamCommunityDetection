@@ -1,11 +1,11 @@
 package th.utils;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.LinkedList;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -19,80 +19,91 @@ import org.graphstream.graph.Node;
  */
 public class ExtractCommunities {
 
-    private static void AddEdgeWeightToMap(SortedMap<Double, Set<Integer>> edgeWeightsMap, Edge e) {
-        Double w = e.getAttribute("weight");
-
-        if (edgeWeightsMap.containsKey(w)) {
-            edgeWeightsMap.get(w).add(e.getIndex());
+    private static void AddToConsequentMap(SortedMap<Double, Set<Node>> map, Double w, Node n) {
+        if (map.containsKey(w)) {
+            map.get(w).add(n);
         } else {
-            Set<Integer> l = new HashSet<Integer>(4);
-            l.add(e.getIndex());
-            edgeWeightsMap.put(w, l);
+            Set<Node> l = new HashSet<Node>(4);
+            l.add(n);
+            map.put(w, l);
+        }
+    }
+
+    private static void AddNextSteps(Node n, Queue<Node> head, SortedMap<Double, Set<Node>> consequent, Double currentSearchWeight) {
+        for (Edge e : n.getEachEdge()) {
+            Double weight = e.getAttribute("weight");
+            Node neightbor = e.getOpposite(n);
+
+            if (neightbor.hasAttribute("visited")) {
+                continue;
+            }
+
+            if (weight < currentSearchWeight) {
+                // We add only if we are the strongest edge to this vertex
+                boolean areWeTheStrongestEdge = true;
+                for (Edge ne : neightbor.getEdgeSet()) {
+                    boolean c = Math.round(weight * 100.0) / 100.0 < Math.round((Double) ne.getAttribute("weight") * 100.0) / 100.0;
+                    if (c) {
+                        areWeTheStrongestEdge = false;
+                    }
+                }
+                if (areWeTheStrongestEdge) {
+                    AddToConsequentMap(consequent, weight, neightbor);
+                }
+                // If we are equal, go and it to head
+            } else if (String.format("%.2f", weight).equals(String.format("%.2f", currentSearchWeight))) {
+                if (!head.contains(neightbor)) {
+                    head.add(neightbor);
+                }
+            }
+        }
+    }
+
+    private static void WeightedBFS(Node n, int community, Double currentSearchWeight) {
+        SortedMap<Double, Set<Node>> subsequent = new TreeMap<Double, Set<Node>>(Collections.reverseOrder());
+        Queue<Node> head = new LinkedList<Node>();
+
+        // Find max weight for first iter.
+        System.out.println(currentSearchWeight);
+
+        AddNextSteps(n, head, subsequent, currentSearchWeight);
+        n.addAttribute("visited", 1);
+        n.addAttribute("community", community);
+
+        while (!subsequent.isEmpty() || !head.isEmpty()) {
+            while (!head.isEmpty()) {
+                Node next = head.poll();
+                AddNextSteps(next, head, subsequent, currentSearchWeight);
+                next.addAttribute("visited", 1);
+                next.addAttribute("community", community);
+            }
+
+            if (!subsequent.isEmpty()) {
+                currentSearchWeight = subsequent.firstKey();
+                head.addAll(subsequent.remove(subsequent.firstKey()));
+            }
         }
     }
 
     public static int MaxToMin(Graph graph) {
-        return MaxToMin(graph, new Integer[0], 0);
-    }
+        graph.removeNode(7);
+        graph.removeNode(9);
 
-    public static int MaxToMin(Graph graph, int minNumVertexThreshold) {
-        return MaxToMin(graph, new Integer[0], minNumVertexThreshold);
-    }
+        SortedMap<Double, Set<Node>> groupedVertices = new TreeMap<Double, Set<Node>>(Collections.reverseOrder());
 
-    public static int MaxToMin(Graph graph, Integer[] fixedIDs, int minNumVertexThreshold) {
-        // fixedIDs is not supported yet!
+        // We need to sort the edges, so we know where to start from
+        for (Edge e : graph.getEdgeSet()) {
+            Double weight = e.getAttribute("weight");
+            AddToConsequentMap(groupedVertices, weight, e.getNode0());
+            AddToConsequentMap(groupedVertices, weight, e.getNode1());
+        }
 
-        SortedMap<Double, Set<Integer>> edgeWeightsMap = new TreeMap<Double, Set<Integer>>(Collections.reverseOrder());
         int communityNum = 0;
-
-        for (Node n : graph) {
-            if (!n.hasAttribute("visited")) {
-                n.setAttribute("visited", 1);
-                // Create edge weight map
-                for (Edge e : n.getEdgeSet()) {
-                    AddEdgeWeightToMap(edgeWeightsMap, e);
+        for (Entry<Double, Set<Node>> en : groupedVertices.entrySet()) {
+            for (Node n : en.getValue()) {
+                if (!n.hasAttribute("visited")) {
+                    WeightedBFS(n, communityNum++, en.getKey());
                 }
-
-                // Set vertices that have no edges, as
-                // independed communities
-                if (edgeWeightsMap.isEmpty()) {
-                    n.setAttribute("community", ++communityNum);
-                }
-
-                // Go for BFS
-                Iterator<Node> breadth = n.getBreadthFirstIterator();
-                while (breadth.hasNext()) {
-                    Node next = breadth.next();
-                    if (!next.hasAttribute("visited")) {
-                        next.setAttribute("visited", 1);
-                        // Create edge weight map
-                        for (Edge e : next.getEdgeSet()) {
-                            AddEdgeWeightToMap(edgeWeightsMap, e);
-                        }
-                    }
-                }
-
-                for (Entry<Double, List<Integer>> entry : edgeWeightsMap.entrySet()) {
-                    for (Integer edgeID : entry.getValue()) {
-                        Edge e = graph.getEdge(edgeID);
-
-                        Node[] nodes = {e.getNode0(), e.getNode1()};
-
-                        // If non of the 2 vertices has a community
-                        if (nodes[0].getAttribute("community") == null && nodes[1].getAttribute("community") == null) {
-                            communityNum++;
-                            nodes[0].setAttribute("community", communityNum);
-                            nodes[1].setAttribute("community", communityNum);
-                        } else if (nodes[0].getAttribute("community") != null && nodes[1].getAttribute("community") == null) {
-                            nodes[1].setAttribute("community", (Integer) nodes[0].getAttribute("community"));
-                        } else if (nodes[0].getAttribute("community") == null && nodes[1].getAttribute("community") != null) {
-                            nodes[0].setAttribute("community", (Integer) nodes[1].getAttribute("community"));
-                        }
-                    }
-                }
-
-                // clear resources
-                edgeWeightsMap.clear();
             }
         }
 
