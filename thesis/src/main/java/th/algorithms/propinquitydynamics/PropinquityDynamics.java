@@ -22,7 +22,7 @@ import th.utils.UIToolbox;
 /**
  *
  * @author Anastasis Andronidis <anastasis90@yahoo.gr>
- * @author Ilias Trichopoulos  <itrichop@csd.auth.gr>
+ * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class PropinquityDynamics implements Algorithm {
 
@@ -201,7 +201,7 @@ public class PropinquityDynamics implements Algorithm {
     public void compute() {
         // Init e to count topology differences
         this.e = 0;
-        
+
         // Superstep 0 first part
         // Init apropriate sets (Nd, Ni).
         for (Node n : this.graph.getEachNode()) {
@@ -428,9 +428,9 @@ public class PropinquityDynamics implements Algorithm {
 
     /**
      * The variable <b>e</b> counts the global additions and removals of edges.
-     * We say that if <b>e</b> is 0, then propinquity dynamics algorithm
-     * has converged.
-     * 
+     * We say that if <b>e</b> is 0, then propinquity dynamics algorithm has
+     * converged.
+     *
      * @return the number of added or removed edges in one phase 2 loop
      */
     public int getE() {
@@ -439,18 +439,20 @@ public class PropinquityDynamics implements Algorithm {
 
     /**
      * Helper function to easy declare that if <b>e</b> == 0, then return true.
-     * 
+     *
      * @return true if e == 0
-     */    
+     */
     public boolean didAbsoluteConvergence() {
         return this.e == 0;
     }
 
     /**
-     * Helper function to easy declare that if <b>e</b> <= <b>threshold</b>, then return true.
+     * Helper function to easy declare that if <b>e</b> <= <b>threshold</b>,
+     * then return true.
      *
-     * @param threshold the threshold we want to say that the algorithm 
-     *                  has converged
+     * @param threshold the threshold we want to say that the algorithm has
+     *                  converged
+     *
      * @return true if e <= threshold
      */
     public boolean didConvergence(int threshold) {
@@ -479,23 +481,23 @@ public class PropinquityDynamics implements Algorithm {
         for (Edge edge : this.graph.getEdgeSet()) {
             this.graph.removeEdge(edge.getIndex());
         }
-        
+
         for (Node n : this.graph.getEachNode()) {
             Set<Integer> Nr = n.getAttribute("Nr");
-            
+
             for (Integer neighborIndex : Nr) {
                 if (n.getEdgeBetween(neighborIndex) == null) {
                     this.graph.addEdge(n.getId() + "and" + neighborIndex, n, this.graph.getNode(neighborIndex));
                 }
-            }            
+            }
         }
     }
-    
-        public void applyNMI(Graph graph) {
+
+    public void applyNMI(Graph graph) {
         NormalizedMutualInformation nmi;
-        nmi = new NormalizedMutualInformation("community","groundTruth");
+        nmi = new NormalizedMutualInformation("community", "groundTruth");
         nmi.init(graph);
-        
+
         UIToolbox ui = new UIToolbox(graph);
         ui.addSprite("NMI", nmi.getMeasure(), 100);
     }
