@@ -1,10 +1,12 @@
 package th.utils;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.graphstream.graph.Edge;
@@ -17,13 +19,13 @@ import org.graphstream.graph.Node;
  */
 public class ExtractCommunities {
 
-    private static void AddEdgeWeightToMap(SortedMap<Double, List<Integer>> edgeWeightsMap, Edge e) {
+    private static void AddEdgeWeightToMap(SortedMap<Double, Set<Integer>> edgeWeightsMap, Edge e) {
         Double w = e.getAttribute("weight");
 
         if (edgeWeightsMap.containsKey(w)) {
             edgeWeightsMap.get(w).add(e.getIndex());
         } else {
-            List<Integer> l = new ArrayList<Integer>(4);
+            Set<Integer> l = new HashSet<Integer>(4);
             l.add(e.getIndex());
             edgeWeightsMap.put(w, l);
         }
@@ -40,7 +42,7 @@ public class ExtractCommunities {
     public static int MaxToMin(Graph graph, Integer[] fixedIDs, int minNumVertexThreshold) {
         // fixedIDs is not supported yet!
 
-        SortedMap<Double, List<Integer>> edgeWeightsMap = new TreeMap<Double, List<Integer>>(Collections.reverseOrder());
+        SortedMap<Double, Set<Integer>> edgeWeightsMap = new TreeMap<Double, Set<Integer>>(Collections.reverseOrder());
         int communityNum = 0;
 
         for (Node n : graph) {
