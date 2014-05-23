@@ -64,7 +64,6 @@ public class ExtractCommunities {
         Queue<Node> head = new LinkedList<Node>();
 
         // Find max weight for first iter.
-        System.out.println(currentSearchWeight);
 
         AddNextSteps(n, head, subsequent, currentSearchWeight);
         n.addAttribute("visited", 1);
