@@ -1,5 +1,6 @@
 package th.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -25,7 +26,7 @@ public class UIToolbox {
         int r = color.nextInt(254)+2;
         int g = color.nextInt(254)+2;
         int b = color.nextInt(254)+2;
-
+        
         return r + "," + g + "," + b;
     }
 
@@ -39,6 +40,7 @@ public class UIToolbox {
         n.setAttribute("ui.style", "size:20px;");
     }
 
+    @SuppressWarnings("unchecked")
     public static void ColorCommunities(Graph graph) {
         Map<Integer, String> colorMap = new HashMap<Integer, String>(10);
 
@@ -48,9 +50,20 @@ public class UIToolbox {
                 // Don't color it. Black is our special color.
                 continue;
             }
-            Integer com = (Integer) n.getAttribute("community");
-
-            if (!colorMap.containsKey(com)) {
+            
+            Integer com = null;
+            if (n.getAttribute("community") instanceof ArrayList<?>) {
+                if (((ArrayList<Integer>) n.getAttribute("community")).size() > 1) {
+                    com = -1;
+                } else {
+                    com = ((ArrayList<Integer>) n.getAttribute("community")).get(0);
+                }
+            } else {
+                com = (Integer) n.getAttribute("community");
+            }
+            if (com == -1) {
+                colorMap.put(com,"255,0,0");
+            } else if (!colorMap.containsKey(com)) {
                 String newColor = GetRGB();
                 // Assert that the color is unique
                 while (colorMap.containsValue(newColor)) {
