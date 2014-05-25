@@ -210,4 +210,14 @@ public class HyperCommunity extends Community {
     public void finilizeInnerEdgesWeightCount() {
         this.innerEdgesWeightCount/=2;
     }
+    
+    public Double getAllOuterEdgesWeightCount() {
+        Double total = 0.0;
+        Map.Entry<String, Double> edgeWeightToCommunity;
+        for (Iterator<Map.Entry<String, Double>> outerEdgesWeightIt = this.edgeWeightToCommunity.entrySet().iterator(); outerEdgesWeightIt.hasNext();) {
+            edgeWeightToCommunity = outerEdgesWeightIt.next();
+            total += edgeWeightToCommunity.getValue();
+        }
+        return total;
+    }
 }
