@@ -97,7 +97,7 @@ public class HyperCommunity extends Community {
      * Increase the edgeWeightToCommunity to the given community by 1.
      */
     public void increaseEdgeWeightToCommunity(String communityId) {
-        this.increaseEdgeWeightToCommunity(communityId,1);
+        this.increaseEdgeWeightToCommunity(communityId,1.0);
     }
     
     /**
@@ -105,7 +105,7 @@ public class HyperCommunity extends Community {
      * @param communityId the community that the outer edge is connected to.
      * @param number the number to increase the edgeWeightToCommunity
      */
-    public void increaseEdgeWeightToCommunity(String communityId, double number) {
+    public void increaseEdgeWeightToCommunity(String communityId, Double number) {
         if(this.edgeWeightToCommunity.containsKey(communityId)) {
             this.edgeWeightToCommunity.put(communityId, this.edgeWeightToCommunity.get(communityId) + number);
         } else {
@@ -118,7 +118,7 @@ public class HyperCommunity extends Community {
      * Decrease the edgeWeightToCommunity to the given community by 1.
      */
     public void decreaseEdgeWeightToCommunity(String communityId) {
-        this.decreaseEdgeWeightToCommunity(communityId, 1);
+        this.decreaseEdgeWeightToCommunity(communityId, 1.0);
     }
     
     /**
@@ -126,7 +126,8 @@ public class HyperCommunity extends Community {
      * @param communityId the community that the outer edge is connected to.
      * @param number the number to decrease the edgeWeightToCommunity.
      */
-    public void decreaseEdgeWeightToCommunity(String communityId, int number) {
+    public void decreaseEdgeWeightToCommunity(String communityId, Double number) {
+        //this.edgeWeightToCommunity.
         this.edgeWeightToCommunity.put(communityId, this.edgeWeightToCommunity.get(communityId) - number);
     }
 
