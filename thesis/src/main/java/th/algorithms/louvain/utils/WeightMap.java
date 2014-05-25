@@ -18,6 +18,7 @@ public class WeightMap extends HashMap<String, Double> {
             this.put(communityId, weight);
         } else {
             currentWeight += weight;
+            this.put(communityId, currentWeight);
         }
     }
     
@@ -25,6 +26,7 @@ public class WeightMap extends HashMap<String, Double> {
         Double currentWeight = this.get(communityId);
         if (currentWeight != null) {
             currentWeight -= weight;
+            this.put(communityId, currentWeight);
         }
     }
     
