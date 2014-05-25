@@ -1,6 +1,7 @@
 package th.main;
 
 import java.io.IOException;
+import org.graphstream.algorithm.measure.Modularity;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
@@ -131,11 +132,31 @@ public class AppManager {
 
     private void LouvainExample(String datasetFile) throws IOException, GraphParseException {
         
+        Graph graph = new DefaultGraph("Louvain");
+        graph.read("../data/smalltest.dgs");
+        graph.display();
+        
         CommunityDetectionLouvain2 louvain = new CommunityDetectionLouvain2();
-//        louvain.init(datasetFile);
-        louvain.init("../data/smalltest.dgs");
-        louvain.debugOn();
-        louvain.execute();
+        //louvain.debugOn();
+        
+        louvain.init(graph);
+        Modularity modularity = new Modularity("community", "weight");
+        modularity.init(graph);
+        
+        double globalNewQ;
+        double globalMaxQ = -0.5;
+        louvain.findCommunities(graph);         // First Phase
+        globalNewQ = modularity.getMeasure();   // Get new global modularity value
+        
+        Graph folded = null;
+        while (globalNewQ > globalMaxQ) {       // As long as the modularity is not the maximum
+            globalMaxQ = globalNewQ;
+            folded = louvain.foldingCommunities(graph); // Second Phase (folding)
+            louvain.findCommunities(folded);    // and get the new modularity
+            globalNewQ = modularity.getMeasure();   // Get new global modularity value
+        }
+        louvain.printFinalGraph(folded,graph,globalMaxQ,0.0); // After reaching the maximum modularity, 
+        // print the graph on the screen.
     }
 
     public static void WriteToFileExample() throws IOException, GraphParseException {
