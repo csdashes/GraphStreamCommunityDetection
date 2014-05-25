@@ -31,4 +31,10 @@ public class WeightMap extends HashMap<String, Double> {
     public Double getWeight(String communityId) {
         return this.get(communityId);
     }
+    
+    public void init(String communityId) {
+        if(!this.containsKey(communityId)) {
+            this.put(communityId, 0.0);
+        }
+    }
 }
