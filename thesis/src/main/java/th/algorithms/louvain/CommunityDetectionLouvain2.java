@@ -240,6 +240,16 @@ public class CommunityDetectionLouvain2 {
                         System.out.println("Node " + node.getIndex() + " goes to community " + neighbourCommunityId + ": " + deltaQ);
                     }
                 }
+                // Move node to the best community (if not already in) and update node and community lists.
+                if (!nodeCommunityId.equals(bestCommunityToGo)) {
+                    //incrementalUpdate(node,bestCommunityToGo);
+                    node.changeAttribute("community", bestCommunityToGo);
+                    if(this.debug) {
+                        System.out.println("Node " + node.getIndex() +
+                                ": Old community=" + nodeCommunityId +
+                                ", New community=" + bestCommunityToGo);
+                    }
+                }
             }
         } while (false);
 
