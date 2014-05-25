@@ -20,7 +20,7 @@ public class HyperCommunity extends Community {
     private double innerEdgesWeightCount;
     //private Map<String,Integer> outerEdgesCount;
     private Map<String,Double> edgeWeightToCommunity;
-    private Set<String> communityNodes;
+    private Set<Integer> communityNodes;
     
     /**
      * Initializing global variables.
@@ -30,21 +30,21 @@ public class HyperCommunity extends Community {
         this.nodesCount = 0;
         this.innerEdgesWeightCount = 0.0;
         this.edgeWeightToCommunity = new HashMap<String,Double>();
-        this.communityNodes = new HashSet<String>();
+        this.communityNodes = new HashSet<Integer>();
     }
     
     /**
      * Appends a set of node ids which represents the contents of the community.
      * @param newNodesSet the set to append.
      */
-    public void addNodesSet(HashSet<String> newNodesSet) {
+    public void addNodesSet(HashSet<Integer> newNodesSet) {
         this.communityNodes.addAll(newNodesSet);
     }
     
     /**
      * @return the set of nodes included in the community.
      */
-    public Set<String> getCommunityNodes() {
+    public Set<Integer> getCommunityNodes() {
         return this.communityNodes;
     }
     
