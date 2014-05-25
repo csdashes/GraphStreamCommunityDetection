@@ -15,7 +15,7 @@ import org.graphstream.graph.Node;
  */
 public class HyperCommunity extends Community {
     
-    private int nodesCount;
+//    private int nodesCount;
     private int innerEdgesCount;
     private double innerEdgesWeightCount;
     //private Map<String,Integer> outerEdgesCount;
@@ -27,10 +27,18 @@ public class HyperCommunity extends Community {
      */
     public HyperCommunity() {
         super();
-        this.nodesCount = 0;
+//        this.nodesCount = 0;
         this.innerEdgesWeightCount = 0.0;
         this.edgeWeightToCommunity = new HashMap<String,Double>();
         this.communityNodes = new HashSet<Integer>();
+    }
+    
+    public void addNode(Integer nodeIndex) {
+        this.communityNodes.add(nodeIndex);
+    }
+    
+    public void removeNode(Integer nodeIndex) {
+        this.communityNodes.remove(nodeIndex);
     }
     
     /**
@@ -51,22 +59,22 @@ public class HyperCommunity extends Community {
     /**
      * Increase the node count by 1.
      */
-    public void increaseNodesCount() {
-        this.nodesCount++;
-    }
+//    public void increaseNodesCount() {
+//        this.nodesCount++;
+//    }
     
     /**
      * Decrease the node count by 1.
      */
-    public void descreaseNodeCount() {
-        this.nodesCount--;
-    }
+//    public void descreaseNodeCount() {
+//        this.nodesCount--;
+//    }
     
     /**
      * @return the number of the nodes that the community has.
      */
     public int getNodesCount() {
-        return this.nodesCount;
+        return this.communityNodes.size();
     }
     
     /**
