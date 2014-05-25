@@ -64,8 +64,9 @@ public class CommunityDetectionLouvain2 {
             nmiCount;
 
     private NormalizedMutualInformation nmi;
-    
+
     private boolean debug = false;
+    private Double totalGraphEdgeWeight;
 
     /**
      * Initializing global variables.
@@ -79,14 +80,18 @@ public class CommunityDetectionLouvain2 {
         this.graph = new SingleGraph("communities");
         this.graph.read(fileName); // Import from the text file.
         //this.graph.display();
-
+        
+        this.totalGraphEdgeWeight = 0.0;
+        
         // Add weight to each edge
         for (Edge edge : this.graph.getEdgeSet()) {
             if (edge.hasAttribute("weight")) {
                 Double tmp = Double.parseDouble((String) edge.getAttribute("weight"));
                 edge.changeAttribute("weight", tmp);
+                this.totalGraphEdgeWeight += tmp;
             } else {
                 edge.addAttribute("weight", 1.0);
+                this.totalGraphEdgeWeight += 1.0;
             }
             edge.addAttribute("ui.label", edge.getAttribute("weight"));
         }
@@ -106,6 +111,7 @@ public class CommunityDetectionLouvain2 {
 
         this.globalMaxQ = -0.5; // making sure to have the lowest value
         this.fileName = fileName;
+        
     }
 
     /**
@@ -164,24 +170,62 @@ public class CommunityDetectionLouvain2 {
 
                 Node neighbour = neighbours.next();
                 String neighbourCommunityId = (String) neighbour.getAttribute("community");
-                
+
                 Edge edgeBetween = node.getEdgeBetween(neighbour);
                 Double edgeBetweenWeight = (Double) edgeBetween.getAttribute("weight");
-                
+
                 nodeCommunity.increaseEdgeWeightToCommunity(neighbourCommunityId, edgeBetweenWeight);
-                
+
                 nodeToCommunityEdgesWeights.put(neighbourCommunityId, edgeBetweenWeight);
             }
-            
-            if(this.debug) {
+
+            Double edgesWeightSumIncidentToNode = 0.0;
+
+            Iterator<Edge> neighbourEdges = node.getEachEdge().iterator();
+            while (neighbourEdges.hasNext()) {
+                // Calculate ki
+                edgesWeightSumIncidentToNode += (Double) neighbourEdges.next().getAttribute("weight");
+                node.setAttribute("edgesWeightSumIncidentToNode", edgesWeightSumIncidentToNode);
+            }
+
+            if (this.debug) {
                 System.out.println("Community " + nodeCommunityId + ": " + nodeToCommunityEdgesWeights);
                 System.out.println("Node " + node.getIndex() + ": " + nodeToCommunityEdgesWeights);
             }
         }
 
+        do {
+            //initialModularity = modularity.getMeasure();
+            for (Node node : graph) {
+//                maxModularity = -0.5;
+//                newModularity = -0.5;
+//                oldCommunity = node.getAttribute("community");
+//                bestCommunity = oldCommunity;
+
+                Double ki = (Double) node.getAttribute("edgesWeightSumIncidentToNode");
+                HashMap<String, Double> nodeToCommunityEdgesWeights = (HashMap<String, Double>) node.getAttribute("nodeToCommunityEdgesWeights");
+
+
+                // For every neighbour node of the node, test if putting it to it's
+                // community, will increase the modularity.
+                neighbours = node.getNeighborNodeIterator();
+                while (neighbours.hasNext()) {
+
+                    Node neighbour = neighbours.next();
+                    String neighbourCommunityId = (String) neighbour.getAttribute("community");
+                    HyperCommunity neighbourCommunity = communities.get(neighbourCommunityId);
+
+                    Double Sin = neighbourCommunity.getInnerEdgesWeightCount();
+                    Double Stot = neighbourCommunity.getAllOuterEdgesWeightCount();
+                    Double kiin = nodeToCommunityEdgesWeights.get(neighbourCommunityId);
+                    Double m = this.totalGraphEdgeWeight;
+                }
+            }
+        } while (false);
+
         return 0;
     }
-
+    
 //    private void initializeWeightCountersToCommunities() {
 //
 //    }
@@ -193,7 +237,6 @@ public class CommunityDetectionLouvain2 {
 //    public void printFinalGraph(Graph graph) {
 //
 //    }
-
     /**
      * Delaying a thread for 100ms. Used when displaying the communities on the
      * screen.
@@ -204,7 +247,7 @@ public class CommunityDetectionLouvain2 {
         } catch (Exception e) {
         }
     }
-    
+
     public void debugOn() {
         this.debug = true;
     }
