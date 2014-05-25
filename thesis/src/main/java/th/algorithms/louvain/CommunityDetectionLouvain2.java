@@ -136,6 +136,9 @@ public class CommunityDetectionLouvain2 {
     }
 
     public double findCommunities() {
+        
+        modularity = new Modularity("community", "weight");
+        modularity.init(graph);
 
         // Mapping between community id and community object
         this.communities = new HashMap<String, HyperCommunity>();
@@ -199,14 +202,11 @@ public class CommunityDetectionLouvain2 {
                 System.out.println("");
             }
         }
-
+        int changes = 0;
         do {
-            //initialModularity = modularity.getMeasure();
+            initialModularity = modularity.getMeasure();
+            changes = 0;
             for (Node node : graph) {
-//                maxModularity = -0.5;
-//                newModularity = -0.5;
-//                oldCommunity = node.getAttribute("community");
-//                bestCommunity = oldCommunity;
                 Double maxDeltaQ = 0.0;
 
                 String nodeCommunityId = (String) node.getAttribute("community"); 
@@ -225,9 +225,16 @@ public class CommunityDetectionLouvain2 {
                     HyperCommunity neighbourCommunity = this.communities.get(neighbourCommunityId);
 
                     Double Sin = neighbourCommunity.getInnerEdgesWeightCount();
-                    Double Stot = neighbourCommunity.getAllOuterEdgesWeightCount();
+                    Double Stot = neighbourCommunity.getAllOuterEdgesWeightCount() + Sin;
                     Double kiin = nodeToCommunityEdgesWeights.getWeight(neighbourCommunityId);
                     Double m = this.totalGraphEdgeWeight;
+                    if(this.debug) {
+                        System.out.println("Sin:\t" + Sin);
+                        System.out.println("Stot:\t" + Stot);
+                        System.out.println("kiin:\t" + kiin);
+                        System.out.println("ki:\t" + ki);
+                        System.out.println("m:\t" + m);
+                    }
                     
                     Double deltaQ = calculateDeltaQ(Sin,Stot,ki,kiin,m);
                     
@@ -237,7 +244,8 @@ public class CommunityDetectionLouvain2 {
                     }
                     
                     if(this.debug) {
-                        System.out.println("Node " + node.getIndex() + " goes to community " + neighbourCommunityId + ": " + deltaQ);
+                        System.out.println("If node " + node.getIndex() + " goes to community " + neighbourCommunityId + ": " + deltaQ);
+                        System.out.println("");
                     }
                 }
                 // Move node to the best community (if not already in) and update node and community lists.
@@ -249,10 +257,16 @@ public class CommunityDetectionLouvain2 {
                                 ": Old community=" + nodeCommunityId +
                                 ", New community=" + bestCommunityToGo);
                     }
+                    changes++;
                 }
             }
-        } while (false);
-
+        } while (changes > 0); // Loop until there is no change
+        
+        if(this.debug) {
+            for (Node node : graph) {
+                System.out.println("Node " + node.getIndex() + ", community: " + (String) node.getAttribute("community")); 
+            }
+        }
         return 0;
     }
     
@@ -308,6 +322,8 @@ public class CommunityDetectionLouvain2 {
             
             neighbourToCommunityEdgesWeights.increase(newCommunityId, edgeBetweenWeight);
             neighbourToCommunityEdgesWeights.decrease(nodeCommunityId, edgeBetweenWeight);
+            System.out.println("Node " + neighbour.getIndex() + ": " +neighbourToCommunityEdgesWeights);
+            
         }
 
     }
