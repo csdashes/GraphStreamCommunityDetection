@@ -201,6 +201,8 @@ public class CommunityDetectionLouvain2 {
 //                newModularity = -0.5;
 //                oldCommunity = node.getAttribute("community");
 //                bestCommunity = oldCommunity;
+                Double maxDeltaQ = 0.0;
+                String bestCommunityToGo = null;
 
                 Double ki = (Double) node.getAttribute("edgesWeightSumIncidentToNode");
                 HashMap<String, Double> nodeToCommunityEdgesWeights = (HashMap<String, Double>) node.getAttribute("nodeToCommunityEdgesWeights");
@@ -220,7 +222,16 @@ public class CommunityDetectionLouvain2 {
                     Double kiin = nodeToCommunityEdgesWeights.get(neighbourCommunityId);
                     Double m = this.totalGraphEdgeWeight;
                     
-                    calculateDeltaQ(Sin,Stot,ki,kiin,m);
+                    Double deltaQ = calculateDeltaQ(Sin,Stot,ki,kiin,m);
+                    
+                    if(deltaQ > maxDeltaQ) {
+                        maxDeltaQ = deltaQ;
+                        bestCommunityToGo = neighbourCommunityId;
+                    }
+                    
+                    if(this.debug) {
+                        System.out.println("Node " + node.getIndex() + " goes to community " + neighbourCommunityId + ": " + deltaQ);
+                    }
                 }
             }
         } while (false);
