@@ -1,7 +1,5 @@
 package th.algorithms.louvain;
 
-import th.algorithms.louvain.utils.HyperCommunityManager;
-import th.algorithms.louvain.utils.HyperCommunity;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import java.io.IOException;
@@ -24,6 +22,9 @@ import org.graphstream.stream.GraphParseException;
 import org.graphstream.ui.graphicGraph.stylesheet.StyleConstants.Units;
 import org.graphstream.ui.spriteManager.Sprite;
 import org.graphstream.ui.spriteManager.SpriteManager;
+import th.algorithms.louvain.utils.HyperCommunity;
+import th.algorithms.louvain.utils.HyperCommunityManager;
+import th.algorithms.louvain.utils.WeightMap;
 
 /**
  * Implementation of the Louvain algorithm.
@@ -67,6 +68,7 @@ public class CommunityDetectionLouvain2 {
 
     private boolean debug = false;
     private Double totalGraphEdgeWeight;
+    private Map<String, HyperCommunity> communities;
 
     /**
      * Initializing global variables.
@@ -136,7 +138,7 @@ public class CommunityDetectionLouvain2 {
     public double findCommunities() {
 
         // Mapping between community id and community object
-        Map<String, HyperCommunity> communities = new HashMap<String, HyperCommunity>();
+        this.communities = new HashMap<String, HyperCommunity>();
 
         for (Node node : this.graph) {
             node.addAttribute("ui.label", node.getIndex()); // Add a label in every node
@@ -149,22 +151,25 @@ public class CommunityDetectionLouvain2 {
             node.addAttribute("community", community.getId());
 
             // Add the newly created community to the map
-            communities.put(community.getId(), community);
+            this.communities.put(community.getId(), community);
 
             // This will keep track of the summary of the edge weights between each node
             // to each community.
-            node.addAttribute("nodeToCommunityEdgesWeights", new HashMap<String, Double>());
+            node.addAttribute("nodeToCommunityEdgesWeights", new WeightMap(node.getDegree())); //the allocation for the WeightMap, should be the same as the node's degree.
         }
 
         // Add the new map of communities in an arraylist so the communities will
         // not be mixed through the recursive steps of the algorithm.
-        this.communitiesPerPhase.add(communities);
+        this.communitiesPerPhase.add(this.communities);
 
         for (Node node : this.graph) {
             String nodeCommunityId = (String) node.getAttribute("community");
             HyperCommunity nodeCommunity = communities.get(nodeCommunityId);
-            HashMap<String, Double> nodeToCommunityEdgesWeights = (HashMap<String, Double>) node.getAttribute("nodeToCommunityEdgesWeights");
-
+            WeightMap nodeToCommunityEdgesWeights = (WeightMap) node.getAttribute("nodeToCommunityEdgesWeights");
+            
+            // to self
+            nodeToCommunityEdgesWeights.init(nodeCommunityId);
+            
             neighbours = node.getNeighborNodeIterator();
             while (neighbours.hasNext()) {
 
@@ -176,7 +181,7 @@ public class CommunityDetectionLouvain2 {
 
                 nodeCommunity.increaseEdgeWeightToCommunity(neighbourCommunityId, edgeBetweenWeight);
 
-                nodeToCommunityEdgesWeights.put(neighbourCommunityId, edgeBetweenWeight);
+                nodeToCommunityEdgesWeights.increase(neighbourCommunityId, edgeBetweenWeight);
             }
 
             Double edgesWeightSumIncidentToNode = 0.0;
@@ -191,6 +196,7 @@ public class CommunityDetectionLouvain2 {
             if (this.debug) {
                 System.out.println("Community " + nodeCommunityId + ": " + nodeToCommunityEdgesWeights);
                 System.out.println("Node " + node.getIndex() + ": " + nodeToCommunityEdgesWeights);
+                System.out.println("");
             }
         }
 
@@ -202,10 +208,11 @@ public class CommunityDetectionLouvain2 {
 //                oldCommunity = node.getAttribute("community");
 //                bestCommunity = oldCommunity;
                 Double maxDeltaQ = 0.0;
-                String bestCommunityToGo = null;
 
+                String nodeCommunityId = (String) node.getAttribute("community"); 
+                String bestCommunityToGo = nodeCommunityId;
                 Double ki = (Double) node.getAttribute("edgesWeightSumIncidentToNode");
-                HashMap<String, Double> nodeToCommunityEdgesWeights = (HashMap<String, Double>) node.getAttribute("nodeToCommunityEdgesWeights");
+                WeightMap nodeToCommunityEdgesWeights = (WeightMap) node.getAttribute("nodeToCommunityEdgesWeights");
 
 
                 // For every neighbour node of the node, test if putting it to it's
@@ -215,11 +222,11 @@ public class CommunityDetectionLouvain2 {
 
                     Node neighbour = neighbours.next();
                     String neighbourCommunityId = (String) neighbour.getAttribute("community");
-                    HyperCommunity neighbourCommunity = communities.get(neighbourCommunityId);
+                    HyperCommunity neighbourCommunity = this.communities.get(neighbourCommunityId);
 
                     Double Sin = neighbourCommunity.getInnerEdgesWeightCount();
                     Double Stot = neighbourCommunity.getAllOuterEdgesWeightCount();
-                    Double kiin = nodeToCommunityEdgesWeights.get(neighbourCommunityId);
+                    Double kiin = nodeToCommunityEdgesWeights.getWeight(neighbourCommunityId);
                     Double m = this.totalGraphEdgeWeight;
                     
                     Double deltaQ = calculateDeltaQ(Sin,Stot,ki,kiin,m);
@@ -239,6 +246,10 @@ public class CommunityDetectionLouvain2 {
         return 0;
     }
     
+    private HyperCommunity getNodeCommunity(Node node) {
+        String nodeCommunityId = (String) node.getAttribute("community");
+        return this.communities.get(nodeCommunityId);
+    }    
     private Double calculateDeltaQ(Double Sin, Double Stot, Double ki, Double kiin, Double m) {
         Double doubleM = m*2;
         Double firstFraction = (Sin + kiin)/doubleM;
