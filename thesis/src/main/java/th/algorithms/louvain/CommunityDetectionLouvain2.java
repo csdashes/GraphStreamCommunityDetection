@@ -242,7 +242,7 @@ public class CommunityDetectionLouvain2 {
                 }
                 // Move node to the best community (if not already in) and update node and community lists.
                 if (!nodeCommunityId.equals(bestCommunityToGo)) {
-                    //incrementalUpdate(node,bestCommunityToGo);
+                    incrementalUpdate(node,bestCommunityToGo);
                     node.changeAttribute("community", bestCommunityToGo);
                     if(this.debug) {
                         System.out.println("Node " + node.getIndex() +
@@ -259,7 +259,59 @@ public class CommunityDetectionLouvain2 {
     private HyperCommunity getNodeCommunity(Node node) {
         String nodeCommunityId = (String) node.getAttribute("community");
         return this.communities.get(nodeCommunityId);
-    }    
+    }
+    
+    private void incrementalUpdate(Node node, String newCommunityId) {
+        String nodeCommunityId = (String) node.getAttribute("community");
+        HyperCommunity nodeCommunity = this.communities.get(nodeCommunityId);
+        HyperCommunity newCommunity = this.communities.get(newCommunityId);
+        WeightMap nodeToCommunityEdgesWeights = (WeightMap) node.getAttribute("nodeToCommunityEdgesWeights");
+        Double weightToCurrentCommunity = nodeToCommunityEdgesWeights.getWeight(nodeCommunityId);
+        Double weightToNewCommunity = nodeToCommunityEdgesWeights.getWeight(newCommunityId);
+        
+        // Update lists in the current community
+        nodeCommunity.decreaseInnerEdgesWeightCount(weightToCurrentCommunity);
+        nodeCommunity.increaseEdgeWeightToCommunity(newCommunityId, weightToCurrentCommunity);
+        nodeCommunity.decreaseEdgeWeightToCommunity(newCommunityId, weightToNewCommunity);
+        
+        // Update lists in the new community
+        newCommunity.increaseInnerEdgesWeightCount(weightToNewCommunity);
+        newCommunity.increaseEdgeWeightToCommunity(nodeCommunityId, weightToCurrentCommunity);
+        newCommunity.decreaseEdgeWeightToCommunity(nodeCommunityId, weightToNewCommunity);
+        
+        //For the rest of the communites that the currect node is connected to, we have to update the lists
+        // OF these communities and FOR these communities
+        HyperCommunity toCommunity;
+        for (Entry<String, Double> nodeToCommunityEdgesWeight : nodeToCommunityEdgesWeights.entrySet()) {
+            String toCommunityId = nodeToCommunityEdgesWeight.getKey();
+            Double weightToCommunity = nodeToCommunityEdgesWeight.getValue();
+            // exclude the already calculated current node community and new community
+            if((!toCommunityId.equals(nodeCommunityId) && !toCommunityId.equals(newCommunityId))
+                    && weightToCommunity != 0.0) {
+                nodeCommunity.decreaseEdgeWeightToCommunity(toCommunityId, weightToCommunity);
+                newCommunity.increaseEdgeWeightToCommunity(toCommunityId, weightToCommunity);
+                
+                // OF these communities
+                toCommunity = this.communities.get(toCommunityId);
+                toCommunity.decreaseEdgeWeightToCommunity(nodeCommunityId, weightToCommunity);
+                toCommunity.increaseEdgeWeightToCommunity(newCommunityId, weightToCommunity);
+            }
+        }
+        
+        neighbours = node.getNeighborNodeIterator();
+        while (neighbours.hasNext()) {
+            Node neighbour = neighbours.next();
+            WeightMap neighbourToCommunityEdgesWeights = (WeightMap) neighbour.getAttribute("nodeToCommunityEdgesWeights");
+            
+            Edge edgeBetween = node.getEdgeBetween(neighbour);
+            Double edgeBetweenWeight = (Double) edgeBetween.getAttribute("weight");
+            
+            neighbourToCommunityEdgesWeights.increase(newCommunityId, edgeBetweenWeight);
+            neighbourToCommunityEdgesWeights.decrease(nodeCommunityId, edgeBetweenWeight);
+        }
+
+    }
+    
     private Double calculateDeltaQ(Double Sin, Double Stot, Double ki, Double kiin, Double m) {
         Double doubleM = m*2;
         Double firstFraction = (Sin + kiin)/doubleM;
