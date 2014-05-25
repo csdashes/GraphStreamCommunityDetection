@@ -219,6 +219,8 @@ public class CommunityDetectionLouvain2 {
                     Double Stot = neighbourCommunity.getAllOuterEdgesWeightCount();
                     Double kiin = nodeToCommunityEdgesWeights.get(neighbourCommunityId);
                     Double m = this.totalGraphEdgeWeight;
+                    
+                    calculateDeltaQ(Sin,Stot,ki,kiin,m);
                 }
             }
         } while (false);
@@ -226,6 +228,19 @@ public class CommunityDetectionLouvain2 {
         return 0;
     }
     
+    private Double calculateDeltaQ(Double Sin, Double Stot, Double ki, Double kiin, Double m) {
+        Double doubleM = m*2;
+        Double firstFraction = (Sin + kiin)/doubleM;
+        Double secondFraction = Math.pow((Stot  + ki)/doubleM,2.0);
+        Double firstStatement = firstFraction - secondFraction;
+        Double thirdFraction = Sin/doubleM;
+        Double fourthFraction = Math.pow(Stot/doubleM, 2.0);
+        Double fifthFraction = Math.pow(ki/doubleM, 2.0);
+        Double secondStatement = thirdFraction - fourthFraction - fifthFraction;
+        
+        return firstStatement - secondStatement;
+    }
+
 //    private void initializeWeightCountersToCommunities() {
 //
 //    }
