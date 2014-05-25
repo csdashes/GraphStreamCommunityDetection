@@ -6,6 +6,7 @@ import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
 import org.graphstream.util.parser.ParseException;
 import th.algorithms.louvain.CommunityDetectionLouvain;
+import th.algorithms.louvain.CommunityDetectionLouvain2;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
 import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithNumberOfEdges;
 import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithTotalPropinquity;
@@ -130,8 +131,10 @@ public class AppManager {
 
     private void LouvainExample(String datasetFile) throws IOException, GraphParseException {
         
-        CommunityDetectionLouvain louvain = new CommunityDetectionLouvain();
-        louvain.init(datasetFile);
+        CommunityDetectionLouvain2 louvain = new CommunityDetectionLouvain2();
+//        louvain.init(datasetFile);
+        louvain.init("../data/smalltest.dgs");
+        louvain.debugOn();
         louvain.execute();
     }
 
