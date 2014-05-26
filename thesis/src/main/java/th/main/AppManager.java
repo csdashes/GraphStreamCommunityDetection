@@ -1,5 +1,6 @@
 package th.main;
 
+import java.io.File;
 import java.io.IOException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
@@ -78,9 +79,9 @@ public class AppManager {
         pd.set(2, 10);
 
         pd.init(graph);
-
-        Statistics.PDStatistics(graph, 2, 10);
-
+        
+        File theFile = new File(datasetFile);
+        Statistics.PDStatistics(graph, theFile.getName().split("\\.")[0], 2, 10);
     }
 
     private void ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(String datasetFile) throws IOException, GraphParseException {
