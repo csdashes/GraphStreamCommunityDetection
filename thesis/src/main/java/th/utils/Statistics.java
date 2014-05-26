@@ -96,7 +96,6 @@ public class Statistics {
         System.out.println("Largest Ni list: " + largestNiList);
         System.out.println("==================");
 
-        int test = 0;
         for (Entry<Integer, Integer> entry : edgeWeights.entrySet()) {
             System.out.println((entry.getValue()) + " entries are " + entry.getKey());
             test += entry.getValue();
