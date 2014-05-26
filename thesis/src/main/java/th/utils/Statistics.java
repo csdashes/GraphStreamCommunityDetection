@@ -98,7 +98,6 @@ public class Statistics {
 
         for (Entry<Integer, Integer> entry : edgeWeights.entrySet()) {
             System.out.println((entry.getValue()) + " entries are " + entry.getKey());
-            test += entry.getValue();
         }
         
         System.out.println("==================");
