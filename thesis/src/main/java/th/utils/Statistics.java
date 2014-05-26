@@ -1,5 +1,8 @@
 package th.utils;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -16,7 +19,7 @@ import th.algorithms.propinquitydynamics.utils.PropinquityMap;
  */
 public class Statistics {
 
-    public static void PDStatistics(Graph graph, int a, int b) {
+    public static void PDStatistics(Graph graph, String graphName, int a, int b) throws FileNotFoundException, UnsupportedEncodingException {
         Map<Integer, Integer> totalPDstats = new TreeMap<Integer, Integer>();
         Map<Integer, Integer> edgeWeights = new TreeMap<Integer, Integer>();
         
@@ -96,14 +99,18 @@ public class Statistics {
         System.out.println("Largest Ni list: " + largestNiList);
         System.out.println("==================");
 
+        PrintWriter writer = new PrintWriter("../exports/" + graphName + "-edgesPD.csv", "UTF-8");
+        writer.println("number of edges,propinquity value");
         for (Entry<Integer, Integer> entry : edgeWeights.entrySet()) {
-            System.out.println((entry.getValue()) + " entries are " + entry.getKey());
+            writer.println((entry.getValue()) + "," + entry.getKey());
         }
+        writer.close();
         
-        System.out.println("==================");
-
+        PrintWriter writer2 = new PrintWriter("../exports/" + graphName + "-PD.csv", "UTF-8");
+        writer2.println("number of entries,propinquity value");
         for (Entry<Integer, Integer> entry : totalPDstats.entrySet()) {
-            System.out.println((entry.getValue() / 2) + " entries are " + entry.getKey());
+            writer2.println((entry.getValue() / 2) + "," + entry.getKey());
         }
+        writer2.close();
     }
 }
