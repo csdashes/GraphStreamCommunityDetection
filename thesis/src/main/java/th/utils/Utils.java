@@ -1,5 +1,6 @@
 package th.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.nio.charset.Charset;
@@ -15,6 +16,7 @@ import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.AdjacencyListGraph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.stream.file.FileSink;
+import org.graphstream.stream.file.FileSinkDGS;
 import org.graphstream.stream.file.FileSinkGML;
 import org.graphstream.util.parser.ParseException;
 
@@ -57,27 +59,25 @@ public class Utils {
         gml.writeAll(graph, fileName + ".gml");
     }
 
-    private static void ExportToDGS() throws IOException {
-        String fileName = "../data/com-dblp.ungraph.txt";
-
+    public static void ExportToDGS(String graphFilePath, String groundTruthFilePath) throws IOException {
         Graph graph = new SingleGraph("asd", false, true);
 
         try {
-            List<String> lines = Files.readAllLines(Paths.get(fileName),
+            List<String> lines = Files.readAllLines(Paths.get(graphFilePath),
                     Charset.defaultCharset());
             for (String line : lines) {
-                String[] a = line.split("\t", 2);
+                if (!line.startsWith("#")) {
+                    String[] a = line.split("\t", 2);
 
-                graph.addEdge(a[0] + "and" + a[1], a[0], a[1]);
+                    graph.addEdge(a[0] + "and" + a[1], a[0], a[1]);                    
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        String fileName2 = "../data/com-dblp.all.cmty.txt";
-
-        try {
-            List<String> lines = Files.readAllLines(Paths.get(fileName2),
+        if (groundTruthFilePath != null && !groundTruthFilePath.isEmpty()) {
+            List<String> lines = Files.readAllLines(Paths.get(groundTruthFilePath),
                     Charset.defaultCharset());
 
             int i = 0;
@@ -96,15 +96,12 @@ public class Utils {
                 }
                 i++;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-//        FileSink fs = new FileSinkDGS();
-        FileSink fs = new FileSinkGML();
-
-//        fs.writeAll(graph, "../data/com-dblp.ungraph.dgs");
-        fs.writeAll(graph, "../data/com-dblp.ungraph.gml");
+        
+        FileSink fs = new FileSinkDGS();
+        
+        File theFile = new File(graphFilePath);
+        fs.writeAll(graph, "../data/" + theFile.getName().split("\\.")[0] + ".dgs");
     }
 
     /**
