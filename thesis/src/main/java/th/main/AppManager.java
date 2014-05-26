@@ -11,6 +11,7 @@ import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithNumberOf
 import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithTotalPropinquity;
 import th.utils.ExtractCommunities;
 import th.utils.Menu;
+import th.utils.Statistics;
 import th.utils.UIToolbox;
 import th.utils.Utils;
 
@@ -27,7 +28,7 @@ public class AppManager {
 
         while (flag) {
             methodSelection = Menu.printMenu();
-            if(methodSelection != 0) {
+            if (methodSelection != 0) {
                 datasetSelection = Menu.printDatasetMenu();
                 switch (datasetSelection) {
                     case 1:
@@ -67,6 +68,19 @@ public class AppManager {
                     return;
             }
         }
+    }
+
+    private void PDOriginalStatics(String datasetFile) throws IOException, GraphParseException {
+        Graph graph = new DefaultGraph("Propinquity Dynamics");
+        graph.read(datasetFile);
+
+        PropinquityDynamics pd = new PropinquityDynamics();
+        pd.set(2, 10);
+
+        pd.init(graph);
+
+        Statistics.PDStatistics(graph, 2, 10);
+
     }
 
     private void ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(String datasetFile) throws IOException, GraphParseException {
@@ -129,7 +143,7 @@ public class AppManager {
     }
 
     private void LouvainExample(String datasetFile) throws IOException, GraphParseException {
-        
+
         CommunityDetectionLouvain louvain = new CommunityDetectionLouvain();
         louvain.init(datasetFile);
         louvain.execute();
