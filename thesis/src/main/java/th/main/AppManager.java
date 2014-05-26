@@ -106,8 +106,9 @@ public class AppManager {
         //Utils.FractionWithTotalPropinquity(graph);
 
         // Use our custom extraction algorithm to retrive internal communities
-        ExtractCommunities.MaxToMin(graph);
+        int com = ExtractCommunities.MaxToMin(graph);
         UIToolbox.ColorCommunities(graph);
+        System.out.println("Number of communities: " + com);
     }
 
     private void ErdozSubgraphwithOriginalPDAndTwoDisplays(String datasetFile) throws IOException, ParseException, GraphParseException {
