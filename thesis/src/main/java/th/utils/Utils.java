@@ -2,12 +2,19 @@ package th.utils;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.AdjacencyListGraph;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.stream.file.FileSink;
 import org.graphstream.stream.file.FileSinkGML;
 import org.graphstream.util.parser.ParseException;
 
@@ -48,6 +55,56 @@ public class Utils {
 
         FileSinkGML gml = new FileSinkGML();
         gml.writeAll(graph, fileName + ".gml");
+    }
+
+    private static void ExportToDGS() throws IOException {
+        String fileName = "../data/com-dblp.ungraph.txt";
+
+        Graph graph = new SingleGraph("asd", false, true);
+
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(fileName),
+                    Charset.defaultCharset());
+            for (String line : lines) {
+                String[] a = line.split("\t", 2);
+
+                graph.addEdge(a[0] + "and" + a[1], a[0], a[1]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String fileName2 = "../data/com-dblp.all.cmty.txt";
+
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(fileName2),
+                    Charset.defaultCharset());
+
+            int i = 0;
+            for (String line : lines) {
+                String[] a = line.split("\t");
+
+                for (String s : a) {
+                    if (graph.getNode(s).hasAttribute("groundTruth")) {
+                        List<Integer> l = graph.getNode(s).getAttribute("groundTruth");
+                        l.add(i);
+                    } else {
+                        List<Integer> l = new ArrayList<Integer>(100);
+                        l.add(i);
+                        graph.getNode(s).addAttribute("groundTruth", l);
+                    }
+                }
+                i++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        FileSink fs = new FileSinkDGS();
+        FileSink fs = new FileSinkGML();
+
+//        fs.writeAll(graph, "../data/com-dblp.ungraph.dgs");
+        fs.writeAll(graph, "../data/com-dblp.ungraph.gml");
     }
 
     /**
