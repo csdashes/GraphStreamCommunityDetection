@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.graphstream.algorithm.community.Community;
 import org.graphstream.graph.Node;
@@ -19,8 +20,10 @@ public class HyperCommunity extends Community {
     private int innerEdgesCount;
     private double innerEdgesWeightCount;
     //private Map<String,Integer> outerEdgesCount;
-    private Map<String,Double> edgeWeightToCommunity;
+    private WeightMap edgeWeightToCommunity;
+    private double totalEdgesWeight;
     private Set<Integer> communityNodes;
+    private String cID;
     
     /**
      * Initializing global variables.
@@ -29,8 +32,9 @@ public class HyperCommunity extends Community {
         super();
 //        this.nodesCount = 0;
         this.innerEdgesWeightCount = 0.0;
-        this.edgeWeightToCommunity = new HashMap<String,Double>();
+        this.edgeWeightToCommunity = new WeightMap(10);
         this.communityNodes = new HashSet<Integer>();
+        this.cID = String.valueOf(Integer.parseInt(this.getId()) + 1); //to avoid having community id=0
     }
     
     public void addNode(Integer nodeIndex) {
@@ -82,22 +86,23 @@ public class HyperCommunity extends Community {
      * having attributes starting from 0.
      * @return the community's attribute id.
      */
-    public String getAttribute() {
-        return String.valueOf(Integer.parseInt(this.getId()) + 1);
+    public String getCID() {
+        return this.cID;
     }
 
     /**
      * @return the edgeWeightToCommunity map
      */
-    public Map<String,Double> getEdgeWeightToCommunity() {
+    public WeightMap getEdgeWeightToCommunityMap() {
         return this.edgeWeightToCommunity;
     }
     
     /**
+     * @param communityId
      * @return the edgeWeightToCommunity of the given community
      */
     public Double getEdgeWeightToCommunity(String communityId) {
-        return this.edgeWeightToCommunity.get(communityId);
+        return this.edgeWeightToCommunity.getWeight(communityId);
     }
     
     /**
@@ -114,11 +119,8 @@ public class HyperCommunity extends Community {
      * @param number the number to increase the edgeWeightToCommunity
      */
     public void increaseEdgeWeightToCommunity(String communityId, Double number) {
-        if(this.edgeWeightToCommunity.containsKey(communityId)) {
-            this.edgeWeightToCommunity.put(communityId, this.edgeWeightToCommunity.get(communityId) + number);
-        } else {
-            this.edgeWeightToCommunity.put(communityId, number);
-        }
+            this.edgeWeightToCommunity.increase(communityId, number);
+            this.totalEdgesWeight += number;
     }
     
     /**
@@ -135,8 +137,12 @@ public class HyperCommunity extends Community {
      * @param number the number to decrease the edgeWeightToCommunity.
      */
     public void decreaseEdgeWeightToCommunity(String communityId, Double number) {
-        //this.edgeWeightToCommunity.
-        this.edgeWeightToCommunity.put(communityId, this.edgeWeightToCommunity.get(communityId) - number);
+        this.edgeWeightToCommunity.decrease(communityId, number);
+        this.totalEdgesWeight -= number;
+        if(this.getEdgeWeightToCommunity(communityId) == 0.0){
+//            this.edgeWeightToCommunity.remove(communityId);
+        }
+//        this.edgeWeightToCommunity.put(communityId, this.edgeWeightToCommunity.get(communityId) - number);
     }
 
     /**
@@ -213,20 +219,29 @@ public class HyperCommunity extends Community {
         this.innerEdgesWeightCount -= number;
     }
     
+    
+    public double getTotalEdgesWeight() {
+        return this.totalEdgesWeight;
+    }
+    
+    public void clearCommunityNodes() {
+        this.communityNodes.clear();
+    }
+    
     /**
      * Divide the inner edges weight counter by 2 (in case they were calculated twice).
      */
-    public void finilizeInnerEdgesWeightCount() {
-        this.innerEdgesWeightCount/=2;
-    }
+//    public void finilizeInnerEdgesWeightCount() {
+//        this.innerEdgesWeightCount/=2;
+//    }
     
-    public Double getAllOuterEdgesWeightCount() {
-        Double total = 0.0;
-        Map.Entry<String, Double> edgeWeightToCommunity;
-        for (Iterator<Map.Entry<String, Double>> outerEdgesWeightIt = this.edgeWeightToCommunity.entrySet().iterator(); outerEdgesWeightIt.hasNext();) {
-            edgeWeightToCommunity = outerEdgesWeightIt.next();
-            total += edgeWeightToCommunity.getValue();
-        }
-        return total;
-    }
+//    public Double getAllEdgesWeightCount() {
+//        Double total = 0.0;
+//        //Map.Entry<String, Double> edgeWeightToCommunity;
+//        for(Entry<String, Double> edgeWeightToCommunity : this.edgeWeightToCommunity.entrySet()) {
+//            total += edgeWeightToCommunity.getValue();
+//        }
+//        return total;
+//    }
+    
 }

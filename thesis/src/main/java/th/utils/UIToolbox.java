@@ -41,7 +41,7 @@ public class UIToolbox {
     }
 
     @SuppressWarnings("unchecked")
-    public static void ColorCommunities(Graph graph) {
+    public static int ColorCommunities(Graph graph) {
         Map<Integer, String> colorMap = new HashMap<Integer, String>(10);
 
         // Set the colors
@@ -72,8 +72,9 @@ public class UIToolbox {
                 colorMap.put(com, newColor);
             }
 
-            n.addAttribute("ui.style", "fill-color: rgb(" + colorMap.get(com) + "); size: 20px;");
+            n.addAttribute("ui.style", "fill-color: rgb(" + colorMap.get(com) + "); size: 5px;");
         }
+        return colorMap.size();
     }
 
     private final SpriteManager sm;

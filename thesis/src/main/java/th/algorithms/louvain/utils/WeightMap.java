@@ -12,6 +12,10 @@ public class WeightMap extends HashMap<String, Double> {
         super(cap);
     }
     
+    public WeightMap(WeightMap wm) {
+        super(wm);
+    }
+    
     public void increase(String communityId, Double weight) {
         Double currentWeight = this.get(communityId);
         if (currentWeight == null) {

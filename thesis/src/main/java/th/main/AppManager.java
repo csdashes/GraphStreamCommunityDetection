@@ -1,8 +1,11 @@
 package th.main;
 
 import java.io.IOException;
+import java.util.HashMap;
 import org.graphstream.algorithm.measure.Modularity;
+import org.graphstream.algorithm.measure.NormalizedMutualInformation;
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
 import org.graphstream.util.parser.ParseException;
@@ -29,7 +32,7 @@ public class AppManager {
 
         while (flag) {
             methodSelection = Menu.printMenu();
-            if(methodSelection != 0) {
+            if (methodSelection != 0) {
                 datasetSelection = Menu.printDatasetMenu();
                 switch (datasetSelection) {
                     case 1:
@@ -131,32 +134,56 @@ public class AppManager {
     }
 
     private void LouvainExample(String datasetFile) throws IOException, GraphParseException {
-        
+        long start = System.currentTimeMillis();
         Graph graph = new DefaultGraph("Louvain");
-        graph.read("../data/smalltest.dgs");
-        graph.display();
-        
+//        graph.read("../data/smalltest.dgs");
+        graph.read(datasetFile);
+        //graph.display();
+
         CommunityDetectionLouvain2 louvain = new CommunityDetectionLouvain2();
-        //louvain.debugOn();
-        
+//        louvain.debugOn();
+
         louvain.init(graph);
         Modularity modularity = new Modularity("community", "weight");
         modularity.init(graph);
-        
+
         double globalNewQ;
-        double globalMaxQ = -0.5;
-        louvain.findCommunities(graph);         // First Phase
+        double globalMaxQ = Double.NEGATIVE_INFINITY;
+        HashMap<String, String> changes;
+
+        Graph initialGraph = Utils.clone(graph);
+
+        changes = louvain.findCommunities(graph); // First Phase
+        louvain.applyChanges(initialGraph,changes);
+        
         globalNewQ = modularity.getMeasure();   // Get new global modularity value
         
         Graph folded = null;
         while (globalNewQ > globalMaxQ) {       // As long as the modularity is not the maximum
             globalMaxQ = globalNewQ;
             folded = louvain.foldingCommunities(graph); // Second Phase (folding)
-            louvain.findCommunities(folded);    // and get the new modularity
+            changes = louvain.findCommunities(folded);    // and get the new modularity
+            louvain.applyChanges(initialGraph, changes);
             globalNewQ = modularity.getMeasure();   // Get new global modularity value
+            graph = folded;
         }
-        louvain.printFinalGraph(folded,graph,globalMaxQ,0.0); // After reaching the maximum modularity, 
-        // print the graph on the screen.
+        
+        System.out.println("\n===== " + (System.currentTimeMillis() - start) + " =====");
+        
+        for (Node node : initialGraph) {
+            String com = (String) node.getAttribute("community");
+//            System.out.println("Node " + node.getIndex() + ", community: " + com);
+            node.setAttribute("community", Integer.parseInt(com));
+        }
+        initialGraph.display();
+        int communitiez = UIToolbox.ColorCommunities(initialGraph);
+        UIToolbox ui = new UIToolbox(initialGraph);
+        NormalizedMutualInformation nmi;
+        nmi = new NormalizedMutualInformation("community","groundTruth");
+        nmi.init(initialGraph);
+        ui.addSprite("NMI", nmi.getMeasure(), 100);
+        ui.addSprite("Modularity", globalMaxQ, 60);
+        ui.addSprite("Communities", communitiez, 20);
     }
 
     public static void WriteToFileExample() throws IOException, GraphParseException {

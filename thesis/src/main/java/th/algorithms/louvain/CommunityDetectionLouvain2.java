@@ -81,6 +81,10 @@ public class CommunityDetectionLouvain2 {
     public void init(Graph graph) throws IOException, GraphParseException {
 
         this.totalGraphEdgeWeight = 0.0;
+        this.manager = new HyperCommunityManager();
+
+        // Mapping between community id and community object
+        this.communities = new HashMap<String, HyperCommunity>();
 
         // Add weight to each edge
         for (Edge edge : graph.getEdgeSet()) {
@@ -95,111 +99,83 @@ public class CommunityDetectionLouvain2 {
             //edge.addAttribute("ui.label", edge.getAttribute("weight"));
         }
 
-        // Add attribute "trueCommunityNodes" to every node, because later each
-        // node will represent a community (after the folding phase) so we want 
-        // to keep track of the contents of each community. Used to revert to
-        // the original graph.        
-        for (Node node : graph) {
-            Set<Integer> trueCommunityNodes = new HashSet<Integer>();
-            trueCommunityNodes.add(node.getIndex());
-            node.addAttribute("trueCommunityNodes", trueCommunityNodes);
-        }
-
-//        this.communitiesPerPhase = new ArrayList<Map<String, HyperCommunity>>();
-        this.manager = new HyperCommunityManager();
+        generateCommunityForEachNode(graph);
+        initWeightsToCommunities(graph);
     }
 
-    /**
-     * The controller of the algorithm.
-     *
-     * @throws IOException
-     * @throws GraphParseException
-     */
-    public void execute() throws IOException, GraphParseException {
-
-    }
-
-    public void findCommunities(Graph graph) {
-        
-        modularity = new Modularity("community", "weight");
-        modularity.init(graph);
-
-        // Mapping between community id and community object
-        this.communities = new HashMap<String, HyperCommunity>();
-
+    public void generateCommunityForEachNode(Graph graph) {
         for (Node node : graph) {
-            node.addAttribute("ui.label", node.getIndex()); // Add a label in every node
-            // with the index id of the node.
+            //node.addAttribute("ui.label", node.getId()); // Add a label in every node
+            // with the id of the node.
             // Every node belongs to a different community.
             HyperCommunity community = manager.communityFactory();
             community.addNode(node.getIndex());
             // Add community attribute to each node, so modularity alg can identify 
             //which nodes belong to each community.
-            node.addAttribute("community", community.getId());
+            node.addAttribute("community", community.getCID());
+            node.addAttribute("nodeAsCommunity", community.getCID());
+            community.increaseEdgeWeightToCommunity(community.getCID(), 0.0);
 
             // Add the newly created community to the map
-            this.communities.put(community.getId(), community);
+            this.communities.put(community.getCID(), community);
 
             // This will keep track of the summary of the edge weights between each node
             // to each community.
             node.addAttribute("nodeToCommunityEdgesWeights", new WeightMap(node.getDegree())); //the allocation for the WeightMap, should be the same as the node's degree.
-        }
 
-        // Add the new map of communities in an arraylist so the communities will
-        // not be mixed through the recursive steps of the algorithm.
-        //this.communitiesPerPhase.add(this.communities);
+            initKi(node);
+
+        }
+    }
+
+    public void initKi(Node node) {
+        Double ki = 0.0;
+        Iterator<Edge> neighbourEdges = node.getEachEdge().iterator();
+        while (neighbourEdges.hasNext()) {
+            ki += (Double) neighbourEdges.next().getAttribute("weight");
+        }
+        node.setAttribute("ki", ki);
+    }
+
+    public void initWeightsToCommunities(Graph graph) {
         for (Node node : graph) {
             String nodeCommunityId = (String) node.getAttribute("community");
             HyperCommunity nodeCommunity = communities.get(nodeCommunityId);
             WeightMap nodeToCommunityEdgesWeights = (WeightMap) node.getAttribute("nodeToCommunityEdgesWeights");
-
-            // to self
             nodeToCommunityEdgesWeights.init(nodeCommunityId);
-
-            neighbours = node.getNeighborNodeIterator();
+            Iterator<Node> neighbours = node.getNeighborNodeIterator();
             while (neighbours.hasNext()) {
-
                 Node neighbour = neighbours.next();
                 String neighbourCommunityId = (String) neighbour.getAttribute("community");
-
                 Edge edgeBetween = node.getEdgeBetween(neighbour);
                 Double edgeBetweenWeight = (Double) edgeBetween.getAttribute("weight");
 
-                nodeCommunity.increaseEdgeWeightToCommunity(neighbourCommunityId, edgeBetweenWeight);
-
                 nodeToCommunityEdgesWeights.increase(neighbourCommunityId, edgeBetweenWeight);
+
+                nodeCommunity.increaseEdgeWeightToCommunity(neighbourCommunityId, edgeBetweenWeight);
             }
-
-            Double edgesWeightSumIncidentToNode = 0.0;
-
-            Iterator<Edge> neighbourEdges = node.getEachEdge().iterator();
-            while (neighbourEdges.hasNext()) {
-                // Calculate ki
-                edgesWeightSumIncidentToNode += (Double) neighbourEdges.next().getAttribute("weight");
-                node.setAttribute("edgesWeightSumIncidentToNode", edgesWeightSumIncidentToNode);
-            }
-
-//            if (this.debug) {
-//                System.out.println("Community " + nodeCommunityId + ": " + nodeToCommunityEdgesWeights);
-//                System.out.println("Node " + node.getIndex() + ": " + nodeToCommunityEdgesWeights);
-//                System.out.println("");
-//            }
         }
-        int changes = 0;
+    }
+
+    public HashMap<String, String> findCommunities(Graph graph) {
+
+        HashMap<String, String> changes = new HashMap<String, String>(10);
+        modularity = new Modularity("community", "weight");
+        modularity.init(graph);
+
+        double initialM = modularity.getMeasure();
         do {
-            initialModularity = modularity.getMeasure();
-            changes = 0;
             for (Node node : graph) {
                 Double maxDeltaQ = 0.0;
 
                 String nodeCommunityId = (String) node.getAttribute("community");
                 String bestCommunityToGo = nodeCommunityId;
-                Double ki = (Double) node.getAttribute("edgesWeightSumIncidentToNode");
                 WeightMap nodeToCommunityEdgesWeights = (WeightMap) node.getAttribute("nodeToCommunityEdgesWeights");
 
-                // For every neighbour node of the node, test if putting it to it's
-                // community, will increase the modularity.
-                neighbours = node.getNeighborNodeIterator();
+                Double ki = (Double) node.getAttribute("ki");
+                Double m = this.totalGraphEdgeWeight;
+
+                Iterator<Node> neighbours = node.getNeighborNodeIterator();
                 while (neighbours.hasNext()) {
 
                     Node neighbour = neighbours.next();
@@ -207,9 +183,8 @@ public class CommunityDetectionLouvain2 {
                     HyperCommunity neighbourCommunity = this.communities.get(neighbourCommunityId);
 
                     Double Sin = neighbourCommunity.getInnerEdgesWeightCount();
-                    Double Stot = neighbourCommunity.getAllOuterEdgesWeightCount() + Sin;
+                    Double Stot = neighbourCommunity.getTotalEdgesWeight();
                     Double kiin = nodeToCommunityEdgesWeights.getWeight(neighbourCommunityId);
-                    Double m = this.totalGraphEdgeWeight;
 //                    if (this.debug) {
 //                        System.out.println("Sin:\t" + Sin);
 //                        System.out.println("Stot:\t" + Stot);
@@ -234,24 +209,27 @@ public class CommunityDetectionLouvain2 {
                 if (!nodeCommunityId.equals(bestCommunityToGo)) {
                     incrementalUpdate(node, bestCommunityToGo);
                     node.changeAttribute("community", bestCommunityToGo);
-
+                    String nodeAsCommunity = (String) node.getAttribute("nodeAsCommunity");
+                    changes.put(nodeAsCommunity, bestCommunityToGo);
                     if (this.debug) {
                         System.out.println("Node " + node.getIndex()
                                 + ": Old community=" + nodeCommunityId
                                 + ", New community=" + bestCommunityToGo);
                     }
-                    changes++;
                 }
             }
-            deltaQ = modularity.getMeasure() - initialModularity;
+            double newM = modularity.getMeasure();
+            deltaQ = newM - initialM;
+            initialM = newM;
         } while (deltaQ > 0); // Loop until there is no improvement in modularity
-//        } while (changes > 0); // Loop until there is no change
 
-//        if (this.debug) {
-//            for (Node node : graph) {
-//                System.out.println("Node " + node.getIndex() + ", community: " + (String) node.getAttribute("community"));
-//            }
-//        }
+        if (this.debug) {
+            for (Node node : graph) {
+                System.out.println("Node " + node.getIndex() + ", community: " + (String) node.getAttribute("community"));
+            }
+            System.out.println("Communities: " + this.communities);
+        }
+        return changes;
     }
 
     private HyperCommunity getNodeCommunity(Node node) {
@@ -268,14 +246,16 @@ public class CommunityDetectionLouvain2 {
         Double weightToNewCommunity = nodeToCommunityEdgesWeights.getWeight(newCommunityId);
 
         // Update lists in the current community
-        nodeCommunity.decreaseInnerEdgesWeightCount(weightToCurrentCommunity);
+//        nodeCommunity.decreaseInnerEdgesWeightCount(weightToCurrentCommunity);
+        nodeCommunity.decreaseEdgeWeightToCommunity(nodeCommunityId, weightToCurrentCommunity);
         nodeCommunity.increaseEdgeWeightToCommunity(newCommunityId, weightToCurrentCommunity);
         nodeCommunity.decreaseEdgeWeightToCommunity(newCommunityId, weightToNewCommunity);
 
         nodeCommunity.removeNode(node.getIndex());
 
         // Update lists in the new community
-        newCommunity.increaseInnerEdgesWeightCount(weightToNewCommunity);
+//        newCommunity.increaseInnerEdgesWeightCount(weightToNewCommunity);
+        newCommunity.increaseEdgeWeightToCommunity(newCommunityId, weightToNewCommunity);
         newCommunity.increaseEdgeWeightToCommunity(nodeCommunityId, weightToCurrentCommunity);
         newCommunity.decreaseEdgeWeightToCommunity(nodeCommunityId, weightToNewCommunity);
 
@@ -293,10 +273,15 @@ public class CommunityDetectionLouvain2 {
                 nodeCommunity.decreaseEdgeWeightToCommunity(toCommunityId, weightToCommunity);
                 newCommunity.increaseEdgeWeightToCommunity(toCommunityId, weightToCommunity);
 
-                // OF these communities
-                toCommunity = this.communities.get(toCommunityId);
-                toCommunity.decreaseEdgeWeightToCommunity(nodeCommunityId, weightToCommunity);
-                toCommunity.increaseEdgeWeightToCommunity(newCommunityId, weightToCommunity);
+                // QUICK FIX. NEED TO FIND PROPER WAY. PROBLEM WITH SELF-EDGES.
+                if (this.communities.containsKey(toCommunityId)) {
+                    // OF these communities
+                    toCommunity = this.communities.get(toCommunityId);
+                    toCommunity.decreaseEdgeWeightToCommunity(nodeCommunityId, weightToCommunity);
+                    toCommunity.increaseEdgeWeightToCommunity(newCommunityId, weightToCommunity);
+                }
+            } else {
+//                newCommunity.increaseEdgeWeightToCommunity(newCommunityId,weightToCommunity);
             }
         }
 
@@ -315,6 +300,11 @@ public class CommunityDetectionLouvain2 {
 //            }
         }
 
+        // remove community from the map if it has no nodes after the update
+        if (nodeCommunity.getNodesCount() == 0) {
+            this.communities.remove(nodeCommunityId);
+        }
+
     }
 
     private Double calculateDeltaQ(Double Sin, Double Stot, Double ki, Double kiin, Double m) {
@@ -330,176 +320,54 @@ public class CommunityDetectionLouvain2 {
         return firstStatement - secondStatement;
     }
 
-//    private void initializeWeightCountersToCommunities() {
-//
-//    }
-//
     public Graph foldingCommunities(Graph graph) {
 
-        // Group nodes by community and count the edge types. Knowing the number
-        // of each edge type (inner and outer) is necessary in order to create
-        // the folded graph.
-//        Map<String, HyperCommunity> communities = communitiesPerPhase.get(communitiesPerPhase.size() - 1);
-//        ListMultimap<String, Node> multimap = ArrayListMultimap.create(); // CommunityId to nodes (contents of community)
-//        HyperCommunity community;
-//        for (Node node : graph) {
-//            String nodeCommunityId = (String) node.getAttribute("community");
-//            multimap.put(nodeCommunityId, node);
-//            HyperCommunity nodeCommunity = this.communities.get(nodeCommunityId); // Get the community object 
-//            // from the node's attribute.
-//            //nodeCommunity.increaseNodesCount();  // increase the count of the community's nodes by 1.
-//            neighbours = node.getNeighborNodeIterator();
-//            while (neighbours.hasNext()) {
-//                // If the neighbour and the node have the same community attribute then increase
-//                // the inner edges of the community, otherwise increase the outer edges of the 
-//                // community to the neighbour's community.
-//                Node neighbour = neighbours.next();
-//                double edgeWeightBetweenThem = (Double) node.getEdgeBetween(neighbour).getAttribute("weight");
-//                String neighbourCommunity = neighbour.getAttribute("community");
-//                if (neighbourCommunity.equals(node.getAttribute("community"))) {
-////                    community.increaseInnerEdgesWeightCount(edgeWeightBetweenThem);
-//                    nodeCommunity.addNodesSet((HashSet<Integer>) node.getAttribute("trueCommunityNodes"));
-//                } else {
-//                    //community.increaseEdgeWeightToCommunity(neighbourCommunity, edgeWeightBetweenThem);
-//                }
-//            }
-//        }
-        // Remove from the map the communities with 0 nodes.
-//        for (Iterator<Entry<String, HyperCommunity>> it = this.communities.entrySet().iterator(); it.hasNext();) {
-//            Entry<String, HyperCommunity> entry = it.next();
-//            if (this.communities.get(entry.getKey()).getNodesCount() == 0) {
-//                it.remove();
-//            }
-//        }
-        // Finilize the inner edges weight count (divide it by 2)
-        for (Entry<String, HyperCommunity> entry : this.communities.entrySet()) {
-            this.communities.get(entry.getKey()).finilizeInnerEdgesWeightCount();
+        // Creation of the folded graph.
+        Graph foldedGraph = new SingleGraph("Louvain Folded Graph");
+
+        // Add all nodes
+        for (Entry<String, HyperCommunity> communityEntry : this.communities.entrySet()) {
+            HyperCommunity hc = communityEntry.getValue();
+            String hcId = hc.getCID();
+            WeightMap edgesWeightsToCommunities = hc.getEdgeWeightToCommunityMap();
+
+            if (foldedGraph.getNode(hcId) == null) {
+                Node newNode = foldedGraph.addNode(hcId);
+                WeightMap nodeToCommunityEdgesWeights = new WeightMap(edgesWeightsToCommunities);
+                newNode.addAttribute("community", hcId);
+                newNode.addAttribute("nodeAsCommunity", hcId);
+                newNode.addAttribute("nodeToCommunityEdgesWeights", nodeToCommunityEdgesWeights);
+                newNode.addAttribute("ki", hc.getTotalEdgesWeight());
+                hc.clearCommunityNodes();
+                hc.addNode(newNode.getIndex());
+            }
         }
 
-        // Creation of the folded graph.
-        Graph foldedGraph = new SingleGraph("communitiesPhase2");
-
-        String edgeIdentifierWayOne,
-                edgeIdentifierWayTwo,
-                edgeIdentifierSelfie;
-        Entry<String, HyperCommunity> communityEntry;
-//        Entry<String, Double> edgeWeightToCommunity;
-        List<String> edgeIdentifiers = new ArrayList<String>(); // Keep a list of edge ids so we
-        // don't add the same edge twice.
-        Edge edge;
-        double innerEdgesWeight;
-
-        // For every community
-        for (Iterator<Entry<String, HyperCommunity>> it = this.communities.entrySet().iterator(); it.hasNext();) {
-            communityEntry = it.next();
-            HyperCommunity hp = communityEntry.getValue();
-            if (hp.getNodesCount() != 0) {
-                // and for every community that the above community is connected to,
-                // create the two nodes and the between them edge, with a weight equal
-                // to the total weight of the outer edges between these two communities.
-                Map<String, Double> edgesWeightsToCommunities = hp.getEdgeWeightToCommunity();
-                for (Iterator<Entry<String, Double>> edgesWeightsToCommunitiesIt = edgesWeightsToCommunities.entrySet().iterator(); edgesWeightsToCommunitiesIt.hasNext();) {
-                    Entry<String, Double> edgesWeightsToCommunity = edgesWeightsToCommunitiesIt.next();
-                    String toCommunityId = edgesWeightsToCommunity.getKey();
-                    HyperCommunity toCommunity = this.communities.get(toCommunityId);
-                    Double edgesWeight = edgesWeightsToCommunity.getValue();
-                    if (edgesWeight != 0.0) {
-                        edgeIdentifierWayOne = hp.getId() + ":" + toCommunityId;
-                        edgeIdentifierWayTwo = toCommunityId + ":" + hp.getId();
-                        if (!edgeIdentifiers.contains(edgeIdentifierWayOne) && !edgeIdentifiers.contains(edgeIdentifierWayTwo)) {
-                            if (foldedGraph.getNode(hp.getId()) == null) {
-                                foldedGraph.addNode(hp.getId()).addAttribute("trueCommunityNodes", hp.getCommunityNodes());
-                            }
-                            if (foldedGraph.getNode(toCommunityId) == null) {
-                                foldedGraph.addNode(toCommunityId).addAttribute("trueCommunityNodes", toCommunity.getCommunityNodes());
-                            }
-                            edge = foldedGraph.addEdge(edgeIdentifierWayOne,
-                                    hp.getId(),
-                                    toCommunityId);
-                            edge.addAttribute("weight", edgesWeight);
-                            edge.addAttribute("ui.label", edgesWeight);
-
-                            edgeIdentifiers.add(edgeIdentifierWayOne);
-                            edgeIdentifiers.add(edgeIdentifierWayTwo);
-                        }
-                    }
+        // Add all edges
+        for (Node newNode : foldedGraph) {
+            HyperCommunity hc = this.communities.get(newNode.getId());
+            WeightMap edgesWeightsToCommunities = hc.getEdgeWeightToCommunityMap();
+            for (Entry<String, Double> edgesWeightsToCommunity : edgesWeightsToCommunities.entrySet()) {
+                String neighbourHcId = edgesWeightsToCommunity.getKey();
+                String newNeighbourNodeId = neighbourHcId;
+                Double edgeWeight = edgesWeightsToCommunity.getValue();
+                if (!newNode.hasEdgeBetween(newNeighbourNodeId)
+                        && !newNeighbourNodeId.equals(newNode.getId())
+                        && edgeWeight != 0.0) {
+                    Edge newEdge = foldedGraph.addEdge(newNode.getId() + ":" + newNeighbourNodeId, newNode.getId(), newNeighbourNodeId);
+                    newEdge.addAttribute("weight", edgeWeight);
                 }
             }
-            // Add a self-edge to every node, with a weight that represents the total 
-            // sum of the inner edges weights of the community.
-//            innerEdgesWeight = hp.getInnerEdgesWeightCount();
-//            edgeIdentifierSelfie = hp.getId() + ":" + hp.getId();
-//            edge = foldedGraph.addEdge(edgeIdentifierSelfie,
-//                    hp.getId(),
-//                    hp.getId());
-//            edge.addAttribute("weight", Double.parseDouble(String.valueOf(innerEdgesWeight)));
         }
 
         return foldedGraph;
     }
 
-    /**
-     * After the maximum modularity was reached, revert to the original graph,
-     * printing the communities (by using the same color in the nodes of the
-     * same community).
-     *
-     * @param graph the graph where each node represents a final community.
-     * @param finalGraph
-     */
-    public void printFinalGraph(Graph foldedGraph, Graph finalGraph, Double modularity, Double nmi) {
-        UIToolbox ui = new UIToolbox(finalGraph);
-        // Cleaning up the communities of the original graph
-        // TO-DO: could be done by a function.
-        for (Node node : finalGraph) {
-            node.addAttribute("community", "");
-            node.addAttribute("ui.style", "size: 20px;");
-        }
-
-        ui.addSprite("Communities", foldedGraph.getNodeCount(), 20);
-        // Creating the communities count on the display screen.
-//        sm = new SpriteManager(finalGraph);
-//        communitiesCount = sm.addSprite("CC");
-//        communitiesCount.setPosition(Units.PX, 20, 20, 0);
-//        communitiesCount.setAttribute("ui.label",
-//                String.format("Communities: %d", foldedGraph.getNodeCount()));
-//        communitiesCount.setAttribute("ui.style", "size: 0px; text-color: rgb(150,100,100); text-size: 20;");
-
-//        finalGraph.display(true); // display the graph on the screen.
-//        modularity.init(finalGraph);
-        // Creating the modularity count on the display screen.
-        ui.addSprite("Modularity", modularity, 60);
-        ui.addSprite("NMI", nmi, 100);
-//        modularityCount = sm.addSprite("MC");
-//        modularityCount.setPosition(Units.PX, 20, 60, 0);
-//        modularityCount.setAttribute("ui.style", "size: 0px; text-color: rgb(150,100,100); text-size: 20;");
-
-//        nmiCount = sm.addSprite("NMIC");
-//        nmiCount.setPosition(Units.PX, 20, 100, 0);
-//        nmiCount.setAttribute("ui.style", "size: 0px; text-color: rgb(150,100,100); text-size: 20;");
-        // Color every node of a community with the same random color.
-        color = new Random();
-        for (Node community : foldedGraph) {
-            r = color.nextInt(255);
-            g = color.nextInt(255);
-            b = color.nextInt(255);
-            Set<Integer> communityNodes = (Set<Integer>) community.getAttribute("trueCommunityNodes");
-            for (Iterator<Integer> node = communityNodes.iterator(); node.hasNext();) {
-                Node n = finalGraph.getNode(node.next());
-                n.addAttribute("community", community.getId());
-                n.addAttribute("ui.style", "fill-color: rgb(" + r + "," + g + "," + b + "); size: 20px;");
-//                modularityCount.setAttribute("ui.label",
-//                        String.format("Modularity: %f", modularity.getMeasure()));
-//                nmiCount.setAttribute("ui.label",
-//                        String.format("NMI: %f", nmi.getMeasure()));
-//                sleep();
-            }
-        }
-
-        // If an edge connects nodes that belong to different communities, color
-        // it gray.
-        for (Edge edge : finalGraph.getEachEdge()) {
-            if (!edge.getNode0().getAttribute("community").equals(edge.getNode1().getAttribute("community"))) {
-                edge.addAttribute("ui.style", "fill-color: rgb(236,236,236);");
+    public void applyChanges(Graph graph, HashMap<String, String> changes) {
+        for (Node node : graph) {
+            String nodeCommunityId = (String) node.getAttribute("community");
+            if (changes.containsKey(nodeCommunityId)) {
+                node.addAttribute("community", changes.get(nodeCommunityId));
             }
         }
     }
