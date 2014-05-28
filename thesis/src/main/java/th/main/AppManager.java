@@ -19,6 +19,7 @@ import th.utils.Utils;
 
 /**
  *
+ * @author Anastasis Andronidis <anastasis90@yahoo.gr>
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class AppManager {
@@ -179,10 +180,13 @@ public class AppManager {
     }
 
     private void LouvainExample(String datasetFile) throws IOException, GraphParseException {
+        Graph graph = new DefaultGraph("Louvain");
+        graph.display();
+        graph.read(datasetFile);
 
         CommunityDetectionLouvain louvain = new CommunityDetectionLouvain();
-        louvain.init(datasetFile);
-        louvain.execute();
+        louvain.init(graph);
+        louvain.compute();
     }
 
     public static void WriteToFileExample() throws IOException, GraphParseException {
