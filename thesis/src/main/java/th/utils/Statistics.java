@@ -3,6 +3,7 @@ package th.utils;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -137,6 +138,38 @@ public class Statistics {
         PrintWriter writer = new PrintWriter("../exports/" + graphName + "-maxPDToAnyNode.csv", "UTF-8");
         writer.println("node index,max propinquity value");
         for (Entry<Integer, Integer> entry : maxPDPerNode.entrySet()) {
+            writer.println(entry.getKey() + "," + (entry.getValue()));
+        }
+        writer.close();
+    }
+    
+    /**
+     * Find the maximum propinquity value of each node to any neighbor.
+     * @param graph The input graph.
+     * @param graphName The name of the graph to be used for the export file.
+     * @throws FileNotFoundException
+     * @throws UnsupportedEncodingException
+     */
+    public static void maxPDToAnyNeighbor(Graph graph, String graphName) throws FileNotFoundException, UnsupportedEncodingException {
+        Map<Integer, Integer> maxPDPerNeighbor = new TreeMap<Integer, Integer>();
+        for (Node n : graph) {
+            Integer localMaxPD = 0;
+            PropinquityMap pm = (PropinquityMap) n.getAttribute("pm");
+            Iterator<Node> neighborNodeIterator = n.getNeighborNodeIterator();
+            while(neighborNodeIterator.hasNext()) {
+                Node nn = neighborNodeIterator.next();
+                if(pm.containsKey(nn.getIndex())) {
+                    Integer pdValue = pm.get(nn.getIndex()).get();
+                    if (pdValue > localMaxPD) {
+                        localMaxPD = pdValue;
+                    }
+                }
+            }
+            maxPDPerNeighbor.put(n.getIndex(),localMaxPD);
+        }
+        PrintWriter writer = new PrintWriter("../exports/" + graphName + "-maxPDToNeighbor.csv", "UTF-8");
+        writer.println("node index,max propinquity value");
+        for (Entry<Integer, Integer> entry : maxPDPerNeighbor.entrySet()) {
             writer.println(entry.getKey() + "," + (entry.getValue()));
         }
         writer.close();

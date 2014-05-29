@@ -87,6 +87,7 @@ public class AppManager {
         File theFile = new File(datasetFile);
 //        Statistics.PDStatistics(graph, theFile.getName().split("\\.")[0], 2, 10);
         Statistics.maxPDToAnyNode(graph, theFile.getName().split("\\.")[0]);
+        Statistics.maxPDToAnyNeighbor(graph, theFile.getName().split("\\.")[0]);
     }
 
     private void ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(String datasetFile) throws IOException, GraphParseException {
