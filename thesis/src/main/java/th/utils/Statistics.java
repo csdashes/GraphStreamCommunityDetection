@@ -118,6 +118,8 @@ public class Statistics {
      * Find the maximum propinquity value of each node to any other.
      * @param graph The input graph.
      * @param graphName The name of the graph to be used for the export file.
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.UnsupportedEncodingException
      */
     public static void maxPDToAnyNode(Graph graph, String graphName) throws FileNotFoundException, UnsupportedEncodingException {
         Map<Integer, Integer> maxPDPerNode = new TreeMap<Integer, Integer>();
@@ -130,7 +132,7 @@ public class Statistics {
                     localMaxPD = pdValue;
                 }
             }
-            maxPDPerNode.put(localMaxPD, n.getIndex());
+            maxPDPerNode.put(n.getIndex(),localMaxPD);
         }
         PrintWriter writer = new PrintWriter("../exports/" + graphName + "-maxPDToAnyNode.csv", "UTF-8");
         writer.println("node index,max propinquity value");
