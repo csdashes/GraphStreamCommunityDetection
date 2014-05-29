@@ -96,7 +96,7 @@ public class CommunityDetectionLouvain2 {
                 edge.addAttribute("weight", 1.0);
                 this.totalGraphEdgeWeight += 1.0;
             }
-            //edge.addAttribute("ui.label", edge.getAttribute("weight"));
+            edge.addAttribute("ui.label", edge.getAttribute("weight"));
         }
 
         generateCommunityForEachNode(graph);
@@ -105,7 +105,7 @@ public class CommunityDetectionLouvain2 {
 
     public void generateCommunityForEachNode(Graph graph) {
         for (Node node : graph) {
-            //node.addAttribute("ui.label", node.getId()); // Add a label in every node
+            node.addAttribute("ui.label", node.getId()); // Add a label in every node
             // with the id of the node.
             // Every node belongs to a different community.
             HyperCommunity community = manager.communityFactory();
@@ -186,15 +186,22 @@ public class CommunityDetectionLouvain2 {
                     Double Stot = neighbourCommunity.getTotalEdgesWeight();
                     Double kiin = nodeToCommunityEdgesWeights.getWeight(neighbourCommunityId);
 //                    if (this.debug) {
-//                        System.out.println("Sin:\t" + Sin);
-//                        System.out.println("Stot:\t" + Stot);
-//                        System.out.println("kiin:\t" + kiin);
-//                        System.out.println("ki:\t" + ki);
-//                        System.out.println("m:\t" + m);
+                        System.out.println("Sin:\t" + Sin);
+                        System.out.println("Stot:\t" + Stot);
+                        System.out.println("kiin:\t" + kiin);
+                        System.out.println("ki:\t" + ki);
+                        System.out.println("m:\t" + m);
 //                    }
 
                     Double deltaQ = calculateDeltaQ(Sin, Stot, ki, kiin, m);
-
+                    System.out.println("Node " + node.getId() + " goes to Community " + neighbourCommunityId);
+                    System.out.println("DeltaQ: " + deltaQ);
+                    
+                    double iii = modularity.getMeasure();
+                    node.changeAttribute("community", neighbourCommunityId);
+                    double aaa = modularity.getMeasure();
+                    System.out.println("Modularity Delta Q: " + (aaa-iii));
+                    
                     if (deltaQ > maxDeltaQ) {
                         maxDeltaQ = deltaQ;
                         bestCommunityToGo = neighbourCommunityId;
