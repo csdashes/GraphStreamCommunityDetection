@@ -64,6 +64,10 @@ public class AppManager {
                     //Execute 3rd function
                     LouvainExample(datasetFile);
                     break;
+                case 4:
+                    //Execute 4rd function
+                    PDOriginalStatics(datasetFile);
+                    break;
                 case 0:
                     //Exit
                     return;
@@ -81,7 +85,8 @@ public class AppManager {
         pd.init(graph);
         
         File theFile = new File(datasetFile);
-        Statistics.PDStatistics(graph, theFile.getName().split("\\.")[0], 2, 10);
+//        Statistics.PDStatistics(graph, theFile.getName().split("\\.")[0], 2, 10);
+        Statistics.maxPDToAnyNode(graph, theFile.getName().split("\\.")[0]);
     }
 
     private void ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(String datasetFile) throws IOException, GraphParseException {

@@ -21,6 +21,7 @@ public class Menu {
         System.out.println("2. Propinquity Dynamics (Erdos subgraph with application"
                 + "of communities to original graph");
         System.out.println("3. Louvain (example)");
+        System.out.println("4. PD Statistics");
         System.out.println("0. EXIT");
         
         while(flag) {
