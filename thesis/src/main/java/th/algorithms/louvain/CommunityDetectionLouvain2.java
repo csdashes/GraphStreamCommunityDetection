@@ -138,11 +138,9 @@ public class CommunityDetectionLouvain2 {
         }
     }
 
-    public HashMap<String, String> findCommunities(Graph graph) {
+    public HashMap<String, String> findCommunities(Graph graph, Modularity modularity) {
 
         HashMap<String, String> changes = new HashMap<String, String>(10);
-        modularity = new Modularity("community", "weight");
-        modularity.init(graph);
         Double loopDeltaQ = 0.0;
 
         double initialM = modularity.getMeasure();
@@ -180,7 +178,7 @@ public class CommunityDetectionLouvain2 {
 
                     Double newCommunitySin = neighbourCommunity.getEdgeWeightToCommunity(neighbourCommunityId);
                     Double newCommunityStot = neighbourCommunity.getTotalEdgesWeight();
-                    Double newCommunityKiin = nodeToCommunityEdgesWeights.getWeight(neighbourCommunityId);
+                    Double newCommunityKiin = nodeToCommunityEdgesWeights.getWeight(neighbourCommunityId)*2;
 
                     if (this.debug) {
                         System.out.println("Departure community Sin:\t" + oldCommunitySin);
