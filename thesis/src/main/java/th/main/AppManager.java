@@ -78,16 +78,18 @@ public class AppManager {
     private void PDOriginalStatics(String datasetFile) throws IOException, GraphParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.read(datasetFile);
+        String filename = "";
 
         PropinquityDynamics pd = new PropinquityDynamics();
         pd.set(2, 10);
 
         pd.init(graph);
-        
+
         File theFile = new File(datasetFile);
 //        Statistics.PDStatistics(graph, theFile.getName().split("\\.")[0], 2, 10);
         Statistics.maxPDToAnyNode(graph, theFile.getName().split("\\.")[0]);
         Statistics.maxPDToAnyNeighbor(graph, theFile.getName().split("\\.")[0]);
+//        Statistics.exportNodePDStatistics(graph, filename);
     }
 
     private void ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(String datasetFile) throws IOException, GraphParseException {
