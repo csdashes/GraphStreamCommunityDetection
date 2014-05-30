@@ -11,3 +11,5 @@ target/
 
 .netbeans_automatic_build
 data/export.gml
+
+exports/
