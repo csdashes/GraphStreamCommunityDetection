@@ -1,17 +1,11 @@
 package th.algorithms.louvain;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 import org.graphstream.algorithm.measure.Modularity;
 import org.graphstream.algorithm.measure.NormalizedMutualInformation;
 import org.graphstream.graph.Edge;
@@ -19,13 +13,11 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.stream.GraphParseException;
-import org.graphstream.ui.graphicGraph.stylesheet.StyleConstants.Units;
 import org.graphstream.ui.spriteManager.Sprite;
 import org.graphstream.ui.spriteManager.SpriteManager;
 import th.algorithms.louvain.utils.HyperCommunity;
 import th.algorithms.louvain.utils.HyperCommunityManager;
 import th.algorithms.louvain.utils.WeightMap;
-import th.utils.UIToolbox;
 
 /**
  * Implementation of the Louvain algorithm.
@@ -74,7 +66,7 @@ public class CommunityDetectionLouvain2 {
     /**
      * Initializing global variables.
      *
-     * @param fileName the input path of the file.
+     * @param graph
      * @throws IOException
      * @throws GraphParseException
      */
@@ -186,22 +178,22 @@ public class CommunityDetectionLouvain2 {
                     Double Stot = neighbourCommunity.getTotalEdgesWeight();
                     Double kiin = nodeToCommunityEdgesWeights.getWeight(neighbourCommunityId);
 //                    if (this.debug) {
-                        System.out.println("Sin:\t" + Sin);
-                        System.out.println("Stot:\t" + Stot);
-                        System.out.println("kiin:\t" + kiin);
-                        System.out.println("ki:\t" + ki);
-                        System.out.println("m:\t" + m);
+                    System.out.println("Sin:\t" + Sin);
+                    System.out.println("Stot:\t" + Stot);
+                    System.out.println("kiin:\t" + kiin);
+                    System.out.println("ki:\t" + ki);
+                    System.out.println("m:\t" + m);
 //                    }
 
                     Double deltaQ = calculateDeltaQ(Sin, Stot, ki, kiin, m);
                     System.out.println("Node " + node.getId() + " goes to Community " + neighbourCommunityId);
                     System.out.println("DeltaQ: " + deltaQ);
-                    
+
                     double iii = modularity.getMeasure();
                     node.changeAttribute("community", neighbourCommunityId);
                     double aaa = modularity.getMeasure();
-                    System.out.println("Modularity Delta Q: " + (aaa-iii));
-                    
+                    System.out.println("Modularity Delta Q: " + (aaa - iii));
+
                     if (deltaQ > maxDeltaQ) {
                         maxDeltaQ = deltaQ;
                         bestCommunityToGo = neighbourCommunityId;
