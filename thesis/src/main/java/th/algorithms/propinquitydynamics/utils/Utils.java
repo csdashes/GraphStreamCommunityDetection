@@ -21,7 +21,7 @@ public class Utils {
             Node[] nodes = {edge.getNode0(), edge.getNode1()};
 
             // get the propinquity
-            int prop = ((PropinquityMap) nodes[0].getAttribute("pm")).get(nodes[1].getIndex()).get();
+            double prop = ((PropinquityMap) nodes[0].getAttribute("pm")).get(nodes[1].getIndex()).get();
 
             if (graphics) {
                 edge.setAttribute("ui.label", String.format("%.2f", prop));
