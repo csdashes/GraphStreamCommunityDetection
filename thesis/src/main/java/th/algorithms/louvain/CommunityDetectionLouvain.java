@@ -21,8 +21,8 @@ import org.graphstream.graph.Node;
 public class CommunityDetectionLouvain implements Algorithm {
     
     private Graph graph;
-    private Map<String, Entry<Double,Double>> communitySiStotMap = new HashMap<String, Entry<Double,Double>>(30);
-    private Double m;
+    private final Map<String, Entry<Double,Double>> communitySiStotMap = new HashMap<String, Entry<Double,Double>>(30);
+    private Double m = 0.0;
 
     private void initEdgesAndCalculateM(Edge e) {
         if (e.hasAttribute("weight")) {
@@ -96,11 +96,6 @@ public class CommunityDetectionLouvain implements Algorithm {
             calculateKi(e);
         }
         
-        // Si
-        // Stot
-        // ki
-        // kiin
-        // m
         // Try to move every node into the community of every neighbour
         for (Node n : this.graph) {
             Iterator<Node> it = n.getNeighborNodeIterator();
