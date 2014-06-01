@@ -1,11 +1,9 @@
 package th.utils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
@@ -20,7 +18,11 @@ import org.graphstream.graph.Node;
  * @author Anastasis Andronidis <anastasis90@yahoo.gr>
  */
 public class ExtractCommunities {
-    
+
+    private static boolean AreEqual(Double d1, Double d2) {
+        return Math.round(d1 * 100.0) / 100.0 == Math.round(d2 * 100.0) / 100.0;
+    }
+
     private static boolean AreWeTheStrongestEdge(Node n, Double w) {
         // We add only if we are the strongest edge to this vertex
         boolean areWeTheStrongestEdge = true;
@@ -49,21 +51,18 @@ public class ExtractCommunities {
             Double weight = e.getAttribute("weight");
             Node neightbor = e.getOpposite(n);
 
-            if (neightbor.hasAttribute("visited")) {
-                if (neightbor.hasAttribute("community")) {
-                    // We add only if we are the strongest edge to this vertex
-                    if (AreWeTheStrongestEdge(neightbor, weight)) {
+            if (AreWeTheStrongestEdge(neightbor, weight)) {
+                if (neightbor.hasAttribute("visited")) {
+                    if (neightbor.hasAttribute("community")) {
                         ((Set<Integer>) neightbor.getAttribute("community")).add(community);
                     }
-                }
-            } else if (weight < currentSearchWeight) {
-                if (AreWeTheStrongestEdge(neightbor, weight)) {
+                } else if (weight < currentSearchWeight) {
                     AddToConsequentMap(consequent, weight, neightbor);
-                }
-                // If we are equal, go and it to head
-            } else if (String.format("%.2f", weight).equals(String.format("%.2f", currentSearchWeight))) {
-                if (!head.contains(neightbor)) {
-                    head.add(neightbor);
+                    // If we are equal, go and it to head
+                } else if (AreEqual(weight, currentSearchWeight)) {
+                    if (!head.contains(neightbor)) {
+                        head.add(neightbor);
+                    }
                 }
             }
         }
@@ -74,7 +73,6 @@ public class ExtractCommunities {
         Queue<Node> head = new LinkedList<Node>();
 
         // Find max weight for first iter.
-
         AddNextSteps(n, head, subsequent, currentSearchWeight, community);
         n.addAttribute("visited", 1);
         Set<Integer> s = new HashSet<Integer>();
@@ -135,9 +133,9 @@ public class ExtractCommunities {
     /**
      * Find disjoined communities by BFS. The first community has number 1.
      *
-     * @param graph    The graph that we will extract the communities.
+     * @param graph The graph that we will extract the communities.
      * @param fixedIDs If we want some vertices to be in a custom community,
-     *                 then this array should contain they IDs.
+     * then this array should contain they IDs.
      *
      * @return The number of communities detected.
      */
