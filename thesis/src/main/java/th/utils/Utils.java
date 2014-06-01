@@ -19,6 +19,7 @@ import org.graphstream.stream.file.FileSink;
 import org.graphstream.stream.file.FileSinkDGS;
 import org.graphstream.stream.file.FileSinkGML;
 import org.graphstream.util.parser.ParseException;
+import th.algorithms.propinquitydynamics.utils.PropinquityMap;
 
 /**
  *
@@ -69,7 +70,7 @@ public class Utils {
                 if (!line.startsWith("#")) {
                     String[] a = line.split("\t", 2);
 
-                    graph.addEdge(a[0] + "and" + a[1], a[0], a[1]);                    
+                    graph.addEdge(a[0] + "and" + a[1], a[0], a[1]);
                 }
             }
         } catch (IOException e) {
@@ -97,9 +98,9 @@ public class Utils {
                 i++;
             }
         }
-        
+
         FileSink fs = new FileSinkDGS();
-        
+
         File theFile = new File(graphFilePath);
         fs.writeAll(graph, "../data/" + theFile.getName().split("\\.")[0] + ".dgs");
     }

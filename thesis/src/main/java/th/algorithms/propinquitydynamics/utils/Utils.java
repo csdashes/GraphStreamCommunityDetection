@@ -16,6 +16,22 @@ import org.graphstream.graph.Node;
  */
 public class Utils {
 
+    public static void SetPDWeights(Graph graph, boolean graphics) {
+        for (Edge edge : graph.getEachEdge()) {
+            Node[] nodes = {edge.getNode0(), edge.getNode1()};
+
+            // get the propinquity
+            int prop = ((PropinquityMap) nodes[0].getAttribute("pm")).get(nodes[1].getIndex()).get();
+
+            if (graphics) {
+                edge.setAttribute("ui.label", String.format("%.2f", prop));
+                edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + prop * 0.3 + ";");
+            }
+            edge.setAttribute("weight", prop);
+
+        }
+    }
+
     /**
      * Take the propinquity between two vertices and divide it with the biggest
      * number of edges between the two. Then set the fraction as the weight of
