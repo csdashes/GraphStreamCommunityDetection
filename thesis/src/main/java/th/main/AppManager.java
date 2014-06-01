@@ -10,6 +10,7 @@ import th.algorithms.louvain.CommunityDetectionLouvain;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
 import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithNumberOfEdges;
 import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithTotalPropinquity;
+import static th.algorithms.propinquitydynamics.utils.Utils.SetPDWeights;
 import th.utils.ExtractCommunities;
 import th.utils.Menu;
 import th.utils.Statistics;
@@ -92,13 +93,38 @@ public class AppManager {
 //        Statistics.exportNodePDStatistics(graph, filename);
     }
 
+    private void ErdosSubgraphPDOriginalAndMaxToMin(String datasetFile) throws IOException, GraphParseException {
+        Graph graph = new DefaultGraph("Propinquity Dynamics");
+        graph.display();
+        graph.read(datasetFile);
+
+        PropinquityDynamics pd = new PropinquityDynamics();
+        pd.set(2, 20);
+
+        pd.init(graph);
+
+        int i = 0;
+        // We need to be sure that we dont have an infinite loop
+        while (i < 100 && !pd.didAbsoluteConvergence()) {
+            pd.compute();
+            i++;
+        }
+        pd.applyFinalTopology();
+
+        // Use our custom extraction algorithm to retrive internal communities
+        SetPDWeights(graph, true);
+        int com = ExtractCommunities.MaxToMin(graph);
+        UIToolbox.ColorCommunities(graph);
+        System.out.println("Number of communities: " + com);
+    }
+
     private void ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(String datasetFile) throws IOException, GraphParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.display();
         graph.read(datasetFile);
 
         PropinquityDynamics pd = new PropinquityDynamics();
-        pd.set(2, 10);
+        pd.set(2, 20);
 
         pd.init(graph);
 
