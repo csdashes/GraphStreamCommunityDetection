@@ -25,7 +25,6 @@ import th.algorithms.louvain.utils.WeightMap;
 public class CommunityDetectionLouvain2 {
 
     private HyperCommunityManager manager;
-    private Modularity modularity;
     private boolean debug = false;
     private Double totalGraphEdgeWeight;
     private Map<String, HyperCommunity> communities;
@@ -55,14 +54,14 @@ public class CommunityDetectionLouvain2 {
                 edge.addAttribute("weight", 1.0);
                 this.totalGraphEdgeWeight += 1.0;
             }
-            edge.addAttribute("ui.label", edge.getAttribute("weight"));
+//            edge.addAttribute("ui.label", edge.getAttribute("weight"));
         }
 
         generateCommunityForEachNode(graph);
         initWeightsToCommunities(graph);
     }
 
-    public void generateCommunityForEachNode(Graph graph) {
+    private void generateCommunityForEachNode(Graph graph) {
         for (Node node : graph) {
 
             // Every node belongs to a different community.
@@ -76,9 +75,8 @@ public class CommunityDetectionLouvain2 {
             // which nodes belong to each community.
             node.addAttribute("community", community.getCID());
 
-            node.addAttribute("ui.label", node.getId() + "(C" + community.getCID() + ")");
-            node.addAttribute("ui.style", "text-size:18px;size:18px;");
-
+//            node.addAttribute("ui.label", node.getId() + "(C" + community.getCID() + ")");
+//            node.addAttribute("ui.style", "text-size:18px;size:18px;");
             // This attribute will be used for extracting the communities
             node.addAttribute("nodeAsCommunity", community.getCID());
 
@@ -102,7 +100,7 @@ public class CommunityDetectionLouvain2 {
      *
      * @param node
      */
-    public void initKi(Node node) {
+    private void initKi(Node node) {
         Double ki = 0.0;
         Iterator<Edge> neighbourEdges = node.getEachEdge().iterator();
         while (neighbourEdges.hasNext()) {
@@ -118,7 +116,7 @@ public class CommunityDetectionLouvain2 {
      *
      * @param graph
      */
-    public void initWeightsToCommunities(Graph graph) {
+    private void initWeightsToCommunities(Graph graph) {
         for (Node node : graph) {
             String nodeCommunityId = (String) node.getAttribute("community");
             HyperCommunity nodeCommunity = communities.get(nodeCommunityId);
@@ -138,13 +136,17 @@ public class CommunityDetectionLouvain2 {
         }
     }
 
-    public HashMap<String, String> findCommunities(Graph graph, Modularity modularity) {
+    public HashMap<String, String> findCommunities(Graph graph) {
 
+        Modularity modularity = new Modularity("community", "weight");
+        modularity.init(graph);
         HashMap<String, String> changes = new HashMap<String, String>(10);
-        Double loopDeltaQ = 0.0;
+        Double loopDeltaQ;
 
         double initialM = modularity.getMeasure();
         do {
+            // Find the neighbor community (of all possible neighbor communities)
+            // of each node that will increase the modularity to the maximum.
             for (Node node : graph) {
                 Double maxDeltaQ = 0.0;
 
@@ -163,11 +165,12 @@ public class CommunityDetectionLouvain2 {
                 Double m = this.totalGraphEdgeWeight;
 
                 Double oldCommunitySin = nodeCommunity.getEdgeWeightToCommunity(nodeCommunityId);
-                Double oldCommunityStot = nodeCommunity.getTotalEdgesWeight();
+//                Double oldCommunityStot = nodeCommunity.getTotalEdgesWeight();
+                Double oldCommunityStot = nodeCommunity.getTotalEdgesWeight() + oldCommunitySin; // NEW STOT
                 Double oldCommunityKiin = nodeToCommunityEdgesWeights.getWeight(nodeCommunityId);
 
-                // We have to try to adopt each neighbor's community and see if
-                // there is a gain in modularity.
+                // For each neighbor community, find the one that gives the larger
+                // modularity gain.
                 Iterator<Node> neighbours = node.getNeighborNodeIterator();
                 while (neighbours.hasNext()) {
                     Node neighbour = neighbours.next();
@@ -177,10 +180,13 @@ public class CommunityDetectionLouvain2 {
                     HyperCommunity neighbourCommunity = this.communities.get(neighbourCommunityId);
 
                     Double newCommunitySin = neighbourCommunity.getEdgeWeightToCommunity(neighbourCommunityId);
-                    Double newCommunityStot = neighbourCommunity.getTotalEdgesWeight();
-                    Double newCommunityKiin = nodeToCommunityEdgesWeights.getWeight(neighbourCommunityId)*2;
-
+                    Double newCommunityStot = neighbourCommunity.getTotalEdgesWeight() + newCommunitySin; // NEW STOT
+//                    Double newCommunityKiin = nodeToCommunityEdgesWeights.getWeight(neighbourCommunityId)*2;
+                    Double newCommunityKiin = nodeToCommunityEdgesWeights.getWeight(neighbourCommunityId);
                     if (this.debug) {
+                        System.out.println("If node " + node.getId()
+                                + " goes from Community " + nodeCommunityId
+                                + " to Community " + neighbourCommunityId);
                         System.out.println("Departure community Sin:\t" + oldCommunitySin);
                         System.out.println("Departure community Stot:\t" + oldCommunityStot);
                         System.out.println("To departure community kiin:\t" + oldCommunityKiin);
@@ -190,25 +196,34 @@ public class CommunityDetectionLouvain2 {
                         System.out.println("ki:\t" + ki);
                         System.out.println("m:\t" + m);
                     }
+
+                    // Calculate the modularity gain
                     Double deltaQ = calculateDeltaQ(oldCommunitySin, oldCommunityStot, oldCommunityKiin,
                             newCommunitySin, newCommunityStot, newCommunityKiin, ki, m);
 
                     if (this.debug) {
-                        System.out.println("If node " + node.getId() + " goes to Community " + neighbourCommunityId);
                         System.out.println("then DeltaQ: " + deltaQ + "\n");
                     }
+
+                    // Used to validate that the ΔQ calculation is correct
 //                    double iii = modularity.getMeasure();
 //                    node.changeAttribute("community", neighbourCommunityId);
 //                    double aaa = modularity.getMeasure();
 //                    System.out.println("Modularity Delta Q: " + (aaa - iii));
+                    // If there is a gain in modularity, remember the community
+                    // that provides it.
                     if (deltaQ > maxDeltaQ) {
                         maxDeltaQ = deltaQ;
                         bestCommunityToGo = neighbourCommunityId;
                     }
                 }
 
-                // Move node to the best community (if not already in) and update node and community lists.
+                // Move node to the best community (if not already in).
+                // Update the node's lists for the edges weights to communities
+                // and the lists for the edges weights to communities of the
+                // destination and departure community.
                 if (!nodeCommunityId.equals(bestCommunityToGo)) {
+
                     incrementalUpdate(node, bestCommunityToGo);
                     node.changeAttribute("community", bestCommunityToGo);
 
@@ -218,16 +233,23 @@ public class CommunityDetectionLouvain2 {
                     changes.put(nodeAsCommunity, bestCommunityToGo);
 
                     if (this.debug) {
-                        System.out.println("Node " + node.getIndex()
+                        System.out.println("\n========================");
+                        System.out.println("Node " + node.getId()
                                 + ": Old community=" + nodeCommunityId
                                 + ", New community=" + bestCommunityToGo);
+                        System.out.println("========================\n");
                     }
                 }
             }
+
+            // After the iteration of all the graph's nodes, check to see if there
+            // was a gain in modularity.
             double newM = modularity.getMeasure();
             loopDeltaQ = newM - initialM;
             initialM = newM;
-        } while (loopDeltaQ > 0); // Loop until there is no improvement in modularity
+
+            // Continue until there is no improvement in modularity.
+        } while (loopDeltaQ > 0);
 
         if (this.debug) {
             for (Node node : graph) {
@@ -246,19 +268,36 @@ public class CommunityDetectionLouvain2 {
         Double weightToCurrentCommunity = nodeToCommunityEdgesWeights.getWeight(nodeCommunityId);
         Double weightToNewCommunity = nodeToCommunityEdgesWeights.getWeight(newCommunityId);
 
-        // Update lists in the current community
-        nodeCommunity.decreaseEdgeWeightToCommunity(nodeCommunityId, weightToCurrentCommunity);
-        nodeCommunity.increaseEdgeWeightToCommunity(newCommunityId, weightToCurrentCommunity);
-        nodeCommunity.decreaseEdgeWeightToCommunity(newCommunityId, weightToNewCommunity);
-
+        // Remove the node of the departure community.
         nodeCommunity.removeNode(node.getIndex());
 
-        // Update lists in the new community
-        newCommunity.increaseEdgeWeightToCommunity(newCommunityId, weightToNewCommunity);
-        newCommunity.increaseEdgeWeightToCommunity(nodeCommunityId, weightToCurrentCommunity);
-        newCommunity.decreaseEdgeWeightToCommunity(nodeCommunityId, weightToNewCommunity);
+        // Decrease the inner edges of the departure community, equal to the
+        // number of edges that the leaving node had, pointing to the departure
+        // community.
+        nodeCommunity.decreaseEdgeWeightToCommunity(nodeCommunityId, weightToCurrentCommunity);
 
+        // If the departure community has still nodes inside, increase the number
+        // of edges departing from the departure community to the destination
+        // community, equal to the number of edges that the leaving node had, 
+        // pointing to the departure community.
+        if (nodeCommunity.getCommunityNodes().size() > 0) {
+            nodeCommunity.increaseEdgeWeightToCommunity(newCommunityId, weightToCurrentCommunity);
+        }
+
+        // Decrease the outer edges of the departure community to the destination
+        // community equal to the number of edges that the leaving node had,
+        // pointing to the destination community.
+        nodeCommunity.decreaseEdgeWeightToCommunity(newCommunityId, weightToNewCommunity);
+
+        // Add the node in the destination community.
         newCommunity.addNode(node.getIndex());
+
+        // Update lists in the destination community.
+        newCommunity.increaseEdgeWeightToCommunity(newCommunityId, weightToNewCommunity);
+        if (nodeCommunity.getCommunityNodes().size() > 0) {
+            newCommunity.increaseEdgeWeightToCommunity(nodeCommunityId, weightToCurrentCommunity);
+        }
+        newCommunity.decreaseEdgeWeightToCommunity(nodeCommunityId, weightToNewCommunity);
 
         //For the rest of the communites that the currect node is connected to, we have to update the lists
         // OF these communities and FOR these communities
@@ -272,7 +311,6 @@ public class CommunityDetectionLouvain2 {
                 nodeCommunity.decreaseEdgeWeightToCommunity(toCommunityId, weightToCommunity);
                 newCommunity.increaseEdgeWeightToCommunity(toCommunityId, weightToCommunity);
 
-                // QUICK FIX. NEED TO FIND PROPER WAY. PROBLEM WITH SELF-EDGES.
                 if (this.communities.containsKey(toCommunityId)) {
                     // OF these communities
                     toCommunity = this.communities.get(toCommunityId);
@@ -320,7 +358,8 @@ public class CommunityDetectionLouvain2 {
             Double ki, Double m) {
 
         Double doubleM = m * 2;
-        Double fraction1 = (Sin - kiin) / doubleM;
+//        Double fraction1 = (Sin - kiin) / doubleM;
+        Double fraction1 = (Sin - kiin) / m;
         Double fraction2 = Math.pow((Stot - ki) / doubleM, 2.0);
 
         return fraction1 - fraction2;
@@ -330,7 +369,8 @@ public class CommunityDetectionLouvain2 {
             Double ki, Double m) {
 
         Double doubleM = m * 2;
-        Double fraction1 = (Sin + kiin) / doubleM;
+//        Double fraction1 = (Sin + kiin) / doubleM;
+        Double fraction1 = (Sin + kiin) / m;
         Double fraction2 = Math.pow((Stot + ki) / doubleM, 2.0);
 
         return fraction1 - fraction2;
@@ -339,7 +379,8 @@ public class CommunityDetectionLouvain2 {
     private Double calculateOldQ(Double Sin, Double Stot, Double m) {
 
         Double doubleM = m * 2;
-        Double fraction1 = Sin / doubleM;
+//        Double fraction1 = Sin / doubleM;
+        Double fraction1 = Sin / m;
         Double fraction2 = Math.pow(Stot / doubleM, 2.0);
 
         return fraction1 - fraction2;
@@ -377,7 +418,7 @@ public class CommunityDetectionLouvain2 {
                 String newNeighbourNodeId = neighbourHcId;
                 Double edgeWeight = edgesWeightsToCommunity.getValue();
                 if (!newNode.hasEdgeBetween(newNeighbourNodeId)
-                        && !newNeighbourNodeId.equals(newNode.getId())
+                        && !newNeighbourNodeId.equals(newNode.getId()) // skip the self-edges
                         && edgeWeight != 0.0) {
                     Edge newEdge = foldedGraph.addEdge(newNode.getId() + ":" + newNeighbourNodeId, newNode.getId(), newNeighbourNodeId);
                     newEdge.addAttribute("weight", edgeWeight);
