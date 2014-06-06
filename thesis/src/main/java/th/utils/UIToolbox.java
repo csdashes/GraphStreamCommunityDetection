@@ -59,7 +59,7 @@ public class UIToolbox {
                     com = ((HashSet<Integer>) n.getAttribute("community")).iterator().next();
                 }
             } else {
-                com = (Integer) n.getAttribute("community");
+                com = Integer.valueOf((String)n.getAttribute("community"));
             }
             if (com == -1) {
                 colorMap.put(com,"255,0,0");
@@ -72,7 +72,8 @@ public class UIToolbox {
                 colorMap.put(com, newColor);
             }
 
-            n.addAttribute("ui.style", "fill-color: rgb(" + colorMap.get(com) + "); size: 5px;");
+            n.addAttribute("ui.style", "fill-color: rgb(" + colorMap.get(com) + "); size: 15px;");
+            n.addAttribute("ui.label", n.getId() + " (" +(String)n.getAttribute("community") +")");
         }
         return colorMap.size();
     }
