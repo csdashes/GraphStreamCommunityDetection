@@ -35,6 +35,7 @@ public class HyperCommunity extends Community {
         this.edgeWeightToCommunity = new WeightMap(10);
         this.communityNodes = new HashSet<Integer>();
         this.cID = String.valueOf(Integer.parseInt(this.getId()) + 1); //to avoid having community id=0
+        this.totalEdgesWeight = 0.0;
     }
     
     public void addNode(Integer nodeIndex) {
@@ -140,7 +141,7 @@ public class HyperCommunity extends Community {
         this.edgeWeightToCommunity.decrease(communityId, number);
         this.totalEdgesWeight -= number;
         if(this.getEdgeWeightToCommunity(communityId) == 0.0){
-//            this.edgeWeightToCommunity.remove(communityId);
+            this.edgeWeightToCommunity.remove(communityId);
         }
 //        this.edgeWeightToCommunity.put(communityId, this.edgeWeightToCommunity.get(communityId) - number);
     }
