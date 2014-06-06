@@ -30,12 +30,19 @@ public class WeightMap extends HashMap<String, Double> {
         Double currentWeight = this.get(communityId);
         if (currentWeight != null) {
             currentWeight -= weight;
-            this.put(communityId, currentWeight);
+            if (currentWeight == 0.0) {
+                this.remove(communityId);
+            } else {
+                this.put(communityId, currentWeight);
+            }
         }
     }
     
     public Double getWeight(String communityId) {
-        return this.get(communityId);
+        if(this.containsKey(communityId)) {
+            return this.get(communityId);
+        }
+        return 0.0;
     }
     
     public void init(String communityId) {
