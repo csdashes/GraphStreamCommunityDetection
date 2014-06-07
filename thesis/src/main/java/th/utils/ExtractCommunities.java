@@ -98,9 +98,6 @@ public class ExtractCommunities {
     }
 
     public static int MaxToMin(Graph graph) {
-        graph.removeNode(7);
-        graph.removeNode(9);
-
         SortedMap<Double, Set<Node>> groupedVertices = new TreeMap<Double, Set<Node>>(Collections.reverseOrder());
 
         // We need to sort the edges, so we know where to start from
