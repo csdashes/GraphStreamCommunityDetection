@@ -18,6 +18,10 @@ import org.graphstream.graph.Node;
 public class Utils {
 
     public static void SetPDWeights(Graph graph, boolean graphics) {
+        SetPDWeights(graph, graphics, false);
+    }
+
+    public static void SetPDWeights(Graph graph, boolean graphics, boolean graphicWidth) {
         for (Edge edge : graph.getEachEdge()) {
             Node[] nodes = {edge.getNode0(), edge.getNode1()};
 
@@ -26,7 +30,9 @@ public class Utils {
 
             if (graphics) {
                 edge.setAttribute("ui.label", String.format("%.2f", prop));
-                edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + prop * 0.3 + ";");
+                if (graphicWidth) {
+                    edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + prop * 0.3 + ";");
+                }
             }
             edge.setAttribute("weight", prop);
 
