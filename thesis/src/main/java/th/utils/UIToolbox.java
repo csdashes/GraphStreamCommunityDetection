@@ -36,7 +36,7 @@ public class UIToolbox {
      * @param n
      */
     public static void StyleNode(Node n) {
-        n.setAttribute("ui.label", n.getIndex());
+        n.setAttribute("ui.label", n.getId());
         n.setAttribute("ui.style", "size:20px;");
     }
 
@@ -47,6 +47,7 @@ public class UIToolbox {
 
         // Set the colors
         for (Node n : graph.getEachNode()) {
+            StyleNode(n);
             if (!n.hasAttribute("community") || n.getAttribute("community") == null) {
                 // Don't color it. Black is our special color.
                 uncommunitized++;
