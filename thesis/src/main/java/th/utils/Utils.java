@@ -34,6 +34,18 @@ public class Utils {
         }
     }
 
+    public static int FindLonelyVertices(Graph graph) {
+        int solo = 0;
+        
+        for (Node n : graph) {
+            if (n.getDegree() == 0) {
+                solo++;
+            }
+        }
+        
+        return solo;
+    }
+
     public static int DeleteLonelyVertices(Graph graph) {
         int deleted = 0;
         boolean flag;
