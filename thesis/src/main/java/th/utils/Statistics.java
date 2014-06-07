@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
 import th.algorithms.propinquitydynamics.utils.MutableInt;
@@ -23,8 +22,20 @@ import th.algorithms.propinquitydynamics.utils.PropinquityMap;
 /**
  *
  * @author Anastasis Andronidis <anastasis90@yahoo.gr>
+ * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class Statistics {
+
+    public static int FindMaxDegree(Graph graph) {
+        int maxDegree = 0;
+        for (Node n : graph) {
+            if (n.getDegree() > maxDegree) {
+                maxDegree = n.getDegree();
+            }
+        }
+
+        return maxDegree;
+    }
 
     public static void PDStatistics(Graph graph, String graphName, int a, int b) throws FileNotFoundException, UnsupportedEncodingException {
         Map<Integer, Integer> totalPDstats = new TreeMap<Integer, Integer>();
