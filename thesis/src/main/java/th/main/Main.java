@@ -4,6 +4,12 @@ import java.io.IOException;
 import org.graphstream.stream.GraphParseException;
 import org.graphstream.util.parser.ParseException;
 
+/**
+ *
+ * @author Anastasis Andronidis <anastasis90@yahoo.gr>
+ * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
+ */
+
 public class Main {
 
     public static void main(String[] args) throws IOException, GraphParseException, ParseException {
