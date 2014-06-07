@@ -49,7 +49,7 @@ public class Utils {
     public static void FractionWithNumberOfEdges(Graph graph) {
         FractionWithNumberOfEdges(graph, false, false);
     }
-    
+
     public static void FractionWithNumberOfEdges(Graph graph, boolean graphics, boolean graphicWidth) {
         for (Edge edge : graph.getEachEdge()) {
             Node[] nodes = {edge.getNode0(), edge.getNode1()};
@@ -85,7 +85,7 @@ public class Utils {
     public static void FractionWithTotalPropinquity(Graph graph) {
         FractionWithTotalPropinquity(graph, false, false);
     }
-    
+
     public static void FractionWithTotalPropinquity(Graph graph, boolean graphics, boolean graphicWidth) {
         for (Edge edge : graph.getEachEdge()) {
             Node[] nodes = {edge.getNode0(), edge.getNode1()};
