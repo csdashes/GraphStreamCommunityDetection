@@ -47,7 +47,7 @@ public class UIToolbox {
 
         // Set the colors
         for (Node n : graph.getEachNode()) {
-            if (!n.hasAttribute("community")) {
+            if (!n.hasAttribute("community") || n.getAttribute("community") == null) {
                 // Don't color it. Black is our special color.
                 uncommunitized++;
                 continue;
