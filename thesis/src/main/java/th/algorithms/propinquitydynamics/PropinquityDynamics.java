@@ -489,7 +489,7 @@ public class PropinquityDynamics implements Algorithm {
 
             for (Integer neighborIndex : Nr) {
                 if (n.getEdgeBetween(neighborIndex) == null) {
-                    this.graph.addEdge(n.getId() + "and" + neighborIndex, n, this.graph.getNode(neighborIndex));
+                    this.graph.addEdge(n.getIndex() + "and" + neighborIndex, n, this.graph.getNode(neighborIndex));
                 }
             }
         }
