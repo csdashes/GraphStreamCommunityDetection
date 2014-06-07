@@ -47,6 +47,10 @@ public class Utils {
      * @param graph
      */
     public static void FractionWithNumberOfEdges(Graph graph) {
+        FractionWithNumberOfEdges(graph, false, false);
+    }
+    
+    public static void FractionWithNumberOfEdges(Graph graph, boolean graphics, boolean graphicWidth) {
         for (Edge edge : graph.getEachEdge()) {
             Node[] nodes = {edge.getNode0(), edge.getNode1()};
 
@@ -61,8 +65,12 @@ public class Utils {
             int prop = ((PropinquityMap) nodes[0].getAttribute("pm")).get(nodes[1].getIndex()).get();
             double weight = (double) prop / (double) maxNumEdges;
 
-            edge.setAttribute("ui.label", String.format("%.2f", weight));
-            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + weight * 3 + ";");
+            if (graphics) {
+                edge.setAttribute("ui.label", String.format("%.2f", weight));
+                if (graphicWidth) {
+                    edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + weight * 3 + ";");
+                }
+            }
             edge.setAttribute("weight", weight);
         }
     }
@@ -75,6 +83,10 @@ public class Utils {
      * @param graph
      */
     public static void FractionWithTotalPropinquity(Graph graph) {
+        FractionWithTotalPropinquity(graph, false, false);
+    }
+    
+    public static void FractionWithTotalPropinquity(Graph graph, boolean graphics, boolean graphicWidth) {
         for (Edge edge : graph.getEachEdge()) {
             Node[] nodes = {edge.getNode0(), edge.getNode1()};
 
@@ -101,8 +113,12 @@ public class Utils {
             int prop = ((PropinquityMap) nodes[0].getAttribute("pm")).get(nodes[1].getIndex()).get();
             double weight = (double) prop / (double) maxPropSum;
 
-            edge.setAttribute("ui.label", String.format("%.2f", weight));
-            edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + weight * 10 + ";");
+            if (graphics) {
+                edge.setAttribute("ui.label", String.format("%.2f", weight));
+                if (graphicWidth) {
+                    edge.setAttribute("ui.style", "text-color:red;text-style:bold; text-size:12;size:" + weight * 10 + ";");
+                }
+            }
             edge.setAttribute("weight", weight);
         }
     }
