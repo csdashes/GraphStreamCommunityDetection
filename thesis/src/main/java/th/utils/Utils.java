@@ -27,6 +27,12 @@ import org.graphstream.util.parser.ParseException;
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class Utils {
+    
+    public static void ResetCommunities(Graph graph) {
+        for (Node n : graph) {
+            n.removeAttribute("community");
+        }
+    }
 
     public static int DeleteLonelyVertices(Graph graph) {
         int deleted = 0;
