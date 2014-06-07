@@ -19,7 +19,6 @@ import org.graphstream.stream.file.FileSink;
 import org.graphstream.stream.file.FileSinkDGS;
 import org.graphstream.stream.file.FileSinkGML;
 import org.graphstream.util.parser.ParseException;
-import th.algorithms.propinquitydynamics.utils.PropinquityMap;
 
 /**
  *
@@ -27,6 +26,17 @@ import th.algorithms.propinquitydynamics.utils.PropinquityMap;
  * @author Anastasis Andronidis <anastasis90@yahoo.gr>
  */
 public class Utils {
+
+    public static int DeleteLonelyVertices(Graph graph) {
+        int deleted = 0;
+        for (Node n : graph) {
+            if (n.getDegree() == 0) {
+                deleted++;
+                graph.removeNode(n);
+            }
+        }
+        return deleted;
+    }
 
     public static void CopyCommunities(Graph sourceGraph, Graph targetGraph) throws ParseException {
         // Check if the graphs have the same amount of vertices
