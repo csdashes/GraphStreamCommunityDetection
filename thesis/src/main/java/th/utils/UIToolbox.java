@@ -41,13 +41,15 @@ public class UIToolbox {
     }
 
     @SuppressWarnings("unchecked")
-    public static void ColorCommunities(Graph graph) {
+    public static int ColorCommunities(Graph graph) {
+        int uncommunitized = 0;
         Map<Integer, String> colorMap = new HashMap<Integer, String>(10);
 
         // Set the colors
         for (Node n : graph.getEachNode()) {
             if (!n.hasAttribute("community")) {
                 // Don't color it. Black is our special color.
+                uncommunitized++;
                 continue;
             }
             
@@ -74,6 +76,7 @@ public class UIToolbox {
 
             n.addAttribute("ui.style", "fill-color: rgb(" + colorMap.get(com) + "); size: 20px;");
         }
+        return uncommunitized;
     }
 
     private final SpriteManager sm;
