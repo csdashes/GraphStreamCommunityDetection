@@ -29,12 +29,18 @@ public class Utils {
 
     public static int DeleteLonelyVertices(Graph graph) {
         int deleted = 0;
-        for (Node n : graph) {
-            if (n.getDegree() == 0) {
-                deleted++;
-                graph.removeNode(n);
+        boolean flag;
+
+        do {
+            flag = false;
+            for (Node n : graph) {
+                if (n.getDegree() == 0) {
+                    deleted++;
+                    flag = true;
+                    graph.removeNode(n);
+                }
             }
-        }
+        } while (flag);
         return deleted;
     }
 
