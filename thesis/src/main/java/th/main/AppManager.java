@@ -19,6 +19,7 @@ import th.utils.Utils;
 
 /**
  *
+ * @author Anastasis Andronidis <anastasis90@yahoo.gr>
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class AppManager {
