@@ -151,6 +151,9 @@ public class ExtractCommunities {
         for (Node n : graph.getEachNode()) {
             if (!n.hasAttribute("visited")) {
                 n.setAttribute("visited", 1);
+                if (n.getDegree() == 0) {
+                    continue;
+                }
                 n.setAttribute("community", ++communityNum);
 
                 // Go for BFS
