@@ -17,8 +17,8 @@ import org.graphstream.graph.Node;
  */
 public class Utils {
 
-    public static void SetPDWeights(Graph graph, boolean graphics) {
-        SetPDWeights(graph, graphics, false);
+    public static void SetPDWeights(Graph graph) {
+        SetPDWeights(graph, false, false);
     }
 
     public static void SetPDWeights(Graph graph, boolean graphics, boolean graphicWidth) {
