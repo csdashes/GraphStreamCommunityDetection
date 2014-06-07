@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
@@ -22,8 +23,8 @@ import org.graphstream.util.parser.ParseException;
 
 /**
  *
- * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  * @author Anastasis Andronidis <anastasis90@yahoo.gr>
+ * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class Utils {
 
@@ -53,7 +54,11 @@ public class Utils {
         }
 
         for (Node n : sourceGraph) {
-            targetGraph.getNode(n.getIndex()).setAttribute("community", (Integer) n.getAttribute("community"));
+            if (n.getAttribute("community") instanceof HashSet<?>) {
+                targetGraph.getNode(n.getIndex()).setAttribute("community", (HashSet<Integer>) n.getAttribute("community"));
+            } else {
+                targetGraph.getNode(n.getIndex()).setAttribute("community", (Integer) n.getAttribute("community"));
+            }
         }
     }
 
