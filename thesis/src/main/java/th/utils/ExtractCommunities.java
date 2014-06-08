@@ -55,7 +55,7 @@ public class ExtractCommunities {
             if (AreWeTheStrongestEdge(neightbor, weight)) {
                 if (neightbor.hasAttribute("visited")) {
                     if (neightbor.hasAttribute("community")) {
-                        ((Set<Integer>) neightbor.getAttribute("community")).add(community);
+//                        ((Set<Integer>) neightbor.getAttribute("community")).add(community);
                     }
                 } else if (weight < currentSearchWeight) {
                     AddToConsequentMap(consequent, weight, neightbor);
@@ -76,18 +76,20 @@ public class ExtractCommunities {
         // Find max weight for first iter.
         AddNextSteps(n, head, subsequent, currentSearchWeight, community);
         n.addAttribute("visited", 1);
-        Set<Integer> s = new HashSet<Integer>();
-        s.add(community);
-        n.addAttribute("community", s);
+//        Set<Integer> s = new HashSet<Integer>();
+//        s.add(community);
+//        n.addAttribute("community", s);
+        n.addAttribute("community", community);
 
         while (!subsequent.isEmpty() || !head.isEmpty()) {
             while (!head.isEmpty()) {
                 Node next = head.poll();
                 AddNextSteps(next, head, subsequent, currentSearchWeight, community);
                 next.addAttribute("visited", 1);
-                Set< Integer> se = new HashSet<Integer>();
-                se.add(community);
-                next.addAttribute("community", se);
+//                Set<Integer> se = new HashSet<Integer>();
+//                se.add(community);
+//                next.addAttribute("community", se);
+                next.addAttribute("community", community);
             }
 
             if (!subsequent.isEmpty()) {
