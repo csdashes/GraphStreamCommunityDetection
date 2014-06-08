@@ -2,6 +2,7 @@ package th.main;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
@@ -158,6 +159,14 @@ public class AppManager {
     }
 
     private void RangeAB(String datasetFile) throws IOException, GraphParseException, ParseException {
+        File theFile = new File(datasetFile);
+        PrintWriter writer = new PrintWriter("../exports/" + theFile.getName().split("\\.")[0] + ".csv", "UTF-8");
+        writer.println("a,b,UncommunitizedVertices,NumberofIterations,"
+                + "BFScom,BFSNMI,BFSModularity,"
+                + "MaxToMinNormalWeihtsCom,MaxToMinNormalWeihtsNMI,MaxToMinNormalWeihtsModularity,"
+                + "MaxToMinP/degreeCom,MaxToMinP/degreeNMI,MaxToMinP/degreeModularity"
+                + "MaxToMinP/SumPCom,MaxToMinP/SumPNMI,MaxToMinP/SumPModularity");
+        
         // Init an origin graph, so we can calculate metrics
         Graph originGraph = new DefaultGraph("Propinquity Dynamics");
         originGraph.read(datasetFile);
@@ -192,6 +201,7 @@ public class AppManager {
                 pd.applyFinalTopology();
 
                 int uncommunitized = FindLonelyVertices(graph);
+                String toCSV = a + "," + b + "," + uncommunitized + "," + i + ",";
                 System.out.println("For a: " + a + " and b: " + b);
                 System.out.println("Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
 
@@ -201,6 +211,7 @@ public class AppManager {
                 double nmi = GetNMI(originGraph);
                 double modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
+                toCSV += com + "," + nmi + "," + modularity + ",";
                 System.out.println("BFS found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 SetPDWeights(graph);
@@ -210,7 +221,8 @@ public class AppManager {
                 nmi = GetNMI(originGraph);
                 modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
-                System.out.println("MaxToMin (normal weihts) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
+                toCSV += com + "," + nmi + "," + modularity + ",";
+//                System.out.println("MaxToMin (normal weihts) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 FractionWithNumberOfEdges(graph);
                 com = ExtractCommunities.MaxToMin(graph);
@@ -219,7 +231,8 @@ public class AppManager {
                 nmi = GetNMI(originGraph);
                 modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
-                System.out.println("MaxToMin (PD/degree) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
+                toCSV += com + "," + nmi + "," + modularity + ",";
+//                System.out.println("MaxToMin (P/degree) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 FractionWithTotalPropinquity(graph);
                 com = ExtractCommunities.MaxToMin(graph);
@@ -227,7 +240,10 @@ public class AppManager {
                 Shark(originGraph);
                 nmi = GetNMI(originGraph);
                 modularity = GetModularity(originGraph);
-                System.out.println("MaxToMin (PD/SumPD) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
+                toCSV += com + "," + nmi + "," + modularity;
+//                System.out.println("MaxToMin (P/SumP) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
+                
+                writer.println(toCSV);
             }
         }
     }
