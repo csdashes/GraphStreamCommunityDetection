@@ -26,15 +26,17 @@ import th.algorithms.propinquitydynamics.utils.PropinquityMap;
  */
 public class Statistics {
 
-    public static int FindMaxDegree(Graph graph) {
-        int maxDegree = 0;
+    public static double[] DegreeStatistics(Graph graph) {
+        double maxDegree = 0.0, avgDegree = 0.0;
         for (Node n : graph) {
             if (n.getDegree() > maxDegree) {
                 maxDegree = n.getDegree();
             }
+            avgDegree += n.getDegree();
         }
 
-        return maxDegree;
+        double[] output = { maxDegree, (avgDegree/graph.getNodeCount()) };
+        return output;
     }
 
     public static void PDStatistics(Graph graph, String graphName, int a, int b) throws FileNotFoundException, UnsupportedEncodingException {
