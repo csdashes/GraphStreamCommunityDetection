@@ -29,8 +29,8 @@ import org.graphstream.util.parser.ParseException;
 public class Utils {
 
     public static void InitWeights(Graph graph) {
-        for (Node n : graph) {
-            n.addAttribute("weight", 1.0);
+        for (Edge e : graph.getEachEdge()) {
+            e.addAttribute("weight", 1.0);
         }
     }
 
