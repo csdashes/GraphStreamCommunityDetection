@@ -155,8 +155,9 @@ public class AppManager {
         // Find max degree
         Graph tmp = new DefaultGraph("Propinquity Dynamics");
         tmp.read(datasetFile);
-        int maxDegree = FindMaxDegree(tmp);
-        System.out.println("Max Degree: " + maxDegree);
+        double[] degreeStats = DegreeStatistics(tmp);
+        System.out.println("Max Degree: " + degreeStats[0]);
+        System.out.println("Avg Degree: " + degreeStats[1]);
 
         int maxB = MaxPropinquityToNonNeighbor((int)degreeStats[0]);
         for (int b = 0; b <= maxB; b++) {
