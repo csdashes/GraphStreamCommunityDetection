@@ -212,7 +212,7 @@ public class AppManager {
                 double modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
                 toCSV += com + "," + nmi + "," + modularity + ",";
-                System.out.println("BFS found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
+//                System.out.println("BFS found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 SetPDWeights(graph);
                 com = ExtractCommunities.MaxToMin(graph);
