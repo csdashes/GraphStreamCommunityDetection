@@ -48,15 +48,6 @@ public class ExtractCommunities {
 
     public static void Shark(Graph graph) {
         boolean uncommunitizedVertExist;
-
-        // Must be at least one community
-        boolean noCommunity = true;
-        for (Node n : graph) {
-            if (n.getAttribute("community") != null) {
-                noCommunity = false;
-            }
-        }
-        if (noCommunity) return;
         
         do {
             uncommunitizedVertExist = false;

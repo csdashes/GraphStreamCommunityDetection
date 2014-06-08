@@ -207,7 +207,10 @@ public class AppManager {
 
                 int com = ExtractCommunities.BFS(graph);
                 Utils.CopyCommunities(graph, originGraph);
-                Shark(originGraph);
+                // Must be at least one community
+                if (com > 0) {
+                    Shark(originGraph);
+                }
                 double nmi = GetNMI(originGraph);
                 double modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
