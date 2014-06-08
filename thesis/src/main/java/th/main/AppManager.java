@@ -10,11 +10,12 @@ import th.algorithms.louvain.CommunityDetectionLouvain;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
 import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithNumberOfEdges;
 import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithTotalPropinquity;
+import static th.algorithms.propinquitydynamics.utils.Utils.MaxPropinquityToNonNeighbor;
 import static th.algorithms.propinquitydynamics.utils.Utils.SetPDWeights;
 import th.utils.ExtractCommunities;
 import th.utils.Menu;
 import th.utils.Statistics;
-import static th.utils.Statistics.FindMaxDegree;
+import static th.utils.Statistics.DegreeStatistics;
 import th.utils.UIToolbox;
 import th.utils.Utils;
 import static th.utils.Utils.FindLonelyVertices;
@@ -157,7 +158,8 @@ public class AppManager {
         int maxDegree = FindMaxDegree(tmp);
         System.out.println("Max Degree: " + maxDegree);
 
-        for (int b = 0; b <= maxDegree; b++) {
+        int maxB = MaxPropinquityToNonNeighbor((int)degreeStats[0]);
+        for (int b = 0; b <= maxB; b++) {
             for (int a = 0; a <= b; a++) {
                 Graph graph = new DefaultGraph("Propinquity Dynamics");
                 graph.read(datasetFile);
