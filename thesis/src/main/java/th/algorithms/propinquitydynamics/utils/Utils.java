@@ -17,6 +17,10 @@ import org.graphstream.graph.Node;
  */
 public class Utils {
 
+    public static int MaxPropinquityToNonNeighbor(int nodeDegree) {
+        return nodeDegree + nodeDegree * (nodeDegree - 1) / 2;
+    }
+
     public static void SetPDWeights(Graph graph) {
         SetPDWeights(graph, false, false);
     }
