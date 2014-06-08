@@ -246,6 +246,7 @@ public class AppManager {
                 writer.println(toCSV);
             }
         }
+        writer.close();
     }
 
     private void PDOriginalAndMaxToMin(String datasetFile) throws IOException, GraphParseException, ParseException {
