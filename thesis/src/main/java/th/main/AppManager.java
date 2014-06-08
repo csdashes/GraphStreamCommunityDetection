@@ -14,8 +14,11 @@ import static th.algorithms.propinquitydynamics.utils.Utils.SetPDWeights;
 import th.utils.ExtractCommunities;
 import th.utils.Menu;
 import th.utils.Statistics;
+import static th.utils.Statistics.FindMaxDegree;
 import th.utils.UIToolbox;
 import th.utils.Utils;
+import static th.utils.Utils.FindLonelyVertices;
+import static th.utils.Utils.ResetCommunities;
 
 /**
  *
@@ -75,6 +78,12 @@ public class AppManager {
                     return;
             }
         }
+
+//        String[] datasets = {"../data/polbooks.gml", "../data/dolphins.gml", "../data/karate.gml"};      
+//        for (String dataset : datasets) {
+//            RangeAB(dataset);
+//        }
+//        CompareExtractions(datasets[2]);
     }
 
     private void PDOriginalStatics(String datasetFile) throws IOException, GraphParseException {
@@ -94,7 +103,104 @@ public class AppManager {
 //        Statistics.exportNodePDStatistics(graph, filename);
     }
 
-    private void ErdosSubgraphPDOriginalAndMaxToMin(String datasetFile) throws IOException, GraphParseException {
+    private void CompareExtractions(String datasetFile) throws IOException, GraphParseException, ParseException {
+        int a = 0, b = 6;
+        Graph graph = new DefaultGraph("Propinquity Dynamics");
+        graph.read(datasetFile);
+
+        PropinquityDynamics pd = new PropinquityDynamics();
+        pd.set(a, b);
+
+        pd.init(graph);
+
+        int i = 0;
+        // We need to be sure that we dont have an infinite loop
+        while (i < 100 && !pd.didAbsoluteConvergence()) {
+            pd.compute();
+            i++;
+        }
+        pd.applyFinalTopology();
+
+        System.out.println("a" + a + "b" + b);
+//        System.out.println("Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
+
+        int com;
+//        com = ExtractCommunities.BFS(graph);
+//        ResetCommunities(graph);
+//        System.out.println("BFS found: " + com);
+
+        SetPDWeights(graph);
+        com = ExtractCommunities.MaxToMin(graph);
+        System.out.println("MaxToMin(normal weihts) found: " + com);
+
+//        FractionWithNumberOfEdges(graph);
+//        com = ExtractCommunities.MaxToMin(graph);
+//        System.out.println("MaxToMin(PD/degree) found: " + com);
+//        FractionWithTotalPropinquity(graph);
+//        com = ExtractCommunities.MaxToMin(graph);
+//        System.out.println("MaxToMin(PD/SumPD) found: " + com);
+        Graph originGraph = new DefaultGraph("Propinquity Dynamics");
+        originGraph.display();
+        originGraph.read(datasetFile);
+        Utils.CopyCommunities(graph, originGraph);
+
+        UIToolbox.ColorCommunities(originGraph);
+
+    }
+
+    private void RangeAB(String datasetFile) throws IOException, GraphParseException, ParseException {
+        System.out.println("Dataset: " + datasetFile);
+
+        // Find max degree
+        Graph tmp = new DefaultGraph("Propinquity Dynamics");
+        tmp.read(datasetFile);
+        int maxDegree = FindMaxDegree(tmp);
+        System.out.println("Max Degree: " + maxDegree);
+
+        for (int b = 0; b <= maxDegree; b++) {
+            for (int a = 0; a <= b; a++) {
+                Graph graph = new DefaultGraph("Propinquity Dynamics");
+                graph.read(datasetFile);
+
+                PropinquityDynamics pd = new PropinquityDynamics();
+                pd.set(a, b);
+
+                pd.init(graph);
+
+                int i = 0;
+                // We need to be sure that we dont have an infinite loop
+                while (i < 100 && !pd.didAbsoluteConvergence()) {
+                    pd.compute();
+                    i++;
+                }
+                pd.applyFinalTopology();
+
+                int uncommunitized = FindLonelyVertices(graph);
+                System.out.println("For a: " + a + " and b: " + b);
+                System.out.println("Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
+
+                int com = ExtractCommunities.BFS(graph);
+                ResetCommunities(graph);
+                System.out.println("BFS found: " + com);
+
+                SetPDWeights(graph);
+                com = ExtractCommunities.MaxToMin(graph);
+                ResetCommunities(graph);
+                System.out.println("MaxToMin (normal weihts) found: " + com);
+
+                FractionWithNumberOfEdges(graph);
+                com = ExtractCommunities.MaxToMin(graph);
+                ResetCommunities(graph);
+                System.out.println("MaxToMin (PD/degree) found: " + com);
+
+                FractionWithTotalPropinquity(graph);
+                com = ExtractCommunities.MaxToMin(graph);
+                System.out.println("MaxToMin (PD/SumPD) found: " + com);
+            }
+        }
+    }
+
+    private void PDOriginalAndMaxToMin(String datasetFile) throws IOException, GraphParseException, ParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.display();
         graph.read(datasetFile);
@@ -113,10 +219,17 @@ public class AppManager {
         pd.applyFinalTopology();
 
         // Use our custom extraction algorithm to retrive internal communities
-        SetPDWeights(graph, true);
+        SetPDWeights(graph);
         int com = ExtractCommunities.MaxToMin(graph);
-        UIToolbox.ColorCommunities(graph);
-        System.out.println("Number of communities: " + com);
+
+        Graph originGraph = new DefaultGraph("Propinquity Dynamics");
+        originGraph.display();
+        originGraph.read(datasetFile);
+        Utils.CopyCommunities(graph, originGraph);
+
+        int uncommunitized = UIToolbox.ColorCommunities(originGraph);
+        System.out.println("Number of communities: " + com + " Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
+
     }
 
     private void ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(String datasetFile) throws IOException, GraphParseException {
