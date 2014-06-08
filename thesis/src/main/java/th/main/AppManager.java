@@ -165,7 +165,7 @@ public class AppManager {
         writer.println("a,b,UncommunitizedVertices,NumberofIterations,"
                 + "BFScom,BFSNMI,BFSModularity,"
                 + "MaxToMinNormalWeihtsCom,MaxToMinNormalWeihtsNMI,MaxToMinNormalWeihtsModularity,"
-                + "MaxToMinP/degreeCom,MaxToMinP/degreeNMI,MaxToMinP/degreeModularity"
+                + "MaxToMinP/degreeCom,MaxToMinP/degreeNMI,MaxToMinP/degreeModularity,"
                 + "MaxToMinP/SumPCom,MaxToMinP/SumPNMI,MaxToMinP/SumPModularity");
         
         // Init an origin graph, so we can calculate metrics
