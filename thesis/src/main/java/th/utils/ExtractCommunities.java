@@ -1,9 +1,11 @@
 package th.utils;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
@@ -19,6 +21,48 @@ import org.graphstream.graph.Node;
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class ExtractCommunities {
+
+    private static SortedMap<Integer, Integer> GetNeighborCommunitiesFrequencies(Node n) {
+        Map<Integer, Integer> map = new HashMap<Integer, Integer>(10);
+        SortedMap<Integer, Integer> sorted_map = new TreeMap<Integer, Integer>(Collections.reverseOrder());
+
+        Iterator<Node> it = n.getNeighborNodeIterator();
+        while (it.hasNext()) {
+            Node nn = it.next();
+
+            if (nn.hasAttribute("community") && nn.getAttribute("community") != null) {
+                Integer com = (Integer) nn.getAttribute("community");
+                if (map.containsKey(com)) {
+                    map.put(com, map.get(com) + 1);
+                } else {
+                    map.put(com, 1);
+                }
+            }
+        }
+
+        for (Entry<Integer, Integer> e : map.entrySet()) {
+            sorted_map.put(e.getValue(), e.getKey());
+        }
+        return sorted_map;
+    }
+
+    public static void Shark(Graph graph) {
+        boolean uncommunitizedVertExist;
+
+        do {
+            uncommunitizedVertExist = false;
+            for (Node n : graph) {
+                if (!n.hasAttribute("community") || n.getAttribute("community") == null) {
+                    uncommunitizedVertExist = true;
+                    SortedMap<Integer, Integer> neighborCommunites = GetNeighborCommunitiesFrequencies(n);
+                    if (neighborCommunites.size() > 0) {
+                        Integer com = neighborCommunites.entrySet().iterator().next().getValue();
+                        n.addAttribute("community", com);
+                    }
+                }
+            }
+        } while (uncommunitizedVertExist);
+    }
 
     private static boolean AreEqual(Double d1, Double d2) {
         return Math.round(d1 * 100.0) / 100.0 == Math.round(d2 * 100.0) / 100.0;
