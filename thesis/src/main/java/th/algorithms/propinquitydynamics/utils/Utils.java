@@ -1,8 +1,6 @@
 package th.algorithms.propinquitydynamics.utils;
 
 import java.util.Set;
-import org.graphstream.algorithm.measure.Modularity;
-import org.graphstream.algorithm.measure.NormalizedMutualInformation;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -122,19 +120,5 @@ public class Utils {
             }
             edge.setAttribute("weight", weight);
         }
-    }
-    
-    public static Double GetModularity(Graph graph) {
-        Modularity modularity;
-        modularity = new Modularity("community", "weight");
-        modularity.init(graph);
-        return modularity.getMeasure();
-    }
-    
-    public static Double GetNMI(Graph graph) {
-        NormalizedMutualInformation nmi;
-        nmi = new NormalizedMutualInformation("community","groundTruth");
-        nmi.init(graph);
-        return nmi.getMeasure();
     }
 }
