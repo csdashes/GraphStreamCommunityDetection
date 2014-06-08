@@ -14,6 +14,8 @@ import static th.algorithms.propinquitydynamics.utils.Utils.MaxPropinquityToNonN
 import static th.algorithms.propinquitydynamics.utils.Utils.SetPDWeights;
 import th.utils.ExtractCommunities;
 import th.utils.Menu;
+import static th.utils.Metrics.GetModularity;
+import static th.utils.Metrics.GetNMI;
 import th.utils.Statistics;
 import static th.utils.Statistics.DegreeStatistics;
 import th.utils.UIToolbox;
@@ -151,6 +153,10 @@ public class AppManager {
     }
 
     private void RangeAB(String datasetFile) throws IOException, GraphParseException, ParseException {
+        // Init an origin graph, so we can calculate metrics
+        Graph originGraph = new DefaultGraph("Propinquity Dynamics");
+        originGraph.read(datasetFile);
+        
         System.out.println("Dataset: " + datasetFile);
 
         // Find max degree
@@ -184,22 +190,34 @@ public class AppManager {
                 System.out.println("Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
 
                 int com = ExtractCommunities.BFS(graph);
+                Utils.CopyCommunities(graph, originGraph);
+                double nmi = GetNMI(originGraph);
+                double modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
-                System.out.println("BFS found: " + com);
+                System.out.println("BFS found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 SetPDWeights(graph);
                 com = ExtractCommunities.MaxToMin(graph);
+                Utils.CopyCommunities(graph, originGraph);
+                nmi = GetNMI(originGraph);
+                modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
-                System.out.println("MaxToMin (normal weihts) found: " + com);
+                System.out.println("MaxToMin (normal weihts) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 FractionWithNumberOfEdges(graph);
                 com = ExtractCommunities.MaxToMin(graph);
+                Utils.CopyCommunities(graph, originGraph);
+                nmi = GetNMI(originGraph);
+                modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
-                System.out.println("MaxToMin (PD/degree) found: " + com);
+                System.out.println("MaxToMin (PD/degree) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 FractionWithTotalPropinquity(graph);
                 com = ExtractCommunities.MaxToMin(graph);
-                System.out.println("MaxToMin (PD/SumPD) found: " + com);
+                Utils.CopyCommunities(graph, originGraph);
+                nmi = GetNMI(originGraph);
+                modularity = GetModularity(originGraph);
+                System.out.println("MaxToMin (PD/SumPD) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
             }
         }
     }
