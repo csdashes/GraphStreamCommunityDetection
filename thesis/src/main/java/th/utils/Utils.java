@@ -30,7 +30,7 @@ public class Utils {
 
     public static void InitWeights(Graph graph) {
         for (Node n : graph) {
-            n.addAttribute("weight", 1);
+            n.addAttribute("weight", 1.0);
         }
     }
 
