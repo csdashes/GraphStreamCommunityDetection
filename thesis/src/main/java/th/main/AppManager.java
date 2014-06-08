@@ -22,6 +22,7 @@ import static th.utils.Statistics.DegreeStatistics;
 import th.utils.UIToolbox;
 import th.utils.Utils;
 import static th.utils.Utils.FindLonelyVertices;
+import static th.utils.Utils.InitWeights;
 import static th.utils.Utils.ResetCommunities;
 
 /**
@@ -160,6 +161,7 @@ public class AppManager {
         // Init an origin graph, so we can calculate metrics
         Graph originGraph = new DefaultGraph("Propinquity Dynamics");
         originGraph.read(datasetFile);
+        InitWeights(originGraph);
         
         System.out.println("Dataset: " + datasetFile);
 

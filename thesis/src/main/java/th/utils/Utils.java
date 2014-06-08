@@ -27,7 +27,13 @@ import org.graphstream.util.parser.ParseException;
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class Utils {
-    
+
+    public static void InitWeights(Graph graph) {
+        for (Node n : graph) {
+            n.addAttribute("weight", 1);
+        }
+    }
+
     public static void ResetCommunities(Graph graph) {
         for (Node n : graph) {
             n.removeAttribute("community");
@@ -36,13 +42,13 @@ public class Utils {
 
     public static int FindLonelyVertices(Graph graph) {
         int solo = 0;
-        
+
         for (Node n : graph) {
             if (n.getDegree() == 0) {
                 solo++;
             }
         }
-        
+
         return solo;
     }
 
