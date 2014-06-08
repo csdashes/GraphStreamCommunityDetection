@@ -20,6 +20,7 @@ import static th.utils.Metrics.GetModularity;
 import static th.utils.Metrics.GetNMI;
 import th.utils.Statistics;
 import static th.utils.Statistics.DegreeStatistics;
+import static th.utils.Statistics.MaxPropinquity;
 import th.utils.UIToolbox;
 import th.utils.Utils;
 import static th.utils.Utils.FindLonelyVertices;
@@ -181,7 +182,7 @@ public class AppManager {
         System.out.println("Max Degree: " + degreeStats[0]);
         System.out.println("Avg Degree: " + degreeStats[1]);
 
-        int maxB = MaxPropinquityToNonNeighbor((int)degreeStats[0]);
+        int maxB = MaxPropinquity(datasetFile);
         for (int b = 0; b <= maxB; b++) {
             for (int a = 0; a <= b; a++) {
                 Graph graph = new DefaultGraph("Propinquity Dynamics");

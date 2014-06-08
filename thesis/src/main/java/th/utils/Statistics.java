@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
 import th.algorithms.propinquitydynamics.utils.MutableInt;
@@ -26,6 +27,28 @@ import th.algorithms.propinquitydynamics.utils.PropinquityMap;
  */
 public class Statistics {
 
+    public static int MaxPropinquity(String file) throws IOException, GraphParseException {
+        Graph graph = new DefaultGraph("Propinquity Dynamics");
+        graph.read(file);
+        return MaxPropinquity(graph);
+    }
+    
+    public static int MaxPropinquity(Graph graph) {
+        int maxProp = 0;
+        
+        for (Node n : graph) {
+            PropinquityMap pm = (PropinquityMap) n.getAttribute("pm");
+            for (Entry<Integer, MutableInt> row : pm.entrySet()) {
+                Integer prop = row.getValue().get();
+                if (prop > maxProp) {
+                    maxProp = prop;
+                }
+            }
+        }
+        
+        return maxProp;
+    }    
+    
     public static double[] DegreeStatistics(Graph graph) {
         double maxDegree = 0.0, avgDegree = 0.0;
         for (Node n : graph) {
