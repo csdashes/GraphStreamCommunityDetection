@@ -140,6 +140,7 @@ public class AppManager {
 //        FractionWithTotalPropinquity(graph);
 //        com = ExtractCommunities.MaxToMin(graph);
 //        System.out.println("MaxToMin(PD/SumPD) found: " + com);
+
         Graph originGraph = new DefaultGraph("Propinquity Dynamics");
         originGraph.display();
         originGraph.read(datasetFile);
