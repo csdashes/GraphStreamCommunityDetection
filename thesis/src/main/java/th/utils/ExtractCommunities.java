@@ -52,7 +52,7 @@ public class ExtractCommunities {
         do {
             uncommunitizedVertExist = false;
             for (Node n : graph) {
-                if (!n.hasAttribute("community") || n.getAttribute("community") == null) {
+                if (n.getDegree()>0 && (!n.hasAttribute("community") || n.getAttribute("community") == null)) {
                     uncommunitizedVertExist = true;
                     SortedMap<Integer, Integer> neighborCommunites = GetNeighborCommunitiesFrequencies(n);
                     if (neighborCommunites.size() > 0) {
