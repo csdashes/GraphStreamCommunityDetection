@@ -13,6 +13,7 @@ import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithTotalPro
 import static th.algorithms.propinquitydynamics.utils.Utils.MaxPropinquityToNonNeighbor;
 import static th.algorithms.propinquitydynamics.utils.Utils.SetPDWeights;
 import th.utils.ExtractCommunities;
+import static th.utils.ExtractCommunities.Shark;
 import th.utils.Menu;
 import static th.utils.Metrics.GetModularity;
 import static th.utils.Metrics.GetNMI;
@@ -124,8 +125,9 @@ public class AppManager {
         }
         pd.applyFinalTopology();
 
+        int uncommunitized = FindLonelyVertices(graph);
         System.out.println("a" + a + "b" + b);
-//        System.out.println("Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
+        System.out.println("Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
 
         int com;
 //        com = ExtractCommunities.BFS(graph);
@@ -147,6 +149,8 @@ public class AppManager {
         originGraph.display();
         originGraph.read(datasetFile);
         Utils.CopyCommunities(graph, originGraph);
+        
+        Shark(originGraph);
 
         UIToolbox.ColorCommunities(originGraph);
 
@@ -191,6 +195,7 @@ public class AppManager {
 
                 int com = ExtractCommunities.BFS(graph);
                 Utils.CopyCommunities(graph, originGraph);
+                Shark(originGraph);
                 double nmi = GetNMI(originGraph);
                 double modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
@@ -199,6 +204,7 @@ public class AppManager {
                 SetPDWeights(graph);
                 com = ExtractCommunities.MaxToMin(graph);
                 Utils.CopyCommunities(graph, originGraph);
+                Shark(originGraph);
                 nmi = GetNMI(originGraph);
                 modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
@@ -207,6 +213,7 @@ public class AppManager {
                 FractionWithNumberOfEdges(graph);
                 com = ExtractCommunities.MaxToMin(graph);
                 Utils.CopyCommunities(graph, originGraph);
+                Shark(originGraph);
                 nmi = GetNMI(originGraph);
                 modularity = GetModularity(originGraph);
                 ResetCommunities(graph);
@@ -215,6 +222,7 @@ public class AppManager {
                 FractionWithTotalPropinquity(graph);
                 com = ExtractCommunities.MaxToMin(graph);
                 Utils.CopyCommunities(graph, originGraph);
+                Shark(originGraph);
                 nmi = GetNMI(originGraph);
                 modularity = GetModularity(originGraph);
                 System.out.println("MaxToMin (PD/SumPD) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
