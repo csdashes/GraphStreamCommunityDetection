@@ -1,15 +1,22 @@
 package th.utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
 import org.graphstream.graph.Graph;
@@ -27,6 +34,47 @@ import org.graphstream.util.parser.ParseException;
  * @author Ilias Trichopoulos <itrichop@csd.auth.gr>
  */
 public class Utils {
+
+    private static String join(List<String> s, String delimiter) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < s.size() - 1; i++) {
+            builder.append(s.get(i));
+            builder.append(delimiter);
+        }
+
+        builder.append(s.get(s.size() - 1));
+
+        return builder.toString();
+    }
+
+    public static void DumpCommunities(Graph graph, String overlapCommunitiesFilePath) throws FileNotFoundException, UnsupportedEncodingException {
+        try (PrintWriter writer = new PrintWriter(overlapCommunitiesFilePath, "UTF-8")) {
+            Map<Integer, List<String>> comMap = new HashMap<>(30);
+
+            for (Node n : graph) {
+                // TODO: This is also a waste of resources. Too many copies
+                List<Integer> nodeCommunities;
+                if (n.getAttribute("community") instanceof HashSet<?>) {
+                    nodeCommunities = new ArrayList<>((HashSet<Integer>) n.getAttribute("community"));
+                } else {
+                    Integer com = (Integer) n.getAttribute("community");
+                    nodeCommunities = new ArrayList<>(Arrays.asList(com));
+                }
+
+                for (Integer com : nodeCommunities) {
+                    // TODO: this is not optimal. in every iteration we create a wasted ArrayList
+                    comMap.merge(com, new ArrayList<>(Arrays.asList(n.getId())), (v1, v2) -> {
+                        v1.addAll(v2);
+                        return v1;
+                    });
+                }
+            }
+
+            comMap.forEach((k, v) -> {
+                writer.println(join(v, "\t"));
+            });
+        }
+    }
 
     public static void InitWeights(Graph graph) {
         for (Edge e : graph.getEachEdge()) {
