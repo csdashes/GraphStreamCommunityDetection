@@ -46,33 +46,54 @@ public class Utils {
         return builder.toString();
     }
 
-    public static void DumpCommunities(Graph graph, String overlapCommunitiesFilePath) throws FileNotFoundException, UnsupportedEncodingException {
-        try (PrintWriter writer = new PrintWriter(overlapCommunitiesFilePath, "UTF-8")) {
-            Map<Integer, List<String>> comMap = new HashMap<>(30);
+    private static void AddCommunities(Map<Integer, List<String>> map, Node n, String attribute) {
+        // TODO: This is also a waste of resources. Too many copies
+        List<Integer> nodeCommunities;
+        if (n.getAttribute(attribute) instanceof HashSet<?>) {
+            nodeCommunities = new ArrayList<>((HashSet<Integer>) n.getAttribute(attribute));
+        } else {
+            Integer com = (Integer) n.getAttribute(attribute);
+            nodeCommunities = Arrays.asList(com);
+        }
 
-            for (Node n : graph) {
-                // TODO: This is also a waste of resources. Too many copies
-                List<Integer> nodeCommunities;
-                if (n.getAttribute("community") instanceof HashSet<?>) {
-                    nodeCommunities = new ArrayList<>((HashSet<Integer>) n.getAttribute("community"));
-                } else {
-                    Integer com = (Integer) n.getAttribute("community");
-                    nodeCommunities = Arrays.asList(com);
-                }
+        for (Integer com : nodeCommunities) {
+            // TODO: this is not optimal. in every iteration we create a wasted ArrayList
+            map.merge(com, new ArrayList<>(Arrays.asList(n.getId())), (v1, v2) -> {
+                v1.addAll(v2);
+                return v1;
+            });
+        }
+    }
 
-                for (Integer com : nodeCommunities) {
-                    // TODO: this is not optimal. in every iteration we create a wasted ArrayList
-                    comMap.merge(com, new ArrayList<>(Arrays.asList(n.getId())), (v1, v2) -> {
-                        v1.addAll(v2);
-                        return v1;
-                    });
-                }
-            }
-
-            comMap.forEach((k, v) -> {
+    private static void WriteToONMIFile(Map<Integer, List<String>> map, String filename) throws FileNotFoundException, UnsupportedEncodingException {
+        try (PrintWriter writer = new PrintWriter(filename, "UTF-8")) {
+            map.forEach((k, v) -> {
                 writer.println(join(v, "\t"));
             });
         }
+    }
+
+    public static void DumpCommunities(Graph graph, String overlapCommunitiesFilePath, String communityAttr) throws FileNotFoundException, UnsupportedEncodingException {
+        Map<Integer, List<String>> communityMap = new HashMap<>(30);
+
+        for (Node n : graph) {
+            AddCommunities(communityMap, n, communityAttr);
+        }
+
+        WriteToONMIFile(communityMap, overlapCommunitiesFilePath);
+    }
+
+    public static void DumpCommunitiesAndGroundTruth(Graph graph, String overlapCommunitiesFilePath, String groundTruthFilePath, String communityAttr, String groundTruthAttr) throws FileNotFoundException, UnsupportedEncodingException {
+        Map<Integer, List<String>> communityMap = new HashMap<>(30);
+        Map<Integer, List<String>> groundTruthMap = new HashMap<>(30);
+
+        for (Node n : graph) {
+            AddCommunities(communityMap, n, communityAttr);
+            AddCommunities(groundTruthMap, n, groundTruthAttr);
+        }
+
+        WriteToONMIFile(communityMap, overlapCommunitiesFilePath);
+        WriteToONMIFile(groundTruthMap, groundTruthFilePath);
     }
 
     public static void InitWeights(Graph graph) {
