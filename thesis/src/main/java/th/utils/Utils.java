@@ -57,7 +57,7 @@ public class Utils {
                     nodeCommunities = new ArrayList<>((HashSet<Integer>) n.getAttribute("community"));
                 } else {
                     Integer com = (Integer) n.getAttribute("community");
-                    nodeCommunities = new ArrayList<>(Arrays.asList(com));
+                    nodeCommunities = Arrays.asList(com);
                 }
 
                 for (Integer com : nodeCommunities) {
