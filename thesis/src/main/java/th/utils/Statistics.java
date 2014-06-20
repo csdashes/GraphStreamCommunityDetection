@@ -33,7 +33,7 @@ public class Statistics {
         return MaxPropinquity(graph);
     }
     
-    public static int MaxPropinquity(Graph graph) throws GraphParseException {
+    public static int MaxPropinquity(Graph graph) {
         int maxProp = 0;
         
         try {
@@ -47,7 +47,14 @@ public class Statistics {
                 }
             }            
         } catch (NullPointerException e) {
-            throw new GraphParseException("Propinquity is null. Did you initialize the Propinquity Dynamics?");
+            if (graph.getNode(0).getAttribute("pm") == null) {
+                PropinquityDynamics pd = new PropinquityDynamics();
+                pd.init(graph);
+                
+                return MaxPropinquity(graph);
+            } else {
+                throw e;
+            }
         }
         
         return maxProp;
