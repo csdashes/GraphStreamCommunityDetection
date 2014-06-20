@@ -35,7 +35,7 @@ import org.graphstream.util.parser.ParseException;
 public class Utils {
 
     private static String join(List<String> s, String delimiter) {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(50);
         for (int i = 0; i < s.size() - 1; i++) {
             builder.append(s.get(i));
             builder.append(delimiter);
@@ -203,7 +203,7 @@ public class Utils {
                         List<Integer> l = graph.getNode(s).getAttribute("groundTruth");
                         l.add(i);
                     } else {
-                        List<Integer> l = new ArrayList<Integer>(100);
+                        List<Integer> l = new ArrayList<>(100);
                         l.add(i);
                         graph.getNode(s).addAttribute("groundTruth", l);
                     }
