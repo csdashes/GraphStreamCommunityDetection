@@ -40,29 +40,32 @@ public class UIToolbox {
         n.setAttribute("ui.style", "size:20px;");
     }
 
-    @SuppressWarnings("unchecked")
     public static int ColorCommunities(Graph graph) {
+        return ColorCommunities(graph, "community");
+    }
+
+    public static int ColorCommunities(Graph graph, String attribute) {
         int uncommunitized = 0;
-        Map<Integer, String> colorMap = new HashMap<Integer, String>(10);
+        Map<Integer, String> colorMap = new HashMap<>(10);
 
         // Set the colors
         for (Node n : graph.getEachNode()) {
             StyleNode(n);
-            if (!n.hasAttribute("community") || n.getAttribute("community") == null) {
+            if (!n.hasAttribute(attribute) || n.getAttribute(attribute) == null) {
                 // Don't color it. Black is our special color.
                 uncommunitized++;
                 continue;
             }
             
-            Integer com = null;
-            if (n.getAttribute("community") instanceof HashSet<?>) {
-                if (((HashSet<Integer>) n.getAttribute("community")).size() > 1) {
+            Integer com;
+            if (n.getAttribute(attribute) instanceof HashSet<?>) {
+                if (((HashSet<Integer>) n.getAttribute(attribute)).size() > 1) {
                     com = -1;
                 } else {
-                    com = ((HashSet<Integer>) n.getAttribute("community")).iterator().next();
+                    com = ((HashSet<Integer>) n.getAttribute(attribute)).iterator().next();
                 }
             } else {
-                com = (Integer) n.getAttribute("community");
+                com = (Integer) n.getAttribute(attribute);
             }
             if (com == -1) {
                 colorMap.put(com,"255,0,0");
