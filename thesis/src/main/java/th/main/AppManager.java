@@ -161,96 +161,96 @@ public class AppManager {
 
     private void RangeAB(String datasetFile) throws IOException, GraphParseException, ParseException {
         File theFile = new File(datasetFile);
-        PrintWriter writer = new PrintWriter("../exports/" + theFile.getName().split("\\.")[0] + ".csv", "UTF-8");
-        writer.println("a,b,UncommunitizedVertices,NumberofIterations,"
-                + "BFScom,BFSNMI,BFSModularity,"
-                + "MaxToMinNormalWeihtsCom,MaxToMinNormalWeihtsNMI,MaxToMinNormalWeihtsModularity,"
-                + "MaxToMinP/degreeCom,MaxToMinP/degreeNMI,MaxToMinP/degreeModularity,"
-                + "MaxToMinP/SumPCom,MaxToMinP/SumPNMI,MaxToMinP/SumPModularity");
-        
-        // Init an origin graph, so we can calculate metrics
-        Graph originGraph = new DefaultGraph("Propinquity Dynamics");
-        originGraph.read(datasetFile);
-        InitWeights(originGraph);
-        
-        System.out.println("Dataset: " + datasetFile);
-
-        // Find max degree
-        Graph tmp = new DefaultGraph("Propinquity Dynamics");
-        tmp.read(datasetFile);
-        double[] degreeStats = DegreeStatistics(tmp);
-        System.out.println("Max Degree: " + degreeStats[0]);
-        System.out.println("Avg Degree: " + degreeStats[1]);
-
-        int maxB = MaxPropinquity(datasetFile);
-        for (int b = 0; b <= maxB; b++) {
-            for (int a = 0; a <= b; a++) {
-                Graph graph = new DefaultGraph("Propinquity Dynamics");
-                graph.read(datasetFile);
-
-                PropinquityDynamics pd = new PropinquityDynamics();
-                pd.set(a, b);
-
-                pd.init(graph);
-
-                int i = 0;
-                // We need to be sure that we dont have an infinite loop
-                while (i < 100 && !pd.didAbsoluteConvergence()) {
-                    pd.compute();
-                    i++;
-                }
-                pd.applyFinalTopology();
-
-                int uncommunitized = FindLonelyVertices(graph);
-                String toCSV = a + "," + b + "," + uncommunitized + "," + i + ",";
-                System.out.println("For a: " + a + " and b: " + b);
-                System.out.println("Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
-
-                int com = ExtractCommunities.BFS(graph);
-                Utils.CopyCommunities(graph, originGraph);
-                // Must be at least one community
-                if (com > 0) {
-                    Shark(originGraph);
-                }
-                double nmi = GetNMI(originGraph);
-                double modularity = GetModularity(originGraph);
-                ResetCommunities(graph);
-                toCSV += com + "," + nmi + "," + modularity + ",";
+        try (PrintWriter writer = new PrintWriter("../exports/" + theFile.getName().split("\\.")[0] + ".csv", "UTF-8")) {
+            writer.println("a,b,UncommunitizedVertices,NumberofIterations,"
+                    + "BFScom,BFSNMI,BFSModularity,"
+                    + "MaxToMinNormalWeihtsCom,MaxToMinNormalWeihtsNMI,MaxToMinNormalWeihtsModularity,"
+                    + "MaxToMinP/degreeCom,MaxToMinP/degreeNMI,MaxToMinP/degreeModularity,"
+                    + "MaxToMinP/SumPCom,MaxToMinP/SumPNMI,MaxToMinP/SumPModularity");
+            
+            // Init an origin graph, so we can calculate metrics
+            Graph originGraph = new DefaultGraph("Propinquity Dynamics");
+            originGraph.read(datasetFile);
+            InitWeights(originGraph);
+            
+            System.out.println("Dataset: " + datasetFile);
+            
+            // Find max degree
+            Graph tmp = new DefaultGraph("Propinquity Dynamics");
+            tmp.read(datasetFile);
+            double[] degreeStats = DegreeStatistics(tmp);
+            System.out.println("Max Degree: " + degreeStats[0]);
+            System.out.println("Avg Degree: " + degreeStats[1]);
+            
+            int maxB = MaxPropinquity(datasetFile);
+            for (int b = 0; b <= maxB; b++) {
+                for (int a = 0; a <= b; a++) {
+                    Graph graph = new DefaultGraph("Propinquity Dynamics");
+                    graph.read(datasetFile);
+                    
+                    PropinquityDynamics pd = new PropinquityDynamics();
+                    pd.set(a, b);
+                    
+                    pd.init(graph);
+                    
+                    int i = 0;
+                    // We need to be sure that we dont have an infinite loop
+                    while (i < 100 && !pd.didAbsoluteConvergence()) {
+                        pd.compute();
+                        i++;
+                    }
+                    pd.applyFinalTopology();
+                    
+                    int uncommunitized = FindLonelyVertices(graph);
+                    String toCSV = a + "," + b + "," + uncommunitized + "," + i + ",";
+                    System.out.println("For a: " + a + " and b: " + b);
+                    System.out.println("Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
+                    
+                    int com = ExtractCommunities.BFS(graph);
+                    Utils.CopyCommunities(graph, originGraph);
+                    // Must be at least one community
+                    if (com > 0) {
+                        Shark(originGraph);
+                    }
+                    double nmi = GetNMI(originGraph);
+                    double modularity = GetModularity(originGraph);
+                    ResetCommunities(graph);
+                    toCSV += com + "," + nmi + "," + modularity + ",";
 //                System.out.println("BFS found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
-
-                SetPDWeights(graph);
-                com = ExtractCommunities.MaxToMin(graph);
-                Utils.CopyCommunities(graph, originGraph);
-                Shark(originGraph);
-                nmi = GetNMI(originGraph);
-                modularity = GetModularity(originGraph);
-                ResetCommunities(graph);
-                toCSV += com + "," + nmi + "," + modularity + ",";
+                    
+                    SetPDWeights(graph);
+                    com = ExtractCommunities.MaxToMin(graph);
+                    Utils.CopyCommunities(graph, originGraph);
+                    Shark(originGraph);
+                    nmi = GetNMI(originGraph);
+                    modularity = GetModularity(originGraph);
+                    ResetCommunities(graph);
+                    toCSV += com + "," + nmi + "," + modularity + ",";
 //                System.out.println("MaxToMin (normal weihts) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
-
-                FractionWithNumberOfEdges(graph);
-                com = ExtractCommunities.MaxToMin(graph);
-                Utils.CopyCommunities(graph, originGraph);
-                Shark(originGraph);
-                nmi = GetNMI(originGraph);
-                modularity = GetModularity(originGraph);
-                ResetCommunities(graph);
-                toCSV += com + "," + nmi + "," + modularity + ",";
+                    
+                    FractionWithNumberOfEdges(graph);
+                    com = ExtractCommunities.MaxToMin(graph);
+                    Utils.CopyCommunities(graph, originGraph);
+                    Shark(originGraph);
+                    nmi = GetNMI(originGraph);
+                    modularity = GetModularity(originGraph);
+                    ResetCommunities(graph);
+                    toCSV += com + "," + nmi + "," + modularity + ",";
 //                System.out.println("MaxToMin (P/degree) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
-
-                FractionWithTotalPropinquity(graph);
-                com = ExtractCommunities.MaxToMin(graph);
-                Utils.CopyCommunities(graph, originGraph);
-                Shark(originGraph);
-                nmi = GetNMI(originGraph);
-                modularity = GetModularity(originGraph);
-                toCSV += com + "," + nmi + "," + modularity;
+                    
+                    FractionWithTotalPropinquity(graph);
+                    com = ExtractCommunities.MaxToMin(graph);
+                    Utils.CopyCommunities(graph, originGraph);
+                    Shark(originGraph);
+                    nmi = GetNMI(originGraph);
+                    modularity = GetModularity(originGraph);
+                    toCSV += com + "," + nmi + "," + modularity;
 //                System.out.println("MaxToMin (P/SumP) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
-                
-                writer.println(toCSV);
+                    
+                    writer.println(toCSV);
+                }
             }
         }
-        writer.close();
     }
 
     private void PDOriginalAndMaxToMin(String datasetFile) throws IOException, GraphParseException, ParseException {
