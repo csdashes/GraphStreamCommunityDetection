@@ -183,7 +183,7 @@ public class AppManager {
             System.out.println("Avg Degree: " + degreeStats[1]);
             
             int maxB = MaxPropinquity(datasetFile);
-            System.out.println("Max propinquity: " + degreeStats[1]);
+            System.out.println("Max propinquity: " + maxB);
             for (int b = 0; b <= maxB; b++) {
                 for (int a = 0; a <= b; a++) {
                     Graph graph = new DefaultGraph("Propinquity Dynamics");
