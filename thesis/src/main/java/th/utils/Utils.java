@@ -56,13 +56,9 @@ public class Utils {
             nodeCommunities = Arrays.asList(com);
         }
 
-        for (Integer com : nodeCommunities) {
-            // TODO: this is not optimal. in every iteration we create a wasted ArrayList
-            map.merge(com, new ArrayList<>(Arrays.asList(n.getId())), (v1, v2) -> {
-                v1.addAll(v2);
-                return v1;
-            });
-        }
+        nodeCommunities.stream().forEach((com) -> {
+            map.computeIfAbsent(com, k -> new ArrayList<>(3)).add(n.getId());
+        });
     }
 
     private static void WriteToONMIFile(Map<Integer, List<String>> map, String filename) throws FileNotFoundException, UnsupportedEncodingException {
