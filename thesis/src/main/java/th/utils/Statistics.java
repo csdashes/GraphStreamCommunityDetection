@@ -74,8 +74,8 @@ public class Statistics {
     }
 
     public static void PDStatistics(Graph graph, String graphName, int a, int b) throws FileNotFoundException, UnsupportedEncodingException {
-        Map<Integer, Integer> totalPDstats = new TreeMap<Integer, Integer>();
-        Map<Integer, Integer> edgeWeights = new TreeMap<Integer, Integer>();
+        Map<Integer, Integer> totalPDstats = new TreeMap<>();
+        Map<Integer, Integer> edgeWeights = new TreeMap<>();
 
         int maxDegree = -1, minDegree = Integer.MAX_VALUE, asum = 0, bsum = 0, nutralsum = 0,
                 oneEdgeVertices = 0, largestNdList = 0, largestNiList = 0;
@@ -95,13 +95,13 @@ public class Statistics {
 
             // total PD distribution count
             PropinquityMap pm = n.getAttribute("pm");
-            for (MutableInt i : pm.values()) {
+            pm.values().stream().forEach((i) -> {
                 if (totalPDstats.containsKey(i.get())) {
                     totalPDstats.put(i.get(), totalPDstats.get(i.get()) + 1);
                 } else {
                     totalPDstats.put(i.get(), 1);
                 }
-            }
+            });
 
             // count items that will be delete/stay/added
             Set<Integer> Nr = n.getAttribute("Nr");
@@ -153,19 +153,19 @@ public class Statistics {
         System.out.println("Largest Ni list: " + largestNiList);
         System.out.println("==================");
 
-        PrintWriter writer = new PrintWriter("../exports/" + graphName + "-edgesPD.csv", "UTF-8");
-        writer.println("number of edges,propinquity value");
-        for (Entry<Integer, Integer> entry : edgeWeights.entrySet()) {
-            writer.println((entry.getValue()) + "," + entry.getKey());
+        try (PrintWriter writer = new PrintWriter("../exports/" + graphName + "-edgesPD.csv", "UTF-8")) {
+            writer.println("number of edges,propinquity value");
+            edgeWeights.entrySet().stream().forEach((entry) -> {
+                writer.println((entry.getValue()) + "," + entry.getKey());
+            });
         }
-        writer.close();
 
-        PrintWriter writer2 = new PrintWriter("../exports/" + graphName + "-PD.csv", "UTF-8");
-        writer2.println("number of entries,propinquity value");
-        for (Entry<Integer, Integer> entry : totalPDstats.entrySet()) {
-            writer2.println((entry.getValue() / 2) + "," + entry.getKey());
+        try (PrintWriter writer2 = new PrintWriter("../exports/" + graphName + "-PD.csv", "UTF-8")) {
+            writer2.println("number of entries,propinquity value");
+            totalPDstats.entrySet().stream().forEach((entry) -> {
+                writer2.println((entry.getValue() / 2) + "," + entry.getKey());
+            });
         }
-        writer2.close();
     }
 
     /**
@@ -177,7 +177,7 @@ public class Statistics {
      * @throws java.io.UnsupportedEncodingException
      */
     public static void maxPDToAnyNode(Graph graph, String graphName) throws FileNotFoundException, UnsupportedEncodingException {
-        Map<Integer, Integer> maxPDPerNode = new TreeMap<Integer, Integer>();
+        Map<Integer, Integer> maxPDPerNode = new TreeMap<>();
         for (Node n : graph) {
             Integer localMaxPD = 0;
             PropinquityMap pm = (PropinquityMap) n.getAttribute("pm");
@@ -189,12 +189,12 @@ public class Statistics {
             }
             maxPDPerNode.put(n.getIndex(), localMaxPD);
         }
-        PrintWriter writer = new PrintWriter("../exports/" + graphName + "-maxPDToAnyNode.csv", "UTF-8");
-        writer.println("node index,max propinquity value");
-        for (Entry<Integer, Integer> entry : maxPDPerNode.entrySet()) {
-            writer.println(entry.getKey() + "," + (entry.getValue()));
+        try (PrintWriter writer = new PrintWriter("../exports/" + graphName + "-maxPDToAnyNode.csv", "UTF-8")) {
+            writer.println("node index,max propinquity value");
+            maxPDPerNode.entrySet().stream().forEach((entry) -> {
+                writer.println(entry.getKey() + "," + (entry.getValue()));
+            });
         }
-        writer.close();
     }
 
     /**
@@ -206,7 +206,7 @@ public class Statistics {
      * @throws UnsupportedEncodingException
      */
     public static void maxPDToAnyNeighbor(Graph graph, String graphName) throws FileNotFoundException, UnsupportedEncodingException {
-        Map<Integer, Integer> maxPDPerNeighbor = new TreeMap<Integer, Integer>();
+        Map<Integer, Integer> maxPDPerNeighbor = new TreeMap<>();
         for (Node n : graph) {
             Integer localMaxPD = 0;
             PropinquityMap pm = (PropinquityMap) n.getAttribute("pm");
@@ -222,12 +222,12 @@ public class Statistics {
             }
             maxPDPerNeighbor.put(n.getIndex(), localMaxPD);
         }
-        PrintWriter writer = new PrintWriter("../exports/" + graphName + "-maxPDToNeighbor.csv", "UTF-8");
-        writer.println("node index,max propinquity value");
-        for (Entry<Integer, Integer> entry : maxPDPerNeighbor.entrySet()) {
-            writer.println(entry.getKey() + "," + (entry.getValue()));
+        try (PrintWriter writer = new PrintWriter("../exports/" + graphName + "-maxPDToNeighbor.csv", "UTF-8")) {
+            writer.println("node index,max propinquity value");
+            maxPDPerNeighbor.entrySet().stream().forEach((entry) -> {
+                writer.println(entry.getKey() + "," + (entry.getValue()));
+            });
         }
-        writer.close();
     }
 
     public static void exportNodePDStatistics(Graph graph, String filename) throws IOException, GraphParseException {
@@ -250,9 +250,7 @@ public class Statistics {
             PrintWriter writer = null;
             try {
                 writer = new PrintWriter("../exports/" + filename + "_" + "node" + (id) + "-propinquityMap.csv", "UTF-8");
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(PropinquityDynamics.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (UnsupportedEncodingException ex) {
+            } catch (FileNotFoundException | UnsupportedEncodingException ex) {
                 Logger.getLogger(PropinquityDynamics.class.getName()).log(Level.SEVERE, null, ex);
             }
             writer.println("node index,propinquity to any,propinquity to neighbor");
