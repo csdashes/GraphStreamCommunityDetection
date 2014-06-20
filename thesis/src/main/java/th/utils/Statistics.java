@@ -33,17 +33,21 @@ public class Statistics {
         return MaxPropinquity(graph);
     }
     
-    public static int MaxPropinquity(Graph graph) {
+    public static int MaxPropinquity(Graph graph) throws GraphParseException {
         int maxProp = 0;
         
-        for (Node n : graph) {
-            PropinquityMap pm = (PropinquityMap) n.getAttribute("pm");
-            for (Entry<Integer, MutableInt> row : pm.entrySet()) {
-                Integer prop = row.getValue().get();
-                if (prop > maxProp) {
-                    maxProp = prop;
+        try {
+            for (Node n : graph) {
+                PropinquityMap pm = (PropinquityMap) n.getAttribute("pm");
+                for (Entry<Integer, MutableInt> row : pm.entrySet()) {
+                    Integer prop = row.getValue().get();
+                    if (prop > maxProp) {
+                        maxProp = prop;
+                    }
                 }
-            }
+            }            
+        } catch (NullPointerException e) {
+            throw new GraphParseException("Propinquity is null. Did you initialize the Propinquity Dynamics?");
         }
         
         return maxProp;
