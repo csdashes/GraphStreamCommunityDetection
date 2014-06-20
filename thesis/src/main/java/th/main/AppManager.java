@@ -210,9 +210,7 @@ public class AppManager {
                     int com = ExtractCommunities.BFS(graph);
                     Utils.CopyCommunities(graph, originGraph);
                     // Must be at least one community
-                    if (com > 0) {
-                        Shark(originGraph);
-                    }
+                    if (com > 0) Shark(originGraph);
                     double nmi = GetNMI(originGraph);
                     double modularity = GetModularity(originGraph);
                     ResetCommunities(graph);
@@ -222,7 +220,7 @@ public class AppManager {
                     SetPDWeights(graph);
                     com = ExtractCommunities.MaxToMin(graph);
                     Utils.CopyCommunities(graph, originGraph);
-                    Shark(originGraph);
+                    if (com > 0) Shark(originGraph);
                     nmi = GetNMI(originGraph);
                     modularity = GetModularity(originGraph);
                     ResetCommunities(graph);
@@ -232,7 +230,7 @@ public class AppManager {
                     FractionWithNumberOfEdges(graph);
                     com = ExtractCommunities.MaxToMin(graph);
                     Utils.CopyCommunities(graph, originGraph);
-                    Shark(originGraph);
+                    if (com > 0) Shark(originGraph);
                     nmi = GetNMI(originGraph);
                     modularity = GetModularity(originGraph);
                     ResetCommunities(graph);
@@ -242,7 +240,7 @@ public class AppManager {
                     FractionWithTotalPropinquity(graph);
                     com = ExtractCommunities.MaxToMin(graph);
                     Utils.CopyCommunities(graph, originGraph);
-                    Shark(originGraph);
+                    if (com > 0) Shark(originGraph);
                     nmi = GetNMI(originGraph);
                     modularity = GetModularity(originGraph);
                     toCSV += com + "," + nmi + "," + modularity;
