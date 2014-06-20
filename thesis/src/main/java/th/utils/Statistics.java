@@ -27,13 +27,13 @@ import th.algorithms.propinquitydynamics.utils.PropinquityMap;
  */
 public class Statistics {
 
-    public static int MaxPropinquity(String file) throws IOException, GraphParseException {
+    public static int MaxPropinquityToGraph(String file) throws IOException, GraphParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.read(file);
-        return MaxPropinquity(graph);
+        return MaxPropinquityToGraph(graph);
     }
     
-    public static int MaxPropinquity(Graph graph) {
+    public static int MaxPropinquityToGraph(Graph graph) {
         int maxProp = 0;
         
         try {
@@ -51,7 +51,7 @@ public class Statistics {
                 PropinquityDynamics pd = new PropinquityDynamics();
                 pd.init(graph);
                 
-                return MaxPropinquity(graph);
+                return MaxPropinquityToGraph(graph);
             } else {
                 throw e;
             }
