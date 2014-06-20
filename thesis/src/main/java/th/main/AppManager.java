@@ -176,13 +176,14 @@ public class AppManager {
             System.out.println("Dataset: " + datasetFile);
             
             // Find max degree
-            Graph tmp = new DefaultGraph("Propinquity Dynamics");
-            tmp.read(datasetFile);
-            double[] degreeStats = DegreeStatistics(tmp);
+            Graph tmp_graph = new DefaultGraph("Propinquity Dynamics");
+            tmp_graph.read(datasetFile);
+            double[] degreeStats = DegreeStatistics(tmp_graph);
             System.out.println("Max Degree: " + degreeStats[0]);
             System.out.println("Avg Degree: " + degreeStats[1]);
             
             int maxB = MaxPropinquity(datasetFile);
+            System.out.println("Max propinquity: " + degreeStats[1]);
             for (int b = 0; b <= maxB; b++) {
                 for (int a = 0; a <= b; a++) {
                     Graph graph = new DefaultGraph("Propinquity Dynamics");
