@@ -57,7 +57,7 @@ public class Utils {
         }
 
         nodeCommunities.stream().forEach((com) -> {
-            map.computeIfAbsent(com, k -> new ArrayList<>(3)).add(n.getId());
+            map.computeIfAbsent(com, (k) -> new ArrayList<>(3)).add(n.getId());
         });
     }
 
