@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
 import org.graphstream.graph.Graph;
@@ -34,6 +35,24 @@ import org.graphstream.util.parser.ParseException;
  */
 public class Utils {
 
+    public static void ParseOverlapCommunities(Graph graph) {
+        String attribute = "groundTruth";
+        
+        for (Node n: graph) {
+            if (n.hasAttribute(attribute) && n.getAttribute(attribute) instanceof String) {
+                String attr = (String) n.getAttribute(attribute);
+                String[] sa = attr.split("\\[",2)[1].split("\\]",2)[0].split(", ");
+                
+                Set<Integer> set = new HashSet<>(4);
+                for (String s : sa) {
+                    set.add(Integer.parseInt(s));
+                }
+                
+                n.setAttribute(attribute, set);
+            }            
+        }
+    }
+    
     private static String join(List<String> s, String delimiter) {
         StringBuilder builder = new StringBuilder(50);
         for (int i = 0; i < s.size() - 1; i++) {
