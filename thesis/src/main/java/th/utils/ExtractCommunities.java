@@ -34,12 +34,16 @@ public class ExtractCommunities {
             Node nn = it.next();
 
             if (nn.hasAttribute("community") && nn.getAttribute("community") != null) {
-                Integer com = (Integer) nn.getAttribute("community");
-                if (map.containsKey(com)) {
-                    map.put(com, map.get(com) + 1);
+                Collection<Integer> communities;
+                if (nn.getAttribute("community") instanceof Collection<?>) {
+                    communities = (Collection<Integer>) nn.getAttribute("community");
                 } else {
-                    map.put(com, 1);
+                    communities = Arrays.asList((Integer) nn.getAttribute("community"));
                 }
+
+                communities.stream().forEach((com) -> {
+                    map.compute(com, (k, v) -> v == null ? 1 : v + 1);
+                });
             }
         }
 
