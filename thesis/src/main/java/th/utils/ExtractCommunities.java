@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
@@ -143,11 +142,14 @@ public class ExtractCommunities {
         }
     }
 
-    public static int MaxToMin(Graph graph, boolean overlap) {
+    public static int[] MaxToMin(Graph graph, boolean overlap) {
         SortedMap<Double, Set<Node>> groupedVertices = new TreeMap<>(Collections.reverseOrder());
 
+        // for each edge
         graph.getEdgeSet().stream().forEach((e) -> {
+            // get the weight
             Double weight = e.getAttribute("weight");
+            // and add weight - set(node) pairs
             groupedVertices.computeIfAbsent(weight, (k) -> new HashSet<>(30)).addAll(Arrays.asList(e.getNode0(), e.getNode1()));
         });
 
@@ -160,12 +162,19 @@ public class ExtractCommunities {
             }
         }
 
+        int overlaps = 0;
         // Delete visited attribute
         for (Node n : graph) {
             n.removeAttribute("visited");
+            if (overlap) {
+                if (((HashSet<Integer>) n.getAttribute("community")).size() > 1) {
+                    overlaps++;
+                }
+            }
         }
 
-        return communityNum;
+        int[] out = {communityNum, overlaps};
+        return out;
     }
 
     public static int BFS(Graph graph) {
