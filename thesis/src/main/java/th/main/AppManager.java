@@ -155,7 +155,7 @@ public class AppManager {
 //        com = ExtractCommunities.MaxToMin(graph);
 //        System.out.println("MaxToMin(PD/degree) found: " + com);
 //        FractionWithTotalPropinquity(graph);
-//        com = ExtractCommunities.MaxToMin(graph);
+//        com = ExtractCommunities.MaxToMin(graph, true);
 //        System.out.println("MaxToMin(PD/SumPD) found: " + com);
 
         Graph originGraph = new DefaultGraph("Propinquity Dynamics");
@@ -277,7 +277,7 @@ public class AppManager {
 
         // Use our custom extraction algorithm to retrive internal communities
         SetPDWeights(graph);
-        int com = ExtractCommunities.MaxToMin(graph, false);
+        int[] com = ExtractCommunities.MaxToMin(graph, false);
 
         Graph originGraph = new DefaultGraph("Propinquity Dynamics");
         originGraph.display();
@@ -285,7 +285,7 @@ public class AppManager {
         GraphUtils.CopyCommunities(graph, originGraph);
 
         int uncommunitized = UIToolbox.ColorCommunities(originGraph);
-        System.out.println("Number of communities: " + com + " Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
+        System.out.println("Number of communities: " + com[0] + " Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
 
     }
 
@@ -312,9 +312,9 @@ public class AppManager {
         //Utils.FractionWithTotalPropinquity(graph);
 
         // Use our custom extraction algorithm to retrive internal communities
-        int com = ExtractCommunities.MaxToMin(graph, false);
+        int[] com = ExtractCommunities.MaxToMin(graph, false);
         UIToolbox.ColorCommunities(graph);
-        System.out.println("Number of communities: " + com);
+        System.out.println("Number of communities: " + com[0]);
     }
 
     private void ErdozSubgraphwithOriginalPDAndTwoDisplays(String datasetFile) throws IOException, ParseException, GraphParseException {
