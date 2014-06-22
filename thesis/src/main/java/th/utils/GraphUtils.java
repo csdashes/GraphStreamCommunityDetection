@@ -87,7 +87,11 @@ public class GraphUtils {
 
         for (Node n : sourceGraph) {
             if (n.getAttribute("community") instanceof HashSet<?>) {
-                targetGraph.getNode(n.getIndex()).setAttribute("community", (HashSet<Integer>) n.getAttribute("community"));
+                if (((HashSet<Integer>) n.getAttribute("community")).size() == 1) {
+                    targetGraph.getNode(n.getIndex()).setAttribute("community", ((HashSet<Integer>) n.getAttribute("community")).stream().findFirst().get());
+                } else {
+                    targetGraph.getNode(n.getIndex()).setAttribute("community", (HashSet<Integer>) n.getAttribute("community"));
+                }
             } else {
                 targetGraph.getNode(n.getIndex()).setAttribute("community", (Integer) n.getAttribute("community"));
             }
