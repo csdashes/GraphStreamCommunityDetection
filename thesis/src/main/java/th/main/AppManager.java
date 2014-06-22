@@ -139,15 +139,18 @@ public class AppManager {
         System.out.println("a" + a + "b" + b);
         System.out.println("Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
 
-        int com;
+        int com, overlaps;
+        int[] output;
 //        com = ExtractCommunities.BFS(graph);
 //        ResetCommunities(graph);
 //        System.out.println("BFS found: " + com);
 
         SetPDWeights(graph);
-        com = ExtractCommunities.MaxToMin(graph, false);
-        System.out.println("MaxToMin(normal weihts) found: " + com);
-
+        output = ExtractCommunities.MaxToMin(graph, true);
+        com = output[0];
+        overlaps = output[1];
+        System.out.println("MaxToMin(normal weihts) found: " + com + " communities. And: " + overlaps + " overlaps");
+        
 //        FractionWithNumberOfEdges(graph);
 //        com = ExtractCommunities.MaxToMin(graph);
 //        System.out.println("MaxToMin(PD/degree) found: " + com);
@@ -158,17 +161,17 @@ public class AppManager {
         Graph originGraph = new DefaultGraph("Propinquity Dynamics");
         originGraph.display();
         originGraph.read(datasetFile);
-        if (true) GraphUtils.ParseOverlapCommunities(originGraph);
-//        Utils.CopyCommunities(graph, originGraph);
-//        
-//        Shark(originGraph);
+//        GraphUtils.ParseOverlapCommunities(originGraph);
+        CopyCommunities(graph, originGraph);
+        
 
-        UIToolbox.ColorCommunities(originGraph, "groundTruth");
-//        double nmi = GetNMI(originGraph);
-//        System.out.println("NMI: " + nmi);
+        Shark(originGraph);
+        UIToolbox.ColorCommunities(originGraph);
+        double nmi = GetNMI(originGraph);
+        System.out.println("NMI: " + nmi);
 
         File theFile = new File(datasetFile);
-        FileUtils.DumpCommunitiesAndGroundTruth(originGraph, "../exports/" + theFile.getName().split("\\.")[0] + ".communities.txt",  "../exports/" + theFile.getName().split("\\.")[0] + ".groundTruth.txt", "community", "groundTruth");
+//        FileUtils.DumpCommunitiesAndGroundTruth(originGraph, "../exports/" + theFile.getName().split("\\.")[0] + ".communities.txt",  "../exports/" + theFile.getName().split("\\.")[0] + ".groundTruth.txt", "community", "groundTruth");
     }
 
     private void RangeAB(String datasetFile, boolean overlapCommunities) throws IOException, GraphParseException, ParseException {
@@ -216,35 +219,36 @@ public class AppManager {
                 System.out.println("Un-communitized Vertices: " + uncommunitized + " Number of Iterations: " + i);
                 fu.append(a + "," + b + "," + uncommunitized + "," + i + ",");
 
-                int com = ExtractCommunities.BFS(graph);
+                int[] output = new int[2];
+                output[0] = ExtractCommunities.BFS(graph);
                 GraphUtils.CopyCommunities(graph, originGraph);
                 // Must be at least one community
-                if (com > 0) Shark(originGraph);
+                if (output[0] > 0) Shark(originGraph);
                 ResetCommunities(graph);
-                fu.append(originGraph, com);
+                fu.append(originGraph, output);
 //                System.out.println("BFS found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 SetPDWeights(graph);
-                com = ExtractCommunities.MaxToMin(graph, overlapCommunities);
+                output = ExtractCommunities.MaxToMin(graph, overlapCommunities);
                 GraphUtils.CopyCommunities(graph, originGraph);
-                if (com > 0) Shark(originGraph);
+                if (output[0] > 0) Shark(originGraph);
                 ResetCommunities(graph);
-                fu.append(originGraph, com);
+                fu.append(originGraph, output);
 //                System.out.println("MaxToMin (normal weihts) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 FractionWithNumberOfEdges(graph);
-                com = ExtractCommunities.MaxToMin(graph, overlapCommunities);
+                output = ExtractCommunities.MaxToMin(graph, overlapCommunities);
                 GraphUtils.CopyCommunities(graph, originGraph);
-                if (com > 0) Shark(originGraph);
+                if (output[0] > 0) Shark(originGraph);
                 ResetCommunities(graph);
-                fu.append(originGraph, com);
+                fu.append(originGraph, output);
 //                System.out.println("MaxToMin (P/degree) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 FractionWithTotalPropinquity(graph);
-                com = ExtractCommunities.MaxToMin(graph, overlapCommunities);
+                output = ExtractCommunities.MaxToMin(graph, overlapCommunities);
                 GraphUtils.CopyCommunities(graph, originGraph);
-                if (com > 0) Shark(originGraph);
-                fu.append(originGraph, com);
+                if (output[0] > 0) Shark(originGraph);
+                fu.append(originGraph, output);
 //                System.out.println("MaxToMin (P/SumP) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
                 
                 fu.finishEntry();

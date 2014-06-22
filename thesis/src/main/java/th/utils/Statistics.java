@@ -61,12 +61,12 @@ public class Statistics {
             this.filename = this.filePrefix + "." + str.replaceAll(",", "\\.");
         }
 
-        private void appendOverlap(Graph graph, int com) {
+        private void appendOverlap(Graph graph, int[] com_overlap) {
             String algorithm = this.q.poll();
             this.q.add(algorithm);
 
             try {
-                FileUtils.DumpCommunities(graph, this.filename + com + "." + algorithm + ".txt", "community");
+                FileUtils.DumpCommunities(graph, this.filename + com_overlap[0] + "." + com_overlap[1] + "." + algorithm + ".txt", "community");
             } catch (FileNotFoundException | UnsupportedEncodingException ex) {
                 Logger.getLogger(FileUtils.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -76,11 +76,11 @@ public class Statistics {
             this.toCSV += str;
         }
 
-        private void appendCommunity(Graph graph, int com) {
+        private void appendCommunity(Graph graph, int[] com_overlap) {
             double nmi = GetNMI(graph);
             double modularity = GetModularity(graph);
 
-            this.toCSV += com + "," + nmi + "," + modularity + ",";
+            this.toCSV += com_overlap[0] + "," + nmi + "," + modularity + ",";
         }
 
         private void finishEntryCommunity() {
@@ -115,12 +115,12 @@ public class Statistics {
             appendOverlap(str);
         }
 
-        public void append(Graph graph, int com) {
+        public void append(Graph graph, int[] com_overlap) {
             if (!this.overlapCommunities) {
-                appendCommunity(graph, com);
+                appendCommunity(graph, com_overlap);
                 return;
             }
-            appendOverlap(graph, com);
+            appendOverlap(graph, com_overlap);
         }
 
         public void finishEntry() {
