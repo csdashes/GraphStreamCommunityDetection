@@ -1,10 +1,13 @@
 package th.utils;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
@@ -22,7 +25,7 @@ import org.graphstream.graph.Node;
  */
 public class ExtractCommunities {
 
-    private static SortedMap<Integer, Integer> GetNeighborCommunitiesFrequencies(Node n) {
+    private static SortedMap<Integer, Integer> GetNeighborCommunityFrequencies(Node n) {
         Map<Integer, Integer> map = new HashMap<>(10);
         SortedMap<Integer, Integer> sorted_map = new TreeMap<>(Collections.reverseOrder());
 
@@ -48,13 +51,13 @@ public class ExtractCommunities {
 
     public static void Shark(Graph graph) {
         boolean uncommunitizedVertExist;
-        
+
         do {
             uncommunitizedVertExist = false;
             for (Node n : graph) {
-                if (n.getDegree()>0 && n.getAttribute("community") == null) {
+                if (n.getDegree() > 0 && n.getAttribute("community") == null) {
                     uncommunitizedVertExist = true;
-                    SortedMap<Integer, Integer> neighborCommunites = GetNeighborCommunitiesFrequencies(n);
+                    SortedMap<Integer, Integer> neighborCommunites = GetNeighborCommunityFrequencies(n);
                     if (neighborCommunites.size() > 0) {
                         Integer com = neighborCommunites.entrySet().iterator().next().getValue();
                         n.addAttribute("community", com);
@@ -80,16 +83,6 @@ public class ExtractCommunities {
         return areWeTheStrongestEdge;
     }
 
-    private static void AddToConsequentMap(SortedMap<Double, Set<Node>> map, Double w, Node n) {
-        if (map.containsKey(w)) {
-            map.get(w).add(n);
-        } else {
-            Set<Node> l = new HashSet<>(4);
-            l.add(n);
-            map.put(w, l);
-        }
-    }
-
     private static void AddNextSteps(Node n, Queue<Node> head, SortedMap<Double, Set<Node>> consequent, Double currentSearchWeight, int community, boolean overlap) {
         for (Edge e : n.getEachEdge()) {
             Double weight = e.getAttribute("weight");
@@ -101,7 +94,7 @@ public class ExtractCommunities {
                         ((Set<Integer>) neightbor.getAttribute("community")).add(community);
                     }
                 } else if (weight < currentSearchWeight) {
-                    AddToConsequentMap(consequent, weight, neightbor);
+                    consequent.computeIfAbsent(weight, (k) -> new HashSet<>(30)).add(neightbor);
                     // If we are equal, go and it to head
                 } else if (AreEqual(weight, currentSearchWeight)) {
                     if (!head.contains(neightbor)) {
@@ -116,7 +109,7 @@ public class ExtractCommunities {
         if (overlap) {
             Set<Integer> s = new HashSet<>(4);
             s.add(community);
-            n.addAttribute("community", s);   
+            n.addAttribute("community", s);
         } else {
             n.addAttribute("community", community);
         }
@@ -151,8 +144,7 @@ public class ExtractCommunities {
 
         graph.getEdgeSet().stream().forEach((e) -> {
             Double weight = e.getAttribute("weight");
-            AddToConsequentMap(groupedVertices, weight, e.getNode0());
-            AddToConsequentMap(groupedVertices, weight, e.getNode1());
+            groupedVertices.computeIfAbsent(weight, (k) -> new HashSet<>(30)).addAll(Arrays.asList(e.getNode0(), e.getNode1()));
         });
 
         int communityNum = 0;
@@ -165,7 +157,7 @@ public class ExtractCommunities {
         }
 
         // Delete visited attribute
-        for (Node n : graph.getEachNode()) {
+        for (Node n : graph) {
             n.removeAttribute("visited");
         }
 
