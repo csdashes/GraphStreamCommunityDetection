@@ -23,8 +23,8 @@ import org.graphstream.graph.Node;
 public class ExtractCommunities {
 
     private static SortedMap<Integer, Integer> GetNeighborCommunitiesFrequencies(Node n) {
-        Map<Integer, Integer> map = new HashMap<Integer, Integer>(10);
-        SortedMap<Integer, Integer> sorted_map = new TreeMap<Integer, Integer>(Collections.reverseOrder());
+        Map<Integer, Integer> map = new HashMap<>(10);
+        SortedMap<Integer, Integer> sorted_map = new TreeMap<>(Collections.reverseOrder());
 
         Iterator<Node> it = n.getNeighborNodeIterator();
         while (it.hasNext()) {
@@ -40,9 +40,9 @@ public class ExtractCommunities {
             }
         }
 
-        for (Entry<Integer, Integer> e : map.entrySet()) {
+        map.entrySet().stream().forEach((e) -> {
             sorted_map.put(e.getValue(), e.getKey());
-        }
+        });
         return sorted_map;
     }
 
@@ -84,7 +84,7 @@ public class ExtractCommunities {
         if (map.containsKey(w)) {
             map.get(w).add(n);
         } else {
-            Set<Node> l = new HashSet<Node>(4);
+            Set<Node> l = new HashSet<>(4);
             l.add(n);
             map.put(w, l);
         }
@@ -114,8 +114,8 @@ public class ExtractCommunities {
     }
 
     private static void WeightedBFS(Node n, int community, Double currentSearchWeight) {
-        SortedMap<Double, Set<Node>> subsequent = new TreeMap<Double, Set<Node>>(Collections.reverseOrder());
-        Queue<Node> head = new LinkedList<Node>();
+        SortedMap<Double, Set<Node>> subsequent = new TreeMap<>(Collections.reverseOrder());
+        Queue<Node> head = new LinkedList<>();
 
         // Find max weight for first iter.
         AddNextSteps(n, head, subsequent, currentSearchWeight, community);
@@ -144,14 +144,13 @@ public class ExtractCommunities {
     }
 
     public static int MaxToMin(Graph graph) {
-        SortedMap<Double, Set<Node>> groupedVertices = new TreeMap<Double, Set<Node>>(Collections.reverseOrder());
+        SortedMap<Double, Set<Node>> groupedVertices = new TreeMap<>(Collections.reverseOrder());
 
-        // We need to sort the edges, so we know where to start from
-        for (Edge e : graph.getEdgeSet()) {
+        graph.getEdgeSet().stream().forEach((e) -> {
             Double weight = e.getAttribute("weight");
             AddToConsequentMap(groupedVertices, weight, e.getNode0());
             AddToConsequentMap(groupedVertices, weight, e.getNode1());
-        }
+        });
 
         int communityNum = 0;
         for (Entry<Double, Set<Node>> en : groupedVertices.entrySet()) {
