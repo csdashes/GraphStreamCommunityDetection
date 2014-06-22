@@ -4,9 +4,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -19,6 +22,8 @@ import org.graphstream.stream.GraphParseException;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
 import th.algorithms.propinquitydynamics.utils.MutableInt;
 import th.algorithms.propinquitydynamics.utils.PropinquityMap;
+import static th.utils.Metrics.GetModularity;
+import static th.utils.Metrics.GetNMI;
 
 /**
  *
@@ -27,15 +32,119 @@ import th.algorithms.propinquitydynamics.utils.PropinquityMap;
  */
 public class Statistics {
 
+    public static class RangeABStatistics {
+
+        private String toCSV = "";
+        private String filePrefix = "";
+        private PrintWriter writer = null;
+        private final boolean overlapCommunities;
+        private Queue<String> q;
+        private String filename;
+
+        private void initOverlap(String filename) {
+            this.filePrefix = filename;
+
+            this.q = new LinkedList<>(Arrays.asList("BFS", "MaxToMinNormal", "MaxToMinPdegree", "MaxToMinPSumP"));
+        }
+
+        private void initCommunity(String filename) throws FileNotFoundException, UnsupportedEncodingException {
+            this.writer = new PrintWriter(filename, "UTF-8");
+
+            this.writer.println("a,b,UncommunitizedVertices,NumberofIterations,"
+                    + "BFScom,BFSNMI,BFSModularity,"
+                    + "MaxToMinNormalWeihtsCom,MaxToMinNormalWeihtsNMI,MaxToMinNormalWeihtsModularity,"
+                    + "MaxToMinP/degreeCom,MaxToMinP/degreeNMI,MaxToMinP/degreeModularity,"
+                    + "MaxToMinP/SumPCom,MaxToMinP/SumPNMI,MaxToMinP/SumPModularity");
+        }
+
+        private void appendOverlap(String str) {
+            this.filename = this.filePrefix + str.replaceAll(",", "\\.");
+        }
+
+        private void appendOverlap(Graph graph, int com) {
+            String algorithm = this.q.poll();
+            this.q.add(algorithm);
+
+            try {
+                FileUtils.DumpCommunities(graph, this.filename + com + "." + algorithm + ".txt", "community");
+            } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                Logger.getLogger(FileUtils.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        private void appendCommunity(String str) {
+            this.toCSV += str;
+        }
+
+        private void appendCommunity(Graph graph, int com) {
+            double nmi = GetNMI(graph);
+            double modularity = GetModularity(graph);
+
+            this.toCSV += com + "," + nmi + "," + modularity + ",";
+        }
+
+        private void finishEntryCommunity() {
+            this.writer.println(this.toCSV);
+            this.toCSV = "";
+        }
+
+        private void finishCommunity() {
+            this.writer.close();
+        }
+
+        /* 
+         * Constructor
+         */
+        public RangeABStatistics(boolean overlapCommunities) {
+            this.overlapCommunities = overlapCommunities;
+        }
+
+        public void init(String filename) throws FileNotFoundException, UnsupportedEncodingException {
+            if (!this.overlapCommunities) {
+                initCommunity(filename);
+                return;
+            }
+            initOverlap(filename);
+        }
+
+        public void append(String str) {
+            if (!this.overlapCommunities) {
+                appendCommunity(str);
+                return;
+            }
+            appendOverlap(str);
+        }
+
+        public void append(Graph graph, int com) {
+            if (!this.overlapCommunities) {
+                appendCommunity(graph, com);
+                return;
+            }
+            appendOverlap(graph, com);
+        }
+
+        public void finishEntry() {
+            if (!this.overlapCommunities) {
+                finishEntryCommunity();
+            }
+        }
+
+        public void finish() {
+            if (!this.overlapCommunities) {
+                finishCommunity();
+            }
+        }
+    }
+
     public static int MaxPropinquityToGraph(String file) throws IOException, GraphParseException {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.read(file);
         return MaxPropinquityToGraph(graph);
     }
-    
+
     public static int MaxPropinquityToGraph(Graph graph) {
         int maxProp = 0;
-        
+
         try {
             for (Node n : graph) {
                 PropinquityMap pm = (PropinquityMap) n.getAttribute("pm");
@@ -45,21 +154,21 @@ public class Statistics {
                         maxProp = prop;
                     }
                 }
-            }            
+            }
         } catch (NullPointerException e) {
             if (graph.getNode(0).getAttribute("pm") == null) {
                 PropinquityDynamics pd = new PropinquityDynamics();
                 pd.init(graph);
-                
+
                 return MaxPropinquityToGraph(graph);
             } else {
                 throw e;
             }
         }
-        
+
         return maxProp;
-    }    
-    
+    }
+
     public static double[] DegreeStatistics(Graph graph) {
         double maxDegree = 0.0, avgDegree = 0.0;
         for (Node n : graph) {
@@ -69,7 +178,7 @@ public class Statistics {
             avgDegree += n.getDegree();
         }
 
-        double[] output = { maxDegree, (avgDegree/graph.getNodeCount()) };
+        double[] output = {maxDegree, (avgDegree / graph.getNodeCount())};
         return output;
     }
 
