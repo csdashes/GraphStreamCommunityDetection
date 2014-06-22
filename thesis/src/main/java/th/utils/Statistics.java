@@ -58,7 +58,7 @@ public class Statistics {
         }
 
         private void appendOverlap(String str) {
-            this.filename = this.filePrefix + str.replaceAll(",", "\\.");
+            this.filename = this.filePrefix + "." + str.replaceAll(",", "\\.");
         }
 
         private void appendOverlap(Graph graph, int com) {
