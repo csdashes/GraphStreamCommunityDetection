@@ -167,7 +167,7 @@ public class ExtractCommunities {
         for (Node n : graph) {
             n.removeAttribute("visited");
             if (overlap) {
-                if (((HashSet<Integer>) n.getAttribute("community")).size() > 1) {
+                if (n.hasAttribute("community") && ((HashSet<Integer>) n.getAttribute("community")).size() > 1) {
                     overlaps++;
                 }
             }
