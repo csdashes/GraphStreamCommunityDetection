@@ -136,7 +136,7 @@ public class ExtractCommunities {
                 Node next = head.poll();
                 AddNextSteps(next, head, subsequent, currentSearchWeight, community, overlap);
                 next.addAttribute("visited", 1);
-                AddNodeToCommunity(n, community, overlap);
+                AddNodeToCommunity(next, community, overlap);
             }
 
             if (!subsequent.isEmpty()) {
