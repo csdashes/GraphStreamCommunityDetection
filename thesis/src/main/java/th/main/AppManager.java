@@ -224,6 +224,7 @@ public class AppManager {
                 GraphUtils.CopyCommunities(graph, originGraph);
                 // Must be at least one community
                 if (output[0] > 0) Shark(originGraph);
+                if (output[1] > 0) System.out.println("Overlaping nodes: " + output[1]);
                 ResetCommunities(graph);
                 fu.append(originGraph, output);
 //                System.out.println("BFS found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
@@ -232,6 +233,7 @@ public class AppManager {
                 output = ExtractCommunities.MaxToMin(graph, overlapCommunities);
                 GraphUtils.CopyCommunities(graph, originGraph);
                 if (output[0] > 0) Shark(originGraph);
+                if (output[1] > 0) System.out.println("Overlaping nodes: " + output[1]);
                 ResetCommunities(graph);
                 fu.append(originGraph, output);
 //                System.out.println("MaxToMin (normal weihts) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
@@ -240,6 +242,7 @@ public class AppManager {
                 output = ExtractCommunities.MaxToMin(graph, overlapCommunities);
                 GraphUtils.CopyCommunities(graph, originGraph);
                 if (output[0] > 0) Shark(originGraph);
+                if (output[1] > 0) System.out.println("Overlaping nodes: " + output[1]);
                 ResetCommunities(graph);
                 fu.append(originGraph, output);
 //                System.out.println("MaxToMin (P/degree) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
@@ -249,6 +252,7 @@ public class AppManager {
                 GraphUtils.CopyCommunities(graph, originGraph);
                 if (output[0] > 0) Shark(originGraph);
                 fu.append(originGraph, output);
+                if (output[1] > 0) System.out.println("Overlaping nodes: " + output[1]);
 //                System.out.println("MaxToMin (P/SumP) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
                 
                 fu.finishEntry();
