@@ -20,6 +20,11 @@ import static th.algorithms.propinquitydynamics.utils.Utils.SetPDWeights;
 import th.utils.ExtractCommunities;
 import static th.utils.ExtractCommunities.Shark;
 import th.utils.FileUtils;
+import th.utils.GraphUtils;
+import static th.utils.GraphUtils.CopyCommunities;
+import static th.utils.GraphUtils.FindLonelyVertices;
+import static th.utils.GraphUtils.InitWeights;
+import static th.utils.GraphUtils.ResetCommunities;
 import th.utils.Menu;
 import static th.utils.Metrics.GetModularity;
 import static th.utils.Metrics.GetNMI;
@@ -28,10 +33,6 @@ import static th.utils.Statistics.DegreeStatistics;
 import static th.utils.Statistics.MaxPropinquityToGraph;
 import th.utils.Statistics.RangeABStatistics;
 import th.utils.UIToolbox;
-import th.utils.GraphUtils;
-import static th.utils.GraphUtils.FindLonelyVertices;
-import static th.utils.GraphUtils.InitWeights;
-import static th.utils.GraphUtils.ResetCommunities;
 
 /**
  *
@@ -224,7 +225,7 @@ public class AppManager {
 //                System.out.println("BFS found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 SetPDWeights(graph);
-                com = ExtractCommunities.MaxToMin(graph, true);
+                com = ExtractCommunities.MaxToMin(graph, overlapCommunities);
                 GraphUtils.CopyCommunities(graph, originGraph);
                 if (com > 0) Shark(originGraph);
                 ResetCommunities(graph);
@@ -232,7 +233,7 @@ public class AppManager {
 //                System.out.println("MaxToMin (normal weihts) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 FractionWithNumberOfEdges(graph);
-                com = ExtractCommunities.MaxToMin(graph, true);
+                com = ExtractCommunities.MaxToMin(graph, overlapCommunities);
                 GraphUtils.CopyCommunities(graph, originGraph);
                 if (com > 0) Shark(originGraph);
                 ResetCommunities(graph);
@@ -240,7 +241,7 @@ public class AppManager {
 //                System.out.println("MaxToMin (P/degree) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 FractionWithTotalPropinquity(graph);
-                com = ExtractCommunities.MaxToMin(graph, true);
+                com = ExtractCommunities.MaxToMin(graph, overlapCommunities);
                 GraphUtils.CopyCommunities(graph, originGraph);
                 if (com > 0) Shark(originGraph);
                 fu.append(originGraph, com);
