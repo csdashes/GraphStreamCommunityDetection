@@ -3,6 +3,10 @@ package th.main;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
@@ -15,17 +19,19 @@ import static th.algorithms.propinquitydynamics.utils.Utils.MaxPropinquityToNonN
 import static th.algorithms.propinquitydynamics.utils.Utils.SetPDWeights;
 import th.utils.ExtractCommunities;
 import static th.utils.ExtractCommunities.Shark;
+import th.utils.FileUtils;
 import th.utils.Menu;
 import static th.utils.Metrics.GetModularity;
 import static th.utils.Metrics.GetNMI;
 import th.utils.Statistics;
 import static th.utils.Statistics.DegreeStatistics;
 import static th.utils.Statistics.MaxPropinquityToGraph;
+import th.utils.Statistics.RangeABStatistics;
 import th.utils.UIToolbox;
-import th.utils.Utils;
-import static th.utils.Utils.FindLonelyVertices;
-import static th.utils.Utils.InitWeights;
-import static th.utils.Utils.ResetCommunities;
+import th.utils.GraphUtils;
+import static th.utils.GraphUtils.FindLonelyVertices;
+import static th.utils.GraphUtils.InitWeights;
+import static th.utils.GraphUtils.ResetCommunities;
 
 /**
  *
