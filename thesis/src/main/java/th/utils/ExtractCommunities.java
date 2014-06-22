@@ -90,16 +90,15 @@ public class ExtractCommunities {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static void AddNextSteps(Node n, Queue<Node> head, SortedMap<Double, Set<Node>> consequent, Double currentSearchWeight, int community) {
+    private static void AddNextSteps(Node n, Queue<Node> head, SortedMap<Double, Set<Node>> consequent, Double currentSearchWeight, int community, boolean overlap) {
         for (Edge e : n.getEachEdge()) {
             Double weight = e.getAttribute("weight");
             Node neightbor = e.getOpposite(n);
 
             if (AreWeTheStrongestEdge(neightbor, weight)) {
                 if (neightbor.hasAttribute("visited")) {
-                    if (neightbor.hasAttribute("community")) {
-//                        ((Set<Integer>) neightbor.getAttribute("community")).add(community);
+                    if (overlap && neightbor.hasAttribute("community")) {
+                        ((Set<Integer>) neightbor.getAttribute("community")).add(community);
                     }
                 } else if (weight < currentSearchWeight) {
                     AddToConsequentMap(consequent, weight, neightbor);
@@ -113,27 +112,31 @@ public class ExtractCommunities {
         }
     }
 
-    private static void WeightedBFS(Node n, int community, Double currentSearchWeight) {
+    private static void AddNodeToCommunity(Node n, int community, boolean overlap) {
+        if (overlap) {
+            Set<Integer> s = new HashSet<>(4);
+            s.add(community);
+            n.addAttribute("community", s);   
+        } else {
+            n.addAttribute("community", community);
+        }
+    }
+
+    private static void WeightedBFS(Node n, int community, Double currentSearchWeight, boolean overlap) {
         SortedMap<Double, Set<Node>> subsequent = new TreeMap<>(Collections.reverseOrder());
         Queue<Node> head = new LinkedList<>();
 
         // Find max weight for first iter.
-        AddNextSteps(n, head, subsequent, currentSearchWeight, community);
+        AddNextSteps(n, head, subsequent, currentSearchWeight, community, overlap);
         n.addAttribute("visited", 1);
-//        Set<Integer> s = new HashSet<Integer>();
-//        s.add(community);
-//        n.addAttribute("community", s);
-        n.addAttribute("community", community);
+        AddNodeToCommunity(n, community, overlap);
 
         while (!subsequent.isEmpty() || !head.isEmpty()) {
             while (!head.isEmpty()) {
                 Node next = head.poll();
-                AddNextSteps(next, head, subsequent, currentSearchWeight, community);
+                AddNextSteps(next, head, subsequent, currentSearchWeight, community, overlap);
                 next.addAttribute("visited", 1);
-//                Set<Integer> se = new HashSet<Integer>();
-//                se.add(community);
-//                next.addAttribute("community", se);
-                next.addAttribute("community", community);
+                AddNodeToCommunity(n, community, overlap);
             }
 
             if (!subsequent.isEmpty()) {
@@ -143,7 +146,7 @@ public class ExtractCommunities {
         }
     }
 
-    public static int MaxToMin(Graph graph) {
+    public static int MaxToMin(Graph graph, boolean overlap) {
         SortedMap<Double, Set<Node>> groupedVertices = new TreeMap<>(Collections.reverseOrder());
 
         graph.getEdgeSet().stream().forEach((e) -> {
@@ -156,7 +159,7 @@ public class ExtractCommunities {
         for (Entry<Double, Set<Node>> en : groupedVertices.entrySet()) {
             for (Node n : en.getValue()) {
                 if (!n.hasAttribute("visited")) {
-                    WeightedBFS(n, communityNum++, en.getKey());
+                    WeightedBFS(n, communityNum++, en.getKey(), overlap);
                 }
             }
         }
