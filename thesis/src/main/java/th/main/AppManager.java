@@ -150,7 +150,7 @@ public class AppManager {
         com = output[0];
         overlaps = output[1];
         System.out.println("MaxToMin(normal weihts) found: " + com + " communities. And: " + overlaps + " overlaps");
-        
+
 //        FractionWithNumberOfEdges(graph);
 //        com = ExtractCommunities.MaxToMin(graph);
 //        System.out.println("MaxToMin(PD/degree) found: " + com);
@@ -233,7 +233,7 @@ public class AppManager {
                 output = ExtractCommunities.MaxToMin(graph, overlapCommunities);
                 GraphUtils.CopyCommunities(graph, originGraph);
                 if (output[0] > 0) Shark(originGraph);
-                if (output[1] > 0) System.out.println("Overlaping nodes: " + output[1]);
+                if (output[1] > 0) System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
                 ResetCommunities(graph);
                 fu.append(originGraph, output);
 //                System.out.println("MaxToMin (normal weihts) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
@@ -251,8 +251,8 @@ public class AppManager {
                 output = ExtractCommunities.MaxToMin(graph, overlapCommunities);
                 GraphUtils.CopyCommunities(graph, originGraph);
                 if (output[0] > 0) Shark(originGraph);
-                fu.append(originGraph, output);
                 if (output[1] > 0) System.out.println("Overlaping nodes: " + output[1]);
+                fu.append(originGraph, output);
 //                System.out.println("MaxToMin (P/SumP) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
                 
                 fu.finishEntry();
