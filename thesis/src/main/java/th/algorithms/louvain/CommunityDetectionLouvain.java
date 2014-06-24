@@ -120,7 +120,7 @@ public class CommunityDetectionLouvain {
             } else {
                 edge.addAttribute("weight", 1.0);
             }
-            edge.addAttribute("ui.label", edge.getAttribute("weight"));
+            edge.addAttribute("ui.label", (Double)edge.getAttribute("weight"));
         }
 
         // Add attribute "trueCommunityNodes" to every node, because later each
@@ -157,6 +157,14 @@ public class CommunityDetectionLouvain {
      * @return the new modularity value.
      */
     public double findCommunities(Graph graph) {
+        
+        System.out.println("/////////////////////////////////////////////////");
+        System.out.println("/////////////////////////////////////////////////");
+        System.out.println("/////////////////////////////////////////////////");
+        System.out.println("/////////////////////////////////////////////////");
+        System.out.println("/////////////////////////////////////////////////");
+        System.out.println("/////////////////////////////////////////////////");
+        System.out.println("/////////////////////////////////////////////////");
 
         modularity = new Modularity("community", "weight");
         modularity.init(graph);
@@ -183,6 +191,12 @@ public class CommunityDetectionLouvain {
         communitiesPerPhase.add(communities);
 
         do {
+            System.out.println("*********************************************");
+            System.out.println("*********************************************");
+            System.out.println("*********************************************");
+            System.out.println("*********************************************");
+            System.out.println("");
+            
             initialModularity = modularity.getMeasure();
             for (Node node : graph) {
                 maxModularity = -0.5;
@@ -193,29 +207,40 @@ public class CommunityDetectionLouvain {
                 // For every neighbour node of the node, test if putting it to it's
                 // community, will increase the modularity.
                 neighbours = node.getNeighborNodeIterator();
+                
+                System.out.println("Node " + node.getId());
                 while (neighbours.hasNext()) {
 
                     Node neighbour = neighbours.next();
-
+                    
+                    double curmod = modularity.getMeasure();
                     // Put the node in the neighbour's community.
-                    node.changeAttribute("community", neighbour.getAttribute("community"));
+                    node.changeAttribute("community", (String)neighbour.getAttribute("community"));
 
                     // Calculate new modularity
                     newModularity = modularity.getMeasure();
-
+                    System.out.println("Moving to com " + (String)neighbour.getAttribute("community")
+                            + ":\t" + (newModularity - curmod));
                     // Find the community that if the node is transfered to, the modularity gain
                     // is the maximum.
                     // In case of tie, the breaking rule is always to take the one that was checked last.
                     if (newModularity > maxModularity) {
                         maxModularity = newModularity;
-                        bestCommunity = neighbour.getAttribute("community");
+                        bestCommunity = (String)neighbour.getAttribute("community");
                     }
                 }
-
+                System.out.println("");
                 // Move node to the best community (if not already in)
                 if (node.getAttribute("community") != bestCommunity) {
                     node.changeAttribute("community", bestCommunity);
+                    System.out.println("Finally, " + node.getId() + " goes to com " + bestCommunity);
+                } else {
+                    System.out.println("Finally, "+ node.getId() + " stays in com " + bestCommunity);
                 }
+                
+                System.out.println("-----------------------------------------");
+                System.out.println("");
+                
                 // Commented for the moment. It could be used for performace improvement.
                 // Count the inner and outer edges that the node (which changes community) is connected to, 
                 // simmultaniously with the community calculation.
@@ -296,7 +321,7 @@ public class CommunityDetectionLouvain {
                         String.format("Modularity: %f", modularity.getMeasure()));
                 nmiCount.setAttribute("ui.label",
                         String.format("NMI: %f", nmi.getMeasure()));
-                sleep();
+//                sleep();
             }
         }
 
