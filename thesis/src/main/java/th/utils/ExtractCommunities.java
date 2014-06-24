@@ -65,7 +65,7 @@ public class ExtractCommunities {
         }
     }
 
-    public static int Shark(Graph graph) {
+    public static int Shark2(Graph graph) {
         int[] overlaps = {0};
         Set<Node> head = new HashSet<>(10);
         Set<Node> subsequent = new HashSet<>(30);
@@ -95,6 +95,28 @@ public class ExtractCommunities {
         }
 
         return overlaps[0];
+    }
+
+    public static int Shark(Graph graph) {
+        boolean uncommunitizedVertExist;
+
+        do {
+            uncommunitizedVertExist = false;
+            for (Node n : graph) {
+                if (n.getDegree() > 0 && n.getAttribute("community") == null) {
+                    uncommunitizedVertExist = true;
+                    Set<Node> uncomNeightbors = new HashSet<>(10);
+                    TreeMap<Double, Set<Integer>> neighborCommunites = GetNeighborCommunityFrequencies(n, uncomNeightbors);
+                    if (neighborCommunites.size() > 0) {
+                        System.out.println("omg: " + neighborCommunites.firstEntry().getValue().size());
+                        Integer com = neighborCommunites.firstEntry().getValue().stream().findFirst().get();
+                        n.addAttribute("community", com);
+                    }
+                }
+            }
+        } while (uncommunitizedVertExist);
+
+        return 0;
     }
 
     private static boolean AreEqual(Double d1, Double d2) {
