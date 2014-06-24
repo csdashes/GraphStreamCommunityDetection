@@ -24,15 +24,12 @@ import org.graphstream.graph.Node;
  */
 public class ExtractCommunities {
 
-    private static SortedMap<Integer, Integer> GetNeighborCommunityFrequencies(Node n) {
+    private static TreeMap<Double, Set<Integer>> GetNeighborCommunityFrequencies(Node n, Set<Node> uncomNeightbors) {
         Map<Integer, Integer> map = new HashMap<>(10);
-        SortedMap<Integer, Integer> sorted_map = new TreeMap<>(Collections.reverseOrder());
+        TreeMap<Double, Set<Integer>> sortedMap = new TreeMap<>(Collections.reverseOrder());
 
-        Iterator<Node> it = n.getNeighborNodeIterator();
-        while (it.hasNext()) {
-            Node nn = it.next();
-
-            if (nn.hasAttribute("community") && nn.getAttribute("community") != null) {
+        n.getNeighborNodeIterator().forEachRemaining((nn) -> {
+            if (nn.getAttribute("community") != null) {
                 Collection<Integer> communities;
                 if (nn.getAttribute("community") instanceof Collection<?>) {
                     communities = (Collection<Integer>) nn.getAttribute("community");
@@ -40,34 +37,57 @@ public class ExtractCommunities {
                     communities = Arrays.asList((Integer) nn.getAttribute("community"));
                 }
 
-                communities.stream().forEach((com) -> {
+                communities.forEach((com) -> {
                     map.compute(com, (k, v) -> v == null ? 1 : v + 1);
                 });
+            } else {
+                uncomNeightbors.add(nn);
             }
-        }
-
-        map.entrySet().stream().forEach((e) -> {
-            sorted_map.put(e.getValue(), e.getKey());
         });
-        return sorted_map;
+        
+        map.forEach((com, num) -> {
+            double freq = num.doubleValue() / n.getDegree();
+            sortedMap.computeIfAbsent(freq, (k) -> new HashSet<>(2)).add(com);            
+        });
+        return sortedMap;
+    }
+    
+    private static void AddToHead(Node n , Set<Node> head) {
+        Set<Node> uncomNeightbors = new HashSet<>(10);
+        TreeMap<Double, Set<Integer>> neighborCommunites = GetNeighborCommunityFrequencies(n, uncomNeightbors);
+        if (neighborCommunites.size() > 0) {
+                    // We decided that only nodes with existing community should
+            // influence nodes with no community
+            n.addAttribute("community_candidate", neighborCommunites.firstEntry().getValue());
+            n.addAttribute("uncomNeigh", uncomNeightbors);
+            // We dont set our community now, as will affect results
+            head.add(n);
+        }
     }
 
     public static void Shark(Graph graph) {
-        boolean uncommunitizedVertExist;
-
-        do {
-            uncommunitizedVertExist = false;
-            for (Node n : graph) {
-                if (n.getDegree() > 0 && n.getAttribute("community") == null) {
-                    uncommunitizedVertExist = true;
-                    SortedMap<Integer, Integer> neighborCommunites = GetNeighborCommunityFrequencies(n);
-                    if (neighborCommunites.size() > 0) {
-                        Integer com = neighborCommunites.entrySet().iterator().next().getValue();
-                        n.addAttribute("community", com);
-                    }
-                }
+        Set<Node> head = new HashSet<>(10);
+        Set<Node> subsequent = new HashSet<>(30);
+        
+        graph.forEach((n) -> {
+            if (n.getDegree() > 0 && n.getAttribute("community") == null) {
+                AddToHead(n, head);
             }
-        } while (uncommunitizedVertExist);
+        });
+        
+        while (!head.isEmpty()) {
+            head.forEach((n) -> {
+                n.addAttribute("community", n.getArray("community_candidate"));
+                n.removeAttribute("community_candidate");
+                
+                subsequent.addAll(n.getAttribute("uncomNeigh"));
+                n.removeAttribute("uncomNeigh");
+            });
+            
+            subsequent.forEach((n) -> {
+                AddToHead(n, head);
+            });
+        }
     }
 
     private static boolean AreEqual(Double d1, Double d2) {
