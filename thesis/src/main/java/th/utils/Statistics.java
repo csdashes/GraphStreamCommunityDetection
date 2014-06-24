@@ -51,22 +51,23 @@ public class Statistics {
             this.writer = new PrintWriter(filename, "UTF-8");
 
             this.writer.println("a,b,UncommunitizedVertices,NumberofIterations,"
-                    + "BFScom,BFSNMI,BFSModularity,"
-                    + "MaxToMinNormalWeihtsCom,MaxToMinNormalWeihtsNMI,MaxToMinNormalWeihtsModularity,"
-                    + "MaxToMinP/degreeCom,MaxToMinP/degreeNMI,MaxToMinP/degreeModularity,"
-                    + "MaxToMinP/SumPCom,MaxToMinP/SumPNMI,MaxToMinP/SumPModularity");
+                    + "BFScom,Overlap,SharkOverlap,TotalOverlap,NMI,Modularity,"
+                    + "MTMNormalWeihtsCom,Overlap,SharkOverlap,TotalOverlap,NMI,Modularity,"
+                    + "MTMP/degreeCom,Overlap,SharkOverlap,TotalOverlap,NMI,Modularity,"
+                    + "MTMP/SumPCom,Overlap,SharkOverlap,TotalOverlap,NMI,Modularity");
         }
 
         private void appendOverlap(String str) {
             this.filename = this.filePrefix + "." + str.replaceAll(",", "\\.");
         }
 
-        private void appendOverlap(Graph graph, int[] com_overlap) {
+        private void appendOverlap(Graph graph, int[] com_overlap, int sharkOverlaps) {
             String algorithm = this.q.poll();
             this.q.add(algorithm);
 
             try {
-                FileUtils.DumpCommunities(graph, this.filename + com_overlap[0] + "." + com_overlap[1] + "." + algorithm + ".txt", "community");
+                FileUtils.DumpCommunities(graph, this.filename + com_overlap[0] + "." + com_overlap[1] + "."
+                        + sharkOverlaps + "." + algorithm + ".txt", "community");
             } catch (FileNotFoundException | UnsupportedEncodingException ex) {
                 Logger.getLogger(FileUtils.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -76,11 +77,13 @@ public class Statistics {
             this.toCSV += str;
         }
 
-        private void appendCommunity(Graph graph, int[] com_overlap) {
+        private void appendCommunity(Graph graph, int[] com_overlap, int sharkOverlaps) {
             double nmi = GetNMI(graph);
             double modularity = GetModularity(graph);
 
-            this.toCSV += com_overlap[0] + "," + nmi + "," + modularity + ",";
+            this.toCSV += com_overlap[0] + "," + com_overlap[1] + ","
+                    + sharkOverlaps + "," + (sharkOverlaps + com_overlap[1])
+                    + "," + nmi + "," + modularity + ",";
         }
 
         private void finishEntryCommunity() {
@@ -115,12 +118,12 @@ public class Statistics {
             appendOverlap(str);
         }
 
-        public void append(Graph graph, int[] com_overlap) {
+        public void append(Graph graph, int[] com_overlap, int sharkOverlaps) {
             if (!this.overlapCommunities) {
-                appendCommunity(graph, com_overlap);
+                appendCommunity(graph, com_overlap, sharkOverlaps);
                 return;
             }
-            appendOverlap(graph, com_overlap);
+            appendOverlap(graph, com_overlap, sharkOverlaps);
         }
 
         public void finishEntry() {
@@ -356,28 +359,24 @@ public class Statistics {
             while (neighborNodeIterator.hasNext()) {
                 System.out.print(neighborNodeIterator.next().getId() + ", ");
             }
-            PrintWriter writer = null;
-            try {
-                writer = new PrintWriter("../exports/" + filename + "_" + "node" + (id) + "-propinquityMap.csv", "UTF-8");
-            } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-                Logger.getLogger(PropinquityDynamics.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            writer.println("node index,propinquity to any,propinquity to neighbor");
 
-            int lala = 0;
-            for (Map.Entry<Integer, MutableInt> entry : pm.entrySet()) {
+            try (PrintWriter writer = new PrintWriter("../exports/" + filename + "_" + "node" + (id) + "-propinquityMap.csv", "UTF-8")) {
+                writer.println("node index,propinquity to any,propinquity to neighbor");
+
+                for (Map.Entry<Integer, MutableInt> entry : pm.entrySet()) {
 //                Iterator<String> attributeKeyIterator = graph.getNode(entry.getKey()).getAttributeKeyIterator();
 //                while (attributeKeyIterator.hasNext()) {
 //                    System.out.println(attributeKeyIterator.next());
 //                }
-                String name = graph.getNode(entry.getKey()).getAttribute("ui.label");
-                if (n.getEdgeBetween(entry.getKey()) == null) {
-                    writer.println(name + "," + entry.getValue().get() + ",0");
-                } else {
-                    writer.println(name + "," + entry.getValue().get() + "," + entry.getValue().get());
+                    String name = graph.getNode(entry.getKey()).getAttribute("ui.label");
+                    if (n.getEdgeBetween(entry.getKey()) == null) {
+                        writer.println(name + "," + entry.getValue().get() + ",0");
+                    } else {
+                        writer.println(name + "," + entry.getValue().get() + "," + entry.getValue().get());
+                    }
                 }
             }
-            writer.close();
+
         }
     }
 }
