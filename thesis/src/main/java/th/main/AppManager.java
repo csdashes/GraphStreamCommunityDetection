@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -174,10 +175,10 @@ public class AppManager {
 //        FileUtils.DumpCommunitiesAndGroundTruth(originGraph, "../exports/" + theFile.getName().split("\\.")[0] + ".communities.txt",  "../exports/" + theFile.getName().split("\\.")[0] + ".groundTruth.txt", "community", "groundTruth");
     }
 
-    private void RangeAB(String datasetFile, boolean overlapCommunities) throws IOException, GraphParseException, ParseException {
-        RangeABStatistics fu = new RangeABStatistics(overlapCommunities);
+    private void RangeAB(String datasetFile, boolean printTooNMI) throws IOException, GraphParseException, ParseException {
+        RangeABStatistics fu = new RangeABStatistics(printTooNMI);
         String filename = "../exports/" + new File(datasetFile).getName().split("\\.")[0];
-        if (!overlapCommunities) filename += ".csv";
+        if (!printTooNMI) filename += ".csv";
         fu.init(filename);
 
         // Init an origin graph, so we can calculate metrics
@@ -220,39 +221,40 @@ public class AppManager {
                 fu.append(a + "," + b + "," + uncommunitized + "," + i + ",");
 
                 int[] output = new int[2];
+                int sharkOverlaps = 0;
                 output[0] = ExtractCommunities.BFS(graph);
                 GraphUtils.CopyCommunities(graph, originGraph);
                 // Must be at least one community
-                if (output[0] > 0) Shark(originGraph);
-                if (output[1] > 0) System.out.println("Overlaping nodes: " + output[1]);
+                if (output[0] > 0) sharkOverlaps = Shark(originGraph);
+                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
                 ResetCommunities(graph);
-                fu.append(originGraph, output);
+                fu.append(originGraph, output, sharkOverlaps);
 //                System.out.println("BFS found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 SetPDWeights(graph);
-                output = ExtractCommunities.MaxToMin(graph, overlapCommunities);
+                output = ExtractCommunities.MaxToMin(graph, true);
                 GraphUtils.CopyCommunities(graph, originGraph);
-                if (output[0] > 0) Shark(originGraph);
-                if (output[1] > 0) System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
+                if (output[0] > 0) sharkOverlaps = Shark(originGraph);
+                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
                 ResetCommunities(graph);
-                fu.append(originGraph, output);
+                fu.append(originGraph, output, sharkOverlaps);
 //                System.out.println("MaxToMin (normal weihts) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 FractionWithNumberOfEdges(graph);
-                output = ExtractCommunities.MaxToMin(graph, overlapCommunities);
+                output = ExtractCommunities.MaxToMin(graph, true);
                 GraphUtils.CopyCommunities(graph, originGraph);
-                if (output[0] > 0) Shark(originGraph);
-                if (output[1] > 0) System.out.println("Overlaping nodes: " + output[1]);
+                if (output[0] > 0) sharkOverlaps = Shark(originGraph);
+                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
                 ResetCommunities(graph);
-                fu.append(originGraph, output);
+                fu.append(originGraph, output, sharkOverlaps);
 //                System.out.println("MaxToMin (P/degree) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
 
                 FractionWithTotalPropinquity(graph);
-                output = ExtractCommunities.MaxToMin(graph, overlapCommunities);
+                output = ExtractCommunities.MaxToMin(graph, true);
                 GraphUtils.CopyCommunities(graph, originGraph);
-                if (output[0] > 0) Shark(originGraph);
-                if (output[1] > 0) System.out.println("Overlaping nodes: " + output[1]);
-                fu.append(originGraph, output);
+                if (output[0] > 0) sharkOverlaps = Shark(originGraph);
+                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
+                fu.append(originGraph, output, sharkOverlaps);
 //                System.out.println("MaxToMin (P/SumP) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
                 
                 fu.finishEntry();
