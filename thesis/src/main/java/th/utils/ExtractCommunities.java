@@ -44,19 +44,19 @@ public class ExtractCommunities {
                 uncomNeightbors.add(nn);
             }
         });
-        
+
         map.forEach((com, num) -> {
             double freq = num.doubleValue() / n.getDegree();
-            sortedMap.computeIfAbsent(freq, (k) -> new HashSet<>(2)).add(com);            
+            sortedMap.computeIfAbsent(freq, (k) -> new HashSet<>(2)).add(com);
         });
         return sortedMap;
     }
-    
-    private static void AddToHead(Node n , Set<Node> head) {
+
+    private static void AddToHead(Node n, Set<Node> head) {
         Set<Node> uncomNeightbors = new HashSet<>(10);
         TreeMap<Double, Set<Integer>> neighborCommunites = GetNeighborCommunityFrequencies(n, uncomNeightbors);
         if (neighborCommunites.size() > 0) {
-                    // We decided that only nodes with existing community should
+            // We decided that only nodes with existing community should
             // influence nodes with no community
             n.addAttribute("community_candidate", neighborCommunites.firstEntry().getValue());
             n.addAttribute("uncomNeigh", uncomNeightbors);
@@ -65,29 +65,34 @@ public class ExtractCommunities {
         }
     }
 
-    public static void Shark(Graph graph) {
+    public static int Shark(Graph graph) {
+        int[] overlaps = {0};
         Set<Node> head = new HashSet<>(10);
         Set<Node> subsequent = new HashSet<>(30);
-        
+
         graph.forEach((n) -> {
             if (n.getDegree() > 0 && n.getAttribute("community") == null) {
                 AddToHead(n, head);
             }
         });
-        
+
         while (!head.isEmpty()) {
             head.forEach((n) -> {
-                n.addAttribute("community", n.getArray("community_candidate"));
+                n.addAttribute("community", n.getAttribute("community_candidate"));
+                // This is dirty and is a hack...
+                if (((Set<Integer>) n.getAttribute("community_candidate")).size() > 1) overlaps[0]++;
                 n.removeAttribute("community_candidate");
-                
+
                 subsequent.addAll(n.getAttribute("uncomNeigh"));
                 n.removeAttribute("uncomNeigh");
             });
-            
+
             subsequent.forEach((n) -> {
                 AddToHead(n, head);
             });
         }
+
+        return overlaps[0];
     }
 
     private static boolean AreEqual(Double d1, Double d2) {
