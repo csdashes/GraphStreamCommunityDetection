@@ -162,11 +162,11 @@ public class AppManager {
         Graph originGraph = new DefaultGraph("Propinquity Dynamics");
         originGraph.display();
         originGraph.read(datasetFile);
-//        GraphUtils.ParseOverlapCommunities(originGraph);
+//        GraphUtils.ParseOverlapCommunities(originGraph, "groundTruth");
         CopyCommunities(graph, originGraph);
         
-
         Shark(originGraph);
+
         UIToolbox.ColorCommunities(originGraph);
         double nmi = GetNMI(originGraph);
         System.out.println("NMI: " + nmi);

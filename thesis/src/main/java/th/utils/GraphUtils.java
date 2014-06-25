@@ -18,8 +18,7 @@ import org.graphstream.util.parser.ParseException;
  */
 public class GraphUtils {
 
-    public static void ParseOverlapCommunities(Graph graph) {
-        String attribute = "groundTruth";
+    public static void ParseOverlapCommunities(Graph graph, String attribute) {
 
         for (Node n : graph) {
             if (n.hasAttribute(attribute) && n.getAttribute(attribute) instanceof String) {
