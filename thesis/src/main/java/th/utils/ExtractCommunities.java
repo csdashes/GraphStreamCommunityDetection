@@ -78,7 +78,9 @@ public class ExtractCommunities {
 
         while (!head.isEmpty()) {
             head.forEach((n) -> {
-                n.addAttribute("community", (HashSet<Integer>) n.getAttribute("community_candidate"));
+                Set<Integer> s = (HashSet<Integer>) n.getAttribute("community_candidate");
+                n.addAttribute("community", (s.size() == 1) ? s.toArray()[0] : s);
+
                 // This is dirty and is a hack...
                 if (((Set<Integer>) n.getAttribute("community_candidate")).size() > 1) overlaps[0]++;
                 n.removeAttribute("community_candidate");
