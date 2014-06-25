@@ -3,6 +3,9 @@ package th.main;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,6 +14,8 @@ import java.util.Set;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.GraphParseException;
+import org.graphstream.stream.file.FileSink;
+import org.graphstream.stream.file.FileSinkGML;
 import org.graphstream.util.parser.ParseException;
 import th.algorithms.louvain.CommunityDetectionLouvain;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
@@ -42,7 +47,7 @@ import th.utils.UIToolbox;
  */
 public class AppManager {
 
-    public void printUserMenu() throws IOException, GraphParseException, ParseException {
+    public void printUserMenu() throws IOException, GraphParseException, ParseException, InterruptedException {
         int methodSelection, datasetSelection;
         String datasetFile = null;
         boolean flag = true;
@@ -369,5 +374,25 @@ public class AppManager {
         graph.removeNode(7);
         
         FileUtils.ExportGraphIntoGML(graph, "../data/export");
+    }
+    
+    private static void MTXtoGML() throws IOException {
+        String fileName = "../data/polblogs.mtx";
+        Graph graph = new DefaultGraph("Propinquity Dynamics", false, true, 1500, 19000);
+        
+        List<String> lines = Files.readAllLines(Paths.get(fileName),
+                Charset.defaultCharset());
+        for (String line : lines) {
+            String[] a = line.split(" ");
+            
+            graph.addEdge(a[0] + " " + a[1], a[0], a[1], true);
+        }
+        graph.display();
+        
+        System.out.println(graph.getNodeCount());
+        System.out.println(graph.getEdgeCount());
+        
+//        FileSink fs = new FileSinkGML();
+//        fs.writeAll(graph, "../data/polblogs2.gml");
     }
 }
