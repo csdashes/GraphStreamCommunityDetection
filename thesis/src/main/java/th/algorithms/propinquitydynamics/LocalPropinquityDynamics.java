@@ -252,7 +252,6 @@ public class LocalPropinquityDynamics implements Algorithm {
             Integer nodeIndex = row.getKey();
             Integer propinquity = row.getValue().get();
             double diff = Math.abs(lowWindowValue - propinquity);
-            System.out.println("diff: " + diff);
             if(diff < lowestDiff) {
                 a = propinquity;
                 lowestDiff = diff;
@@ -284,7 +283,7 @@ public class LocalPropinquityDynamics implements Algorithm {
                     Nd.add(nodeIndex);
                     Nr.remove(nodeIndex);
                     this.e++;
-                } else if (propinquity.get() >= this.b && !Nr.contains(nodeIndex)) {
+                } else if (propinquity.get() >= estimateB(n) && !Nr.contains(nodeIndex)) {
                     Ni.add(nodeIndex);
                     this.e++;
                 }
