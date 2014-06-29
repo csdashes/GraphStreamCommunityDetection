@@ -33,6 +33,7 @@ import static th.utils.GraphUtils.FindLonelyVertices;
 import static th.utils.GraphUtils.InitWeights;
 import static th.utils.GraphUtils.ResetCommunities;
 import th.utils.Menu;
+import th.utils.Metrics;
 import static th.utils.Metrics.GetModularity;
 import static th.utils.Metrics.GetNMI;
 import th.utils.Statistics;
@@ -106,6 +107,8 @@ public class AppManager {
 //        }
 //        CompareExtractions(datasets[2]);
         PDLocalAB("../data/karate.gml");
+//        PDLocalAB("../data/dolphins.gml");
+//        PDLocalAB("../data/polbooks.gml");
     }
 
     private void PDOriginalStatics(String datasetFile) throws IOException, GraphParseException {
@@ -277,7 +280,14 @@ public class AppManager {
         Graph graph = new DefaultGraph("Propinquity Dynamics");
         graph.read(datasetFile);
         LocalPropinquityDynamics lpd = new LocalPropinquityDynamics();
+        lpd.statisticsOn();
         lpd.init(graph);
+        int i = 0;
+        // We need to be sure that we dont have an infinite loop
+        while (i < 100 && !lpd.didAbsoluteConvergence()) {
+            lpd.compute();
+            i++;
+        }
         lpd.applyFinalTopology();
         SetPDWeights(graph);
         output = ExtractCommunities.MaxToMin(graph, true);
@@ -285,6 +295,8 @@ public class AppManager {
         originGraph.display();
         originGraph.read(datasetFile);
         GraphUtils.CopyCommunities(graph, originGraph);
+        UIToolbox ui = new UIToolbox(originGraph);
+        ui.addSprite("NMI", Metrics.GetNMI(originGraph), 60);
         int uncommunitized = UIToolbox.ColorCommunities(originGraph);
     }
 
