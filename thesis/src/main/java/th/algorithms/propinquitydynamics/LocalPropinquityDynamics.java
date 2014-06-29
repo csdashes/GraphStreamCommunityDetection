@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import org.apache.commons.math3.stat.StatUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.graphstream.algorithm.Algorithm;
 import org.graphstream.algorithm.measure.NormalizedMutualInformation;
 import org.graphstream.graph.Edge;
@@ -203,6 +205,7 @@ public class LocalPropinquityDynamics implements Algorithm {
                 PropinquityMap pm = n.getAttribute("pm");
                 System.out.println("pm: " + pm);
                 System.out.println("b: " + estimateB(n));
+                System.out.println("a: " + estimateA(n));
             }
         }
     }
@@ -219,6 +222,36 @@ public class LocalPropinquityDynamics implements Algorithm {
             }
          }
         return b;
+    }
+    
+    
+    // find the maximum propinquity for a neighbor
+    private int estimateA(Node n){
+        double lowestDiff = Double.MAX_VALUE;
+        int a = 0;
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+        PropinquityMap pm = n.getAttribute("pm");
+        int i = 0;
+        for (Entry<Integer, MutableInt> row : pm.entrySet()) {
+            Integer nodeIndex = row.getKey();
+            Integer propinquity = row.getValue().get();
+            stats.addValue((double)propinquity);
+            i++;
+        }
+        double mean = stats.getMean();
+        double std = stats.getStandardDeviation();
+        double lowWindowValue = mean - std;
+        for (Entry<Integer, MutableInt> row : pm.entrySet()) {
+            Integer nodeIndex = row.getKey();
+            Integer propinquity = row.getValue().get();
+            double diff = Math.abs(lowWindowValue - propinquity);
+            System.out.println("diff: " + diff);
+            if(diff < lowestDiff) {
+                a = propinquity;
+                lowestDiff = diff;
+            }
+        }
+        return a;
     }
 
     // PHASE 2
