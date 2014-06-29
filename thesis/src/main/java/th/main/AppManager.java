@@ -197,6 +197,8 @@ public class AppManager {
         Graph tmp_graph = new DefaultGraph("Propinquity Dynamics");
         tmp_graph.read(datasetFile);
         double[] degreeStats = DegreeStatistics(tmp_graph);
+        System.out.println("#nodes: " + tmp_graph.getNodeCount());
+        System.out.println("#edges: " + tmp_graph.getEdgeCount());
         System.out.println("Max Degree: " + degreeStats[0]);
         System.out.println("Avg Degree: " + degreeStats[1]);
 
@@ -230,8 +232,8 @@ public class AppManager {
                 output[0] = ExtractCommunities.BFS(graph);
                 GraphUtils.CopyCommunities(graph, originGraph);
                 // Must be at least one community
-                if (output[0] > 0) sharkOverlaps = Shark(originGraph);
-                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
+                if (output[0] > 0) Shark(originGraph);
+//                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
                 ResetCommunities(graph);
                 fu.append(originGraph, output, sharkOverlaps);
 //                System.out.println("BFS found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
@@ -239,8 +241,8 @@ public class AppManager {
                 SetPDWeights(graph);
                 output = ExtractCommunities.MaxToMin(graph, true);
                 GraphUtils.CopyCommunities(graph, originGraph);
-                if (output[0] > 0) sharkOverlaps = Shark(originGraph);
-                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
+                if (output[0] > 0) Shark(originGraph);
+//                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
                 ResetCommunities(graph);
                 fu.append(originGraph, output, sharkOverlaps);
 //                System.out.println("MaxToMin (normal weihts) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
@@ -248,8 +250,8 @@ public class AppManager {
                 FractionWithNumberOfEdges(graph);
                 output = ExtractCommunities.MaxToMin(graph, true);
                 GraphUtils.CopyCommunities(graph, originGraph);
-                if (output[0] > 0) sharkOverlaps = Shark(originGraph);
-                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
+                if (output[0] > 0) Shark(originGraph);
+//                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
                 ResetCommunities(graph);
                 fu.append(originGraph, output, sharkOverlaps);
 //                System.out.println("MaxToMin (P/degree) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
@@ -257,8 +259,8 @@ public class AppManager {
                 FractionWithTotalPropinquity(graph);
                 output = ExtractCommunities.MaxToMin(graph, true);
                 GraphUtils.CopyCommunities(graph, originGraph);
-                if (output[0] > 0) sharkOverlaps = Shark(originGraph);
-                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
+                if (output[0] > 0) Shark(originGraph);
+//                System.out.println("Communities: " + output[0] + " Overlaping nodes: " + output[1]);
                 fu.append(originGraph, output, sharkOverlaps);
 //                System.out.println("MaxToMin (P/SumP) found: " + com + " with NMI: " + nmi + " and Modularity: " + modularity);
                 
