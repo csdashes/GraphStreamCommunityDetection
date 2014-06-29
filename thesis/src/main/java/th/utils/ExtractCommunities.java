@@ -99,26 +99,26 @@ public class ExtractCommunities {
         return overlaps[0];
     }
 
-    public static int Shark1(Graph graph) {
-        boolean uncommunitizedVertExist;
-
-        do {
-            uncommunitizedVertExist = false;
-            for (Node n : graph) {
-                if (n.getDegree() > 0 && n.getAttribute("community") == null) {
-                    uncommunitizedVertExist = true;
-                    Set<Node> uncomNeightbors = new HashSet<>(10);
-                    TreeMap<Double, Set<Integer>> neighborCommunites = GetNeighborCommunityFrequencies(n, uncomNeightbors);
-                    if (neighborCommunites.size() > 0) {
-                        Integer com = neighborCommunites.firstEntry().getValue().stream().findFirst().get();
-                        n.addAttribute("community", com);
-                    }
-                }
-            }
-        } while (uncommunitizedVertExist);
-
-        return 0;
-    }
+//    public static int Shark1(Graph graph) {
+//        boolean uncommunitizedVertExist;
+//
+//        do {
+//            uncommunitizedVertExist = false;
+//            for (Node n : graph) {
+//                if (n.getDegree() > 0 && n.getAttribute("community") == null) {
+//                    uncommunitizedVertExist = true;
+//                    Set<Node> uncomNeightbors = new HashSet<>(10);
+//                    TreeMap<Double, Set<Integer>> neighborCommunites = GetNeighborCommunityFrequencies(n, uncomNeightbors);
+//                    if (neighborCommunites.size() > 0) {
+//                        Integer com = neighborCommunites.firstEntry().getValue().stream().findFirst().get();
+//                        n.addAttribute("community", com);
+//                    }
+//                }
+//            }
+//        } while (uncommunitizedVertExist);
+//
+//        return 0;
+//    }
 
     private static boolean AreEqual(Double d1, Double d2) {
         return Math.round(d1 * 100.0) / 100.0 == Math.round(d2 * 100.0) / 100.0;
