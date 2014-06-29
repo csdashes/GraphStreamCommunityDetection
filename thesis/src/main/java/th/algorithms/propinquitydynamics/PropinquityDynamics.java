@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
 import org.graphstream.algorithm.measure.NormalizedMutualInformation;
@@ -43,7 +44,7 @@ public class PropinquityDynamics implements Algorithm {
     }
 
     private Set<Integer> getNeightboursOf(Node n) {
-        Set<Integer> out = new HashSet<Integer>(10);
+        Set<Integer> out = new HashSet<>(10);
         Iterator<Node> it = n.getNeighborNodeIterator();
         while (it.hasNext()) {
             out.add(it.next().getIndex());
@@ -66,29 +67,29 @@ public class PropinquityDynamics implements Algorithm {
     private void PUdown(Integer u_i, Set<Integer> set, boolean skip) {
         PropinquityMap pm = this.graph.getNode(u_i).getAttribute("pm");
 
-        for (Integer pu : set) {
+        set.forEach((pu) -> {
             if (skip) {
-                if (u_i != pu) {
+                if (!Objects.equals(u_i, pu)) {
                     pm.decrease(pu);
                 }
             } else {
                 pm.decrease(pu);
             }
-        }
+        });
     }
 
     private void PUup(Integer u_i, Set<Integer> set, boolean skip) {
         PropinquityMap pm = this.graph.getNode(u_i).getAttribute("pm");
 
-        for (Integer pu : set) {
+        set.forEach((pu) -> {
             if (skip) {
-                if (u_i != pu) {
+                if (!Objects.equals(u_i, pu)) {
                     pm.increase(pu);
                 }
             } else {
                 pm.increase(pu);
             }
-        }
+        });
     }
 
     public void set(int a, int b) {
@@ -97,6 +98,7 @@ public class PropinquityDynamics implements Algorithm {
     }
 
     // PHASE 1
+    @Override
     public void init(Graph graph) {
         this.graph = graph;
 
@@ -121,9 +123,9 @@ public class PropinquityDynamics implements Algorithm {
             Set<Integer> Nr = n.getAttribute("Nr");
             PropinquityMap pm = n.getAttribute("pm");
 
-            for (Integer nn : Nr) {
+            Nr.forEach((nn) -> {
                 pm.increase(nn);
-            }
+            });
         }
 
         // Superstep 0 + 1
@@ -135,9 +137,9 @@ public class PropinquityDynamics implements Algorithm {
         for (Node n : this.graph.getEachNode()) {
             Set<Integer> Nr = n.getAttribute("Nr");
 
-            for (Integer nn : Nr) {
+            Nr.forEach((nn) -> {
                 PU(nn, Nr, '+', true);
-            }
+            });
         }
 
         if (this.debug) {
@@ -170,9 +172,9 @@ public class PropinquityDynamics implements Algorithm {
                 // Nc <- Nr ^ Sr
                 Set<Integer> Nc = Sets.intersection(Nr, neighNr);
 
-                for (Integer nn : Nc) {
+                Nc.forEach((nn) -> {
                     PU(nn, Nc, '+', true);
-                }
+                });
             }
         }
 
@@ -188,9 +190,9 @@ public class PropinquityDynamics implements Algorithm {
             for (Node n : this.graph.getEachNode()) {
                 PropinquityMap pm = n.getAttribute("pm");
 
-                for (MutableInt i : pm.values()) {
+                pm.values().forEach((i) -> {
                     stats.increase(i.get());
-                }
+                });
             }
 
             System.out.println(stats);
@@ -198,6 +200,7 @@ public class PropinquityDynamics implements Algorithm {
     }
 
     // PHASE 2
+    @Override
     public void compute() {
         // Init e to count topology differences
         this.e = 0;
@@ -205,26 +208,24 @@ public class PropinquityDynamics implements Algorithm {
         // Superstep 0 first part
         // Init apropriate sets (Nd, Ni).
         for (Node n : this.graph.getEachNode()) {
-            Set<Integer> Ni = new HashSet<Integer>(10);
-            Set<Integer> Nd = new HashSet<Integer>(10);
+            Set<Integer> Ni = new HashSet<>(10);
+            Set<Integer> Nd = new HashSet<>(10);
             n.setAttribute("Ni", Ni);
             n.setAttribute("Nd", Nd);
 
             Set<Integer> Nr = n.getAttribute("Nr");
             PropinquityMap pm = n.getAttribute("pm");
-            for (Entry<Integer, MutableInt> row : pm.entrySet()) {
-                Integer nodeIndex = row.getKey();
-                Integer propinquity = row.getValue().get();
+            pm.forEach((nodeIndex, propinquity) -> {
 
-                if (propinquity <= this.a && Nr.contains(nodeIndex)) {
+                if (propinquity.get() <= this.a && Nr.contains(nodeIndex)) {
                     Nd.add(nodeIndex);
                     Nr.remove(nodeIndex);
                     this.e++;
-                } else if (propinquity >= this.b && !Nr.contains(nodeIndex)) {
+                } else if (propinquity.get() >= this.b && !Nr.contains(nodeIndex)) {
                     Ni.add(nodeIndex);
                     this.e++;
                 }
-            }
+            });
         }
 
         // We take care of the direct connections here. If we delete a neightbor,
@@ -234,12 +235,12 @@ public class PropinquityDynamics implements Algorithm {
             Set<Integer> Ni = n.getAttribute("Ni");
             Set<Integer> Nd = n.getAttribute("Nd");
 
-            for (Integer id : Ni) {
+            Ni.forEach((id) -> {
                 pm.increase(id);
-            }
-            for (Integer id : Nd) {
+            });
+            Nd.forEach((id) -> {
                 pm.decrease(id);
-            }
+            });
         }
 
         if (this.debug) {
@@ -265,28 +266,23 @@ public class PropinquityDynamics implements Algorithm {
             Set<Integer> Ni = n.getAttribute("Ni");
             Set<Integer> Nd = n.getAttribute("Nd");
 
-            // The Ni nodes are new nodes to us. This means than we need to
-            // inform our current (by current means after cleaning Nr list with Nd)
-            // neighbours. We are the Angle Propinquity between our new Ni neighbours
-            // and our old Nr neighbrous.
-            // The same works for Nd.
-            for (Integer u_i : Nr) {
+            Nr.forEach((u_i) -> {
                 PU(u_i, Ni, '+');
                 PU(u_i, Nd, '-');
-            }
+            });
 
             // On the other hand, we need to inform our new neigbours to include
             // our current and the other new neighbours.
-            for (Integer u_i : Ni) {
+            Ni.forEach((u_i) -> {
                 PU(u_i, Nr, '+');
                 PU(u_i, Ni, '+', true);
-            }
+            });
             // When it comes to Nd, we need to take back all points we
             // added so far.
-            for (Integer u_i : Nd) {
+            Nd.forEach((u_i) -> {
                 PU(u_i, Nr, '-');
                 PU(u_i, Nd, '-', true);
-            }
+            });
         }
 
         if (this.debug) {
@@ -315,21 +311,21 @@ public class PropinquityDynamics implements Algorithm {
                         Set<Integer> Cri = CalculateCri(Nr, Ni, nnNr, nnNi);
                         Set<Integer> Crd = CalculateCrd(Nr, Nd, nnNr, nnNd);
 
-                        for (Integer u_i : Crr) {
+                        Crr.forEach((u_i) -> {
                             // PU(u_i,Cri,+), PU(u_i,Crd,−)
                             PU(u_i, Cri, '+');
                             PU(u_i, Crd, '-');
-                        }
-                        for (Integer u_i : Cri) {
+                        });
+                        Cri.forEach((u_i) -> {
                             // PU(u_i,Crr,+), PU(u_i,Cri−{u_i},+)
                             PU(u_i, Crr, '+');
                             PU(u_i, Cri, '+', true);
-                        }
-                        for (Integer u_i : Crd) {
+                        });
+                        Crd.forEach((u_i) -> {
                             // PU(u_i,Crr,-), PU(u_i,Crd−{u_i},-)
                             PU(u_i, Crr, '-');
                             PU(u_i, Crd, '-', true);
-                        }
+                        });
                     }
 
                     // Note: We might not those 2 here :/
@@ -361,9 +357,9 @@ public class PropinquityDynamics implements Algorithm {
                     if (nnNi.contains(n.getIndex())) {
                         Set<Integer> Cii = CalculateCii(Nr, Ni, nnNr, nnNi);
 
-                        for (Integer u_i : Cii) {
+                        Cii.forEach((u_i) -> {
                             PU(u_i, Cii, '+', true);
-                        }
+                        });
                     }
                 }
             }
@@ -376,9 +372,9 @@ public class PropinquityDynamics implements Algorithm {
                     if (nnNd.contains(n.getIndex())) {
                         Set<Integer> Cdd = CalculateCdd(Nr, Nd, nnNr, nnNd);
 
-                        for (Integer u_i : Cdd) {
+                        Cdd.forEach((u_i) -> {
                             PU(u_i, Cdd, '-', true);
-                        }
+                        });
                     }
                 }
             }
