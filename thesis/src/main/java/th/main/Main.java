@@ -17,6 +17,6 @@ public class Main {
         // I've got your back bro!
         AppManager appmana = new AppManager();
         appmana.printUserMenu();
-        System.exit(0);
+//        System.exit(0);
     }
 }

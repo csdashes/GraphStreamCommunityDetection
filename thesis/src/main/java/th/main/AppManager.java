@@ -18,6 +18,7 @@ import org.graphstream.stream.file.FileSink;
 import org.graphstream.stream.file.FileSinkGML;
 import org.graphstream.util.parser.ParseException;
 import th.algorithms.louvain.CommunityDetectionLouvain;
+import th.algorithms.propinquitydynamics.LocalPropinquityDynamics;
 import th.algorithms.propinquitydynamics.PropinquityDynamics;
 import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithNumberOfEdges;
 import static th.algorithms.propinquitydynamics.utils.Utils.FractionWithTotalPropinquity;
@@ -52,58 +53,59 @@ public class AppManager {
         String datasetFile = null;
         boolean flag = true;
 
-        while (flag) {
-            methodSelection = Menu.printMenu();
-            if (methodSelection != 0) {
-                datasetSelection = Menu.printDatasetMenu();
-                switch (datasetSelection) {
-                    case 1:
-                        datasetFile = "../data/polbooks.gml";
-                        break;
-                    case 2:
-                        datasetFile = "../data/dolphins.gml";
-                        break;
-                    case 3:
-                        datasetFile = "../data/karate.gml";
-                        break;
-                    case 4:
-                        datasetFile = "../data/erdos02.gml";
-                        break;
-                    case 5:
-                        datasetFile = "../data/erdos02-subset.gml";
-                        break;
-                    case 0:
-                        return;
-                }
-            }
-            switch (methodSelection) {
-                case 1:
-                    //Execute 1st function
-                    ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(datasetFile);
-                    break;
-                case 2:
-                    //Execute 2st function
-                    ErdozSubgraphwithOriginalPDAndTwoDisplays(datasetFile);
-                    break;
-                case 3:
-                    //Execute 3rd function
-                    LouvainExample(datasetFile);
-                    break;
-                case 4:
-                    //Execute 4rd function
-                    PDOriginalStatics(datasetFile);
-                    break;
-                case 0:
-                    //Exit
-                    return;
-            }
-        }
+//        while (flag) {
+//            methodSelection = Menu.printMenu();
+//            if (methodSelection != 0) {
+//                datasetSelection = Menu.printDatasetMenu();
+//                switch (datasetSelection) {
+//                    case 1:
+//                        datasetFile = "../data/polbooks.gml";
+//                        break;
+//                    case 2:
+//                        datasetFile = "../data/dolphins.gml";
+//                        break;
+//                    case 3:
+//                        datasetFile = "../data/karate.gml";
+//                        break;
+//                    case 4:
+//                        datasetFile = "../data/erdos02.gml";
+//                        break;
+//                    case 5:
+//                        datasetFile = "../data/erdos02-subset.gml";
+//                        break;
+//                    case 0:
+//                        return;
+//                }
+//            }
+//            switch (methodSelection) {
+//                case 1:
+//                    //Execute 1st function
+//                    ErdosSubgraphPDwithAbsoluteFractionsAndMaxToMin(datasetFile);
+//                    break;
+//                case 2:
+//                    //Execute 2st function
+//                    ErdozSubgraphwithOriginalPDAndTwoDisplays(datasetFile);
+//                    break;
+//                case 3:
+//                    //Execute 3rd function
+//                    LouvainExample(datasetFile);
+//                    break;
+//                case 4:
+//                    //Execute 4rd function
+//                    PDOriginalStatics(datasetFile);
+//                    break;
+//                case 0:
+//                    //Exit
+//                    return;
+//            }
+//        }
 
 //        String[] datasets = {"../data/polbooks.gml", "../data/dolphins.gml", "../data/karate.gml"};      
 //        for (String dataset : datasets) {
 //            RangeAB(dataset);
 //        }
 //        CompareExtractions(datasets[2]);
+        PDLocalAB("../data/karate.gml");
     }
 
     private void PDOriginalStatics(String datasetFile) throws IOException, GraphParseException {
@@ -268,6 +270,22 @@ public class AppManager {
             }
         }
         fu.finish();
+    }
+    
+    private void PDLocalAB(String datasetFile) throws IOException, GraphParseException, ParseException {
+        int[] output = new int[2];
+        Graph graph = new DefaultGraph("Propinquity Dynamics");
+        graph.read(datasetFile);
+        LocalPropinquityDynamics lpd = new LocalPropinquityDynamics();
+        lpd.init(graph);
+        lpd.applyFinalTopology();
+        SetPDWeights(graph);
+        output = ExtractCommunities.MaxToMin(graph, true);
+        Graph originGraph = new DefaultGraph("Propinquity Dynamics");
+        originGraph.display();
+        originGraph.read(datasetFile);
+        GraphUtils.CopyCommunities(graph, originGraph);
+        int uncommunitized = UIToolbox.ColorCommunities(originGraph);
     }
 
     private void PDOriginalAndMaxToMin(String datasetFile) throws IOException, GraphParseException, ParseException {
