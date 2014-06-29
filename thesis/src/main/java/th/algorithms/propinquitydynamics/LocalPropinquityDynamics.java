@@ -3,6 +3,7 @@ package th.algorithms.propinquitydynamics;
 import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import org.graphstream.algorithm.Algorithm;
@@ -15,6 +16,7 @@ import static th.algorithms.propinquitydynamics.utils.CalculationTable.Calculate
 import static th.algorithms.propinquitydynamics.utils.CalculationTable.CalculateCrd;
 import static th.algorithms.propinquitydynamics.utils.CalculationTable.CalculateCri;
 import static th.algorithms.propinquitydynamics.utils.CalculationTable.CalculateCrr;
+import th.algorithms.propinquitydynamics.utils.MutableInt;
 import th.algorithms.propinquitydynamics.utils.PropinquityMap;
 import th.utils.UIToolbox;
 
@@ -195,6 +197,28 @@ public class LocalPropinquityDynamics implements Algorithm {
 
             System.out.println(stats);
         }
+        if (this.debug) {
+            System.out.println("Checking the b calculation");
+            for (Node n : this.graph.getEachNode()) {
+                PropinquityMap pm = n.getAttribute("pm");
+                System.out.println("pm: " + pm);
+                System.out.println("b: " + estimateB(n));
+            }
+        }
+    }
+    
+    // find the maximum propinquity for a neighbor
+    private int estimateB(Node n){
+        int b = Integer.MIN_VALUE;
+        PropinquityMap pm = n.getAttribute("pm");
+         for (Entry<Integer, MutableInt> row : pm.entrySet()) {
+            Integer nodeIndex = row.getKey();
+            Integer propinquity = row.getValue().get();
+            if(n.hasEdgeBetween(nodeIndex) && propinquity > b) {
+                b = propinquity;
+            }
+         }
+        return b;
     }
 
     // PHASE 2
