@@ -210,6 +210,10 @@ public class LocalPropinquityDynamics implements Algorithm {
         }
     }
     
+    private int estimateB(int nodeIndex) {
+        return estimateB(this.graph.getNode(nodeIndex));
+    }
+    
     // find the maximum propinquity for a neighbor
     private int estimateB(Node n){
         int b = Integer.MIN_VALUE;
@@ -224,6 +228,9 @@ public class LocalPropinquityDynamics implements Algorithm {
         return b;
     }
     
+    private int estimateA(int nodeIndex) {
+        return estimateA(this.graph.getNode(nodeIndex));
+    }
     
     // find the maximum propinquity for a neighbor
     private int estimateA(Node n){
