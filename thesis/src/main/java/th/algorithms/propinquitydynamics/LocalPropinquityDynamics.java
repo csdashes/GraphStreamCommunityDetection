@@ -278,12 +278,12 @@ public class LocalPropinquityDynamics implements Algorithm {
             PropinquityMap pm = n.getAttribute("pm");
             pm.forEach((nodeIndex, propinquity) -> {
 
-                if (propinquity.get() <= estimateA(n) && Nr.contains(nodeIndex)
-                        && propinquity.get() <= estimateA(nodeIndex)) {
+                if (propinquity.get() < estimateA(n) && Nr.contains(nodeIndex)
+                        && propinquity.get() < estimateA(nodeIndex)) {
                     Nd.add(nodeIndex);
                     Nr.remove(nodeIndex);
                     this.e++;
-                } else if (propinquity.get() >= estimateB(n) && !Nr.contains(nodeIndex)) {
+                } else if (propinquity.get() > estimateB(n) && !Nr.contains(nodeIndex)) {
                     Ni.add(nodeIndex);
                     this.e++;
                 }
