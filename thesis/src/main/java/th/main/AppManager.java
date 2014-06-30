@@ -107,8 +107,9 @@ public class AppManager {
 //        }
 //        CompareExtractions(datasets[2]);
         PDLocalAB("../data/karate.gml");
-//        PDLocalAB("../data/dolphins.gml");
-//        PDLocalAB("../data/polbooks.gml");
+        PDLocalAB("../data/dolphins.gml");
+        PDLocalAB("../data/polbooks.gml");
+        PDLocalAB("../data/football.gml");
     }
 
     private void PDOriginalStatics(String datasetFile) throws IOException, GraphParseException {
@@ -278,6 +279,7 @@ public class AppManager {
     private void PDLocalAB(String datasetFile) throws IOException, GraphParseException, ParseException {
         int[] output = new int[2];
         Graph graph = new DefaultGraph("Propinquity Dynamics");
+        graph.display();
         graph.read(datasetFile);
         LocalPropinquityDynamics lpd = new LocalPropinquityDynamics();
         lpd.statisticsOn();
